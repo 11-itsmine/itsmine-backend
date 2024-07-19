@@ -3,9 +3,9 @@ package com.sparta.itsmine.global.exception.user;
 
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 
-public class UserNotFoundException extends UserException {
+public class UserAlreadyExistsException extends UserException {
 
-    public UserNotFoundException(ResponseExceptionEnum responseCodeEnum) {
+    public UserAlreadyExistsException(ResponseExceptionEnum responseCodeEnum) {
         super(responseCodeEnum);
     }
 
