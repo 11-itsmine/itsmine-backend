@@ -32,6 +32,14 @@ public class QnaService {
         return qnaRepository.findAllByProduct(product);
     }
 
+    public Qna getQna(Long productId, Long qnaId) {
+        Product product = getProductEntity(productId);
+        
+        return qnaRepository.findByIdAndAndProduct(qnaId, product).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 문의 입니다")
+        );
+    }
+
 
     public Product getProductEntity(Long productId) {
         return productRepository.findById(productId).orElseThrow(

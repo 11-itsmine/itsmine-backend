@@ -59,5 +59,6 @@ public class QnaController {
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Qna qna = qnaService.getQna(productId, qnaId);
+        return ResponseUtils.of(SUCCESS_QNA_LIST, qna);
     }
 }
