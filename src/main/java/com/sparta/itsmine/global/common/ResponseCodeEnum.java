@@ -15,7 +15,8 @@ public enum ResponseCodeEnum {
     SUCCESS_CREATE_QNA(HttpStatus.CREATED, "문의 내용이 등록 되었습니다."),
     SUCCESS_QNA_LIST(HttpStatus.OK, "문의 목록 조회"),
     NULL_QNA_LIST(HttpStatus.OK, "문의 내용은 없을수도 있습니다."),
-    SUCCESS_GET_QNA(HttpStatus.OK, "문의 내용 입니다.");
+    SUCCESS_GET_QNA(HttpStatus.OK, "문의 내용 입니다."),
+    SUCCESS_UPDATE_QNA(HttpStatus.OK, "문의 수정 완료 했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

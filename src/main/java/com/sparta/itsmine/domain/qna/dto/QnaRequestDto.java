@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CreateQnaRequestDTO {
+public class QnaRequestDto {
 
     @NotNull(message = "제목이 비어있습니다.")
     private String title;

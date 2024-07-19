@@ -3,8 +3,9 @@ package com.sparta.itsmine.domain.qna.controller;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.NULL_QNA_LIST;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_CREATE_QNA;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_QNA_LIST;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_UPDATE_QNA;
 
-import com.sparta.itsmine.domain.qna.dto.CreateQnaRequestDTO;
+import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.service.QnaService;
 import com.sparta.itsmine.domain.security.UserDetailsImpl;
@@ -19,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +35,7 @@ public class QnaController {
     @PostMapping
     public ResponseEntity<HttpResponseDto> createQna(
             @PathVariable Long productId,
-            @Valid @RequestBody CreateQnaRequestDTO requestDTO,
+            @Valid @RequestBody QnaRequestDto requestDTO,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         User user = userDetails.getUser();
@@ -60,5 +62,16 @@ public class QnaController {
     ) {
         Qna qna = qnaService.getQna(productId, qnaId);
         return ResponseUtils.of(SUCCESS_QNA_LIST, qna);
+    }
+
+    @PutMapping("/{qnaId}")
+    public ResponseEntity<HttpResponseDto> updateQna(
+            @PathVariable Long productId,
+            @PathVariable Long qnaId,
+            @RequestBody QnaRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+        qnaService.updateQna(productId, qnaId, requestDto, user);
+        return ResponseUtils.of(SUCCESS_UPDATE_QNA);
     }
 }

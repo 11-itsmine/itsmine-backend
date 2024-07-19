@@ -2,7 +2,7 @@ package com.sparta.itsmine.domain.qna.entity;
 
 import com.sparta.itsmine.domain.comment.entity.Comment;
 import com.sparta.itsmine.domain.product.entity.Product;
-import com.sparta.itsmine.domain.qna.dto.CreateQnaRequestDTO;
+import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -33,20 +33,28 @@ public class Qna extends TimeStamp {
 
     private String content;
 
+    private boolean secretQna;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
     @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
-    private Qna(CreateQnaRequestDTO qnaRequestDTO, Product product) {
-        this.title = qnaRequestDTO.getTitle();
-        this.content = qnaRequestDTO.getContent();
+    private Qna(QnaRequestDto requestDto, Product product) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
         this.product = product;
+        this.secretQna = requestDto.isSecretQna();
     }
 
-    public static Qna of(CreateQnaRequestDTO qnaRequestDTO, Product product) {
+    public static Qna of(QnaRequestDto qnaRequestDTO, Product product) {
         return new Qna(qnaRequestDTO, product);
     }
 
+    public void update(QnaRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.secretQna = requestDto.isSecretQna();
+    }
 }

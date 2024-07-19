@@ -2,7 +2,7 @@ package com.sparta.itsmine.domain.qna.service;
 
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
-import com.sparta.itsmine.domain.qna.dto.CreateQnaRequestDTO;
+import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
 import com.sparta.itsmine.domain.user.entity.User;
@@ -20,7 +20,7 @@ public class QnaService {
     private final ProductRepository productRepository;
 
     @Transactional
-    public void createQna(Long productId, CreateQnaRequestDTO requestDTO, User user) {
+    public void createQna(Long productId, QnaRequestDto requestDTO, User user) {
         Product product = getProductEntity(productId);
         Qna qna = Qna.of(requestDTO, product);
 
@@ -34,10 +34,19 @@ public class QnaService {
 
     public Qna getQna(Long productId, Long qnaId) {
         Product product = getProductEntity(productId);
-        
+
         return qnaRepository.findByIdAndAndProduct(qnaId, product).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 문의 입니다")
         );
+    }
+
+    @Transactional
+    public void updateQna(Long productId, Long qnaId, QnaRequestDto requestDto, User user) {
+        Product product = getProductEntity(productId);
+        Qna qna = qnaRepository.findByIdAndAndProduct(qnaId, product).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 문의 입니다")
+        );
+        qna.update(requestDto);
     }
 
 
@@ -46,4 +55,6 @@ public class QnaService {
                 () -> new IllegalArgumentException("상품 정보가 없습니다.")
         );
     }
+
+
 }
