@@ -1,6 +1,6 @@
-package com.sparta.itsmine.domain.user.repository;
+package com.sparta.itsmine.domain.usertest.repository;
 
-import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.domain.usertest.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
