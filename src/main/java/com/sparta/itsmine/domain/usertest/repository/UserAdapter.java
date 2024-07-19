@@ -14,10 +14,14 @@ public class UserAdapter {
 
     private final UserRepository userRepository;
 
-    public User findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username)
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("This \"%s\" does not exist.", username)));
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
 
