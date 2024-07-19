@@ -6,6 +6,8 @@ import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -27,7 +29,7 @@ public class Product extends TimeStamp {
     private Long Id;
 
     @ManyToOne
-    @Column(name = "category_name")
+    @JoinColumn(name = "category_name")
     private Category category;
 
     @Column(name = "product_name")
@@ -48,7 +50,7 @@ public class Product extends TimeStamp {
     @JoinColumn(name = "qna_id")
     private List<Qna> qnaList = new ArrayList<>();
 
+    @Enumerated(value = EnumType.STRING)
     private ProductStatus status;
-
 
 }

@@ -11,7 +11,8 @@ public enum ResponseCodeEnum {
     SUCCESS_LOGIN(HttpStatus.OK, "로그인을 완료했습니다."),
     USER_SUCCESS_SIGNUP(HttpStatus.OK, "님의 회원가입을 완료 했습니다."),
     REISSUE_ACCESS_TOKEN(HttpStatus.OK, "억세스 토큰 재발급을 완료했습니다."),
-    ;
+    //QnA
+    SUCCESS_CREATE_QNA(HttpStatus.CREATED, "문의 내용이 등록 되었습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

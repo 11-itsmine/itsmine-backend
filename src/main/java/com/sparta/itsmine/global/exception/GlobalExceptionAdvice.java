@@ -1,6 +1,7 @@
 package com.sparta.itsmine.global.exception;
 
 import com.sparta.itsmine.global.common.HttpResponseDto;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import com.sparta.itsmine.global.common.ResponseUtils;
 import jdk.jshell.spi.ExecutionControl.UserException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,6 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(UserException.class)
     public ResponseEntity<HttpResponseDto> handleUserException(UserException e) {
         log.error("에러 메세지: ", e);
-        return ResponseUtils.of(e.getResponseExceptionEnum());
+        return ResponseUtils.of(ResponseExceptionEnum.valueOf(e.getMessage()));
     }
 }
