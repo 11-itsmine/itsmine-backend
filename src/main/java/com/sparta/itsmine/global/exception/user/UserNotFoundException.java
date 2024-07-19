@@ -7,6 +7,6 @@ import jdk.jshell.spi.ExecutionControl.UserException;
 public class UserNotFoundException extends UserException {
 
     public UserNotFoundException(ResponseExceptionEnum responseCodeEnum) {
-        super(responseCodeEnum);
+        super(responseCodeEnum.getMessage());
     }
 }
