@@ -13,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.HttpResponseDto;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -90,17 +91,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         res.setStatus(statusCode);
         res.setContentType("application/json");
         try {
-            String json = new ObjectMapper().writeValueAsString(new HttpResponse(statusCode, msg));
+            String json = new ObjectMapper().writeValueAsString(new HttpResponseDto(statusCode, msg));
             res.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-    }
-
-    @AllArgsConstructor
-    public static class HttpResponse {
-        private int statusCode;
-        private String msg;
     }
 
 }

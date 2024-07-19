@@ -37,7 +37,7 @@ public class JwtProvider {
     public static final String REFRESH_TOKEN_COOKIE_NAME = "RefreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
 
-    private static final int REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000; // 2주
+    public static final int REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000; // 2주
 
     private final RefreshTokenRepository refreshTokenRepository;
 

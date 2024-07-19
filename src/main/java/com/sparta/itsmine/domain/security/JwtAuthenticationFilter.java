@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
 import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.HttpResponseDto;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -83,7 +84,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // JSON 응답 생성
         String jsonResponse = new ObjectMapper().writeValueAsString(
-                new ApiResponse(SC_OK, "로그인 성공", accessToken, refreshToken)
+                new HttpResponseDto(SC_OK, "로그인 성공")
         );
 
         res.getWriter().write(jsonResponse);
@@ -102,24 +103,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // JSON 응답 생성
         String jsonResponse = new ObjectMapper().writeValueAsString(
-                new ApiResponse(SC_UNAUTHORIZED, "로그인 실패: " + failed.getMessage(), null, null)
+                new HttpResponseDto(SC_UNAUTHORIZED, "로그인 실패: " + failed.getMessage())
         );
 
         res.getWriter().write(jsonResponse);
-    }
-
-    /**
-     * 로그인 응답 데이터
-     */
-    @Data
-    @AllArgsConstructor
-    private static class ApiResponse {
-
-        private int statusCode;
-        private String msg;
-        private String accessToken;
-        private String refreshToken;
-
     }
 
 }
