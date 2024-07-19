@@ -17,6 +17,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,6 +73,16 @@ public class QnaController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         qnaService.updateQna(productId, qnaId, requestDto, user);
+        return ResponseUtils.of(SUCCESS_UPDATE_QNA);
+    }
+
+    @DeleteMapping("/{qnaId}")
+    public ResponseEntity<HttpResponseDto> deleteQna(
+            @PathVariable Long productId,
+            @PathVariable Long qnaId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+        qnaService.deleteQna(productId, qnaId, userDetails);
         return ResponseUtils.of(SUCCESS_UPDATE_QNA);
     }
 }
