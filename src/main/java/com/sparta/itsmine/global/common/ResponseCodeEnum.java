@@ -14,7 +14,8 @@ public enum ResponseCodeEnum {
     SUCCESS_LOGOUT(HttpStatus.OK, "로그아웃을 완료했습니다."),
     USER_SUCCESS_GET(HttpStatus.OK, "유저 조회를 완료 했습니다."),
     USER_DELETE_SUCCESS(HttpStatus.OK, "회원 탈퇴를 완료했습니다."),
-    USER_RESIGN_SUCCESS(HttpStatus.OK, "회원 복구를 성공했습니다.")
+    USER_RESIGN_SUCCESS(HttpStatus.OK, "회원 복구를 완료했습니다."),
+    USER_UPDATE_SUCCESS(HttpStatus.OK, "유저 정보 수정을 완료했습니다."),
     ;
 
     private final HttpStatus httpStatus;

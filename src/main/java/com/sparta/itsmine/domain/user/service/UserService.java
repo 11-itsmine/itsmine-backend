@@ -6,6 +6,7 @@ import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADE
 import java.time.LocalDateTime;
 
 import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
 import com.sparta.itsmine.domain.user.entity.User;
@@ -15,7 +16,6 @@ import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.user.UserAlreadyExistsException;
 import com.sparta.itsmine.global.exception.user.UserDeletedException;
-import com.sparta.itsmine.global.exception.user.UserMismatchException;
 import com.sparta.itsmine.global.exception.user.UserNotDeletedException;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -90,6 +90,13 @@ public class UserService {
         }
 
         user.updateDeletedAt(null);
+        userAdapter.save(user);
+    }
+
+    @Transactional
+    public void update(User user, ProfileUpdateRequestDto requestDto) {
+
+        user.updateProfile(requestDto);
         userAdapter.save(user);
     }
 }

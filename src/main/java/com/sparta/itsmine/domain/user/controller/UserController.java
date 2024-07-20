@@ -6,7 +6,9 @@ import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_DELETE_SUCC
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_RESIGN_SUCCESS;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SUCCESS_GET;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_UPDATE_SUCCESS;
 
+import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
@@ -73,5 +75,14 @@ public class UserController {
     ) {
         userService.resign(userId);
         return ResponseUtils.of(USER_RESIGN_SUCCESS);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<HttpResponseDto> update(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @RequestBody ProfileUpdateRequestDto updateDto
+    ) {
+        userService.update(userDetails.getUser(), updateDto);
+        return ResponseUtils.of(USER_UPDATE_SUCCESS);
     }
 }

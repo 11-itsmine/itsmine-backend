@@ -2,6 +2,7 @@ package com.sparta.itsmine.domain.user.entity;
 
 import java.time.LocalDateTime;
 
+import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.Column;
@@ -81,5 +82,11 @@ public class User extends TimeStamp {
 
     public void updateDeletedAt(LocalDateTime date) {
         this.deletedAt = date;
+    }
+
+    public void updateProfile(ProfileUpdateRequestDto requestDto) {
+        this.email = requestDto.getEmail();
+        this.nickname = requestDto.getNickname();
+        this.address = requestDto.getAddress();
     }
 }
