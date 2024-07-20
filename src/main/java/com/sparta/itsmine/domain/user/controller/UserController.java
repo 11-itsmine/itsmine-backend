@@ -2,10 +2,12 @@ package com.sparta.itsmine.domain.user.controller;
 
 
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_LOGOUT;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_DELETE_SUCCESS;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_RESIGN_SUCCESS;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SUCCESS_GET;
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SUCCESS_SIGNUP;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
 
-import com.sparta.itsmine.domain.security.UserDetailsImpl;
+import com.sparta.itsmine.global.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
 import com.sparta.itsmine.domain.user.service.UserService;
@@ -16,10 +18,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +39,7 @@ public class UserController {
             @RequestBody SignupRequestDto requestDto
     ) {
         String username = userService.signup(requestDto);
-        return ResponseUtils.of(USER_SUCCESS_SIGNUP, username);
+        return ResponseUtils.of(USER_SIGNUP_SUCCESS, username);
     }
 
     @GetMapping("/logout")
@@ -54,5 +57,21 @@ public class UserController {
     ) {
         UserResponseDto response = userService.getUser(userId);
         return ResponseUtils.of(USER_SUCCESS_GET, response);
+    }
+
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<HttpResponseDto> withdraw(
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        userService.withdraw(userDetails.getUser());
+        return ResponseUtils.of(USER_DELETE_SUCCESS);
+    }
+
+    @PutMapping("/resign/{userId}")
+    public ResponseEntity<HttpResponseDto> resign(
+        @PathVariable Long userId
+    ) {
+        userService.resign(userId);
+        return ResponseUtils.of(USER_RESIGN_SUCCESS);
     }
 }

@@ -1,6 +1,5 @@
 package com.sparta.itsmine.domain.user.repository;
 
-
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.user.UserNotFoundException;
@@ -15,21 +14,33 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserAdapter {
 
-    private final UserRepository userRepository;
+	private final UserRepository userRepository;
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(
-                    ResponseExceptionEnum.USER_NOT_FOUND));
-    }
+	public User findByUsername(String username) {
+		return userRepository.findByUsername(username)
+			.orElseThrow(() -> new UserNotFoundException(
+				ResponseExceptionEnum.USER_NOT_FOUND));
+	}
 
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
+	public boolean existsByUsername(String username) {
+		return userRepository.existsByUsername(username);
+	}
 
-    public User findById(Long id) {
-        return userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException(
-                ResponseExceptionEnum.USER_NOT_FOUND));
-    }
+	public User findById(Long id) {
+		return userRepository.findById(id)
+			.orElseThrow(() -> new UserNotFoundException(
+				ResponseExceptionEnum.USER_NOT_FOUND));
+	}
+
+	public void save(User user) {
+		userRepository.save(user);
+	}
+
+	public boolean isDeleted(String username) {
+		User user = findByUsername(username);
+		if (user.getDeletedAt() != null) {
+			return true;
+		}
+		return false;
+	}
 }

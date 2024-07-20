@@ -1,5 +1,7 @@
 package com.sparta.itsmine.domain.user.entity;
 
+import java.time.LocalDateTime;
+
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.Column;
@@ -49,6 +51,8 @@ public class User extends TimeStamp {
     @Column(nullable = false)
     private String address;
 
+    private LocalDateTime deletedAt;
+
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
@@ -75,4 +79,7 @@ public class User extends TimeStamp {
      * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
      */
 
+    public void updateDeletedAt(LocalDateTime date) {
+        this.deletedAt = date;
+    }
 }
