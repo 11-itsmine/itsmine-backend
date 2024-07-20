@@ -1,15 +1,20 @@
 package com.sparta.itsmine.domain.user.service;
 
 
+import static com.sparta.itsmine.domain.security.JwtProvider.AUTHORIZATION_HEADER;
+
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.user.UserAlreadyExistsException;
 import com.sparta.itsmine.global.exception.user.UserException;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +30,7 @@ public class UserService {
     private final UserAdapter adapter;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final RefreshTokenAdapter refreshTokenAdapter;
 
     // @Value("${admin.token}")
     // private String adminToken;
@@ -49,6 +55,8 @@ public class UserService {
         return requestDto.getName();
     }
 
-
-
+    public void logout(String username, HttpServletResponse response) {
+        response.setHeader(AUTHORIZATION_HEADER, "");
+        refreshTokenAdapter.deleteByUsername(username);
+    }
 }

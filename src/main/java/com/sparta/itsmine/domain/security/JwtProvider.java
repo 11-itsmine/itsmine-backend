@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 
 import io.jsonwebtoken.Claims;
@@ -40,6 +42,7 @@ public class JwtProvider {
     public static final int REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000; // 2주
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenAdapter refreshTokenAdapter;
 
     @Value("${jwt-secret-key}")
     private String secretKey;
@@ -155,7 +158,8 @@ public class JwtProvider {
     public boolean validateRefreshToken(String token) {
         log.info("Refresh 토큰 검증");
         String username = getUsernameFromToken(token);
-        return refreshTokenRepository.findByUsername(username).isPresent();
+        // 비어 있지 않으면 true 반환
+        return !refreshTokenAdapter.findByUsername(username).getRefreshToken().isBlank();
     }
 
     /**
