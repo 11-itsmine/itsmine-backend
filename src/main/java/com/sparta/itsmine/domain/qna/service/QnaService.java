@@ -7,6 +7,8 @@ import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
 import com.sparta.itsmine.domain.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.qna.QnaNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,26 +38,20 @@ public class QnaService {
     public Qna getQna(Long productId, Long qnaId) {
         Product product = getProductEntity(productId);
 
-        return qnaRepository.findByIdAndAndProduct(qnaId, product).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 문의 입니다")
-        );
+        return getQnaEntity(product, qnaId);
     }
 
     @Transactional
     public void updateQna(Long productId, Long qnaId, QnaRequestDto requestDto, User user) {
         Product product = getProductEntity(productId);
-        Qna qna = qnaRepository.findByIdAndAndProduct(qnaId, product).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 문의 입니다")
-        );
+        Qna qna = getQnaEntity(product, qnaId);
         qna.update(requestDto);
     }
 
     @Transactional
     public void deleteQna(Long productId, Long qnaId, UserDetailsImpl userDetails) {
         Product product = getProductEntity(productId);
-        Qna qna = qnaRepository.findByIdAndAndProduct(qnaId, product).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 문의 입니다")
-        );
+        Qna qna = getQnaEntity(product, qnaId);
         qnaRepository.delete(qna);
     }
 
@@ -65,4 +61,11 @@ public class QnaService {
                 () -> new IllegalArgumentException("상품 정보가 없습니다.")
         );
     }
+
+    public Qna getQnaEntity(Product product, Long qnaId) {
+        return qnaRepository.findByIdAndAndProduct(qnaId, product).orElseThrow(
+                () -> new QnaNotFoundException(ResponseExceptionEnum.QNA_NOT_FOUND)
+        );
+    }
+
 }
