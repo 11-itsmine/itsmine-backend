@@ -21,8 +21,8 @@ public class Comment extends TimeStamp {
     @Column(nullable = false)
     private String content;
 
-    @ManyToOne
-    @JoinColumn(name = "qna_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "qna_id")
     private QnaJH qna;
 
     public Comment(CommentRequestDto commentRequestDto, QnaJH qna) {
@@ -30,4 +30,7 @@ public class Comment extends TimeStamp {
         this.qna = qna;
     }
 
+    public void update(CommentRequestDto requestDto) {
+        this.content = requestDto.getContent();
+    }
 }

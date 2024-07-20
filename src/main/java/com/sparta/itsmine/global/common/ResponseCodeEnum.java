@@ -15,6 +15,9 @@ public enum ResponseCodeEnum {
 
     //댓글
     COMMENT_SUCCESS_CREATE(HttpStatus.OK, "댓글 작성이 완료 되었습니다."),
+    COMMENT_SUCCESS_GET(HttpStatus.OK, "댓글 조회가 완료 되었습니다."),
+    COMMENT_SUCCESS_UPDATE(HttpStatus.OK,"댓글 수정이 완료 되었습니다."),
+    COMMENT_SUCCESS_DELETE(HttpStatus.OK,"댓글 삭제가 완료 되었습니다.")
     ;
 
     private final HttpStatus httpStatus;
