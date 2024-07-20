@@ -23,6 +23,7 @@ public class SignupRequestDto {
     private String nickname;
     private boolean isAdmin;
     private String adminToken;
+    private String address;
 
 
 }

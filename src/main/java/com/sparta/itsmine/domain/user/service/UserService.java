@@ -5,6 +5,7 @@ import static com.sparta.itsmine.domain.security.JwtProvider.AUTHORIZATION_HEADE
 
 import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
+import com.sparta.itsmine.domain.user.dto.UserResponseDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
@@ -31,6 +32,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RefreshTokenAdapter refreshTokenAdapter;
+    private final UserAdapter userAdapter;
 
     // @Value("${admin.token}")
     // private String adminToken;
@@ -50,7 +52,7 @@ public class UserService {
 
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        User user = new User(requestDto.getUsername(), encodedPassword, requestDto.getName(), requestDto.getNickname(), requestDto.getEmail(), role);
+        User user = new User(requestDto.getUsername(), encodedPassword, requestDto.getName(), requestDto.getNickname(), requestDto.getEmail(), role, requestDto.getAddress());
         userRepository.save(user);
         return requestDto.getName();
     }
@@ -58,5 +60,10 @@ public class UserService {
     public void logout(String username, HttpServletResponse response) {
         response.setHeader(AUTHORIZATION_HEADER, "");
         refreshTokenAdapter.deleteByUsername(username);
+    }
+
+    public UserResponseDto getUser(Long userId) {
+        User user = userAdapter.findById(userId);
+        return new UserResponseDto(user);
     }
 }

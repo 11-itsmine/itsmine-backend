@@ -2,9 +2,12 @@ package com.sparta.itsmine.domain.user.repository;
 
 
 import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.user.UserNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -16,13 +19,17 @@ public class UserAdapter {
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(
-                        String.format("This \"%s\" does not exist.", username)));
+                .orElseThrow(() -> new UserNotFoundException(
+                    ResponseExceptionEnum.USER_NOT_FOUND));
     }
 
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
 
-
+    public User findById(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(
+                ResponseExceptionEnum.USER_NOT_FOUND));
+    }
 }

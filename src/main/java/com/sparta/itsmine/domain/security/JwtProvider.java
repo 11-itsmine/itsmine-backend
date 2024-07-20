@@ -39,7 +39,7 @@ public class JwtProvider {
     public static final String REFRESH_TOKEN_COOKIE_NAME = "RefreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
 
-    public static final int REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000; // 2주
+    public static final Long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenAdapter refreshTokenAdapter;
@@ -98,7 +98,7 @@ public class JwtProvider {
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         cookie.setPath("/");
-        cookie.setMaxAge(REFRESH_TOKEN_TIME);
+        cookie.setMaxAge(Math.toIntExact(REFRESH_TOKEN_TIME));
 
         response.addCookie(cookie);
     }
