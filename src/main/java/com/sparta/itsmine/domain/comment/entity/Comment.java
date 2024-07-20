@@ -6,7 +6,6 @@ import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @NoArgsConstructor
@@ -30,7 +29,7 @@ public class Comment extends TimeStamp {
         this.qna = qna;
     }
 
-    public void update(CommentRequestDto requestDto) {
+    public void CommentUpdate(CommentRequestDto requestDto) {
         this.content = requestDto.getContent();
     }
 }

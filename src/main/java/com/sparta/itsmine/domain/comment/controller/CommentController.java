@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.comment.controller;
 import com.sparta.itsmine.domain.comment.dto.CommentRequestDto;
 import com.sparta.itsmine.domain.comment.dto.CommentResponseDto;
 import com.sparta.itsmine.domain.comment.service.CommentService;
+import com.sparta.itsmine.domain.security.UserDetailsImpl;
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseCodeEnum;
 import com.sparta.itsmine.global.common.ResponseUtils;
@@ -22,10 +23,9 @@ public class CommentController {
     @PostMapping("/qnas/{qnaId}/comments")
     public ResponseEntity<HttpResponseDto> addComment(
             @PathVariable Long qnaId,
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody CommentRequestDto commentRequestDto) {
-        log.info("ㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄴㅁㅁㄴㄻㄴㄴㅁㄹㄴㅁㄴㄹㄹㄴㅁㄹㄹㄴㅁ");
-        commentService.addComment(qnaId,userDetails,commentRequestDto);
+        commentService.addComment(qnaId,userDetails.getUser(),commentRequestDto);
         return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_CREATE);
     }
 }

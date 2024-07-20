@@ -4,12 +4,8 @@ import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import lombok.Getter;
 
 @Getter
-public class QnaExceptionJH extends RuntimeException{
-
-    private final ResponseExceptionEnum responseExceptionEnum;
-
-    public QnaExceptionJH(ResponseExceptionEnum responseExceptionEnum) {
-        super(responseExceptionEnum.getMessage());
-        this.responseExceptionEnum = responseExceptionEnum;
+public class QnaExceptionJH extends CommentException{
+    public QnaExceptionJH(ResponseExceptionEnum responseCodeEnum) {
+        super(responseCodeEnum);
     }
 }

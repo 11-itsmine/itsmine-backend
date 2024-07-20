@@ -1,7 +1,6 @@
 package com.sparta.itsmine.domain.qnaJH.entity;
 
 import com.sparta.itsmine.domain.comment.entity.Comment;
-import com.sparta.itsmine.domain.qnaJH.dto.QnaRequestDtoJH;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,7 +22,4 @@ public class QnaJH extends TimeStamp {
     @OneToOne(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Comment comment;
 
-    public QnaJH(QnaRequestDtoJH requestDto) {
-        content = requestDto.getContent();
-    }
 }
