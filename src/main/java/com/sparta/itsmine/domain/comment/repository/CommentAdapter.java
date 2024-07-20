@@ -25,23 +25,9 @@ public class CommentAdapter {
         return comment;
     }
 
-    public Comment findByQnaIdAndId(Long qnaId, Long id) {
-        Comment comment = commentRepository.findByQnaIdAndId(qnaId, id);
-        if (comment == null) {
-            throw new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND);
-        }
-        return comment;
-    }
-
     public void commentAlreadyExists(Long qnaId) {
         if (commentRepository.findByQnaId(qnaId) != null) {
             throw new CommentAlreadyExistsException(ResponseExceptionEnum.COMMENT_ALREADY_EXISTS);
-        }
-    }
-
-    public void commentExistsByQnaId(Long qnaId) {
-        if (commentRepository.findByQnaId(qnaId) == null) {
-            throw new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND);
         }
     }
 }

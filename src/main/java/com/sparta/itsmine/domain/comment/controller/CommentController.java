@@ -11,17 +11,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
+@RequestMapping("/qnas/{qnaId}/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
 
     // 댓글 생성
-    @PostMapping("/qnas/{qnaId}/comments")
+    @PostMapping
     public ResponseEntity<HttpResponseDto> addComment(
             @PathVariable Long qnaId,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -31,7 +31,7 @@ public class CommentController {
     }
 
     // 댓글 조회
-    @GetMapping("/qnas/{qnaId}/comments")
+    @GetMapping
     public ResponseEntity<HttpResponseDto> getComment(
             @PathVariable Long qnaId) {
 
@@ -40,14 +40,23 @@ public class CommentController {
     }
 
     // 댓글 수정
-    @PatchMapping("/qnas/{qnaId}/comments/{commentId}")
+    @PatchMapping
     public ResponseEntity<HttpResponseDto> updateComment(
             @PathVariable Long qnaId,
-            @PathVariable Long commentId,
             @RequestBody CommentRequestDto commentRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        commentService.updateComment(qnaId,commentId,commentRequestDto,userDetails.getUser());
+        commentService.updateComment(qnaId,commentRequestDto,userDetails.getUser());
         return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_UPDATE);
+    }
+
+    // 댓글 삭제
+    @DeleteMapping
+    public ResponseEntity<HttpResponseDto> deleteComment(
+            @PathVariable Long qnaId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        commentService.deleteComment(qnaId,userDetails.getUser());
+        return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_DELETE);
     }
 }
