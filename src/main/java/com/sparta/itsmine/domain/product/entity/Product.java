@@ -31,7 +31,7 @@ public class Product extends TimeStamp {
     private Long Id;
 
     @ManyToOne
-    @JoinColumn(name = "category_name")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @Column(name = "product_name")

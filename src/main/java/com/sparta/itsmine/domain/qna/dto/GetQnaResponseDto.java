@@ -11,6 +11,7 @@ public class GetQnaResponseDto {
     private final String title;
     private final String content;
     private final boolean secretQna;
+    private final Long product_id;
     private final String username;
     private final String nickname;
     private final LocalDateTime createAt;
@@ -20,6 +21,7 @@ public class GetQnaResponseDto {
         this.id = qna.getId();
         this.title = qna.getTitle();
         this.content = qna.getContent();
+        this.product_id = qna.getProduct().getId();
         this.secretQna = qna.isSecretQna();
         this.username = qna.getUser().getUsername();
         this.nickname = qna.getUser().getNickname();
