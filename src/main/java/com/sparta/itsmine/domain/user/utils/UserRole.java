@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.usertest.utils;
+package com.sparta.itsmine.domain.user.utils;
 
 import lombok.Getter;
 

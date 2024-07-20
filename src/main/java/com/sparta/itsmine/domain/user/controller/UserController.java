@@ -1,10 +1,10 @@
-package com.sparta.itsmine.domain.usertest.controller;
+package com.sparta.itsmine.domain.user.controller;
 
 
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SUCCESS_SIGNUP;
 
-import com.sparta.itsmine.domain.usertest.dto.SignupRequestDto;
-import com.sparta.itsmine.domain.usertest.service.UserService;
+import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
+import com.sparta.itsmine.domain.user.service.UserService;
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseUtils;
 import lombok.RequiredArgsConstructor;

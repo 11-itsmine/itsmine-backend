@@ -1,6 +1,6 @@
-package com.sparta.itsmine.domain.usertest.entity;
+package com.sparta.itsmine.domain.user.entity;
 
-import com.sparta.itsmine.domain.usertest.utils.UserRole;
+import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

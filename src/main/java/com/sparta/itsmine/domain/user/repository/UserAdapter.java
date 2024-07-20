@@ -1,7 +1,7 @@
-package com.sparta.itsmine.domain.usertest.repository;
+package com.sparta.itsmine.domain.user.repository;
 
 
-import com.sparta.itsmine.domain.usertest.entity.User;
+import com.sparta.itsmine.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
