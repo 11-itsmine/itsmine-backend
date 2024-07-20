@@ -29,7 +29,7 @@ public class Comment extends TimeStamp {
         this.qna = qna;
     }
 
-    public void CommentUpdate(CommentRequestDto requestDto) {
+    public void commentUpdate(CommentRequestDto requestDto) {
         this.content = requestDto.getContent();
     }
 }
