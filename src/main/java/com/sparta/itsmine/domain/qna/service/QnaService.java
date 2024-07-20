@@ -2,15 +2,19 @@ package com.sparta.itsmine.domain.qna.service;
 
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
+import com.sparta.itsmine.domain.qna.dto.GetQnaResponseDto;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
-import com.sparta.itsmine.domain.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.qna.QnaCheckUserException;
 import com.sparta.itsmine.global.exception.qna.QnaNotFoundException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,53 +23,87 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class QnaService {
 
+    private static final Logger log = LoggerFactory.getLogger(QnaService.class);
     private final QnaRepository qnaRepository;
     private final ProductRepository productRepository;
 
     @Transactional
     public void createQna(Long productId, QnaRequestDto requestDTO, User user) {
         Product product = getProductEntity(productId);
-        Qna qna = Qna.of(requestDTO, product);
+        Qna qna = Qna.of(requestDTO, user, product);
 
         qnaRepository.save(qna);
     }
 
-    public List<Qna> getQnaList(Long productId) {
+    public Page<GetQnaResponseDto> getQnaList(Long productId, Pageable pageable) {
         Product product = getProductEntity(productId);
-        return qnaRepository.findAllByProduct(product);
+        Page<Qna> qnaList = qnaRepository.findAllByProduct(product, pageable);
+        return qnaList.map(GetQnaResponseDto::of);
     }
 
-    public Qna getQna(Long productId, Long qnaId) {
-        Product product = getProductEntity(productId);
-
-        return getQnaEntity(product, qnaId);
+    public GetQnaResponseDto getQna(Long productId, Long qnaId) {
+        checkProduct(productId);
+        return GetQnaResponseDto.of(getQnaEntity(qnaId));
     }
 
     @Transactional
-    public void updateQna(Long productId, Long qnaId, QnaRequestDto requestDto, User user) {
-        Product product = getProductEntity(productId);
-        Qna qna = getQnaEntity(product, qnaId);
+    public void updateQna(Long qnaId, QnaRequestDto requestDto, User user) {
+        Qna qna = getQnaEntity(qnaId);
+        checkQnaUser(user, qna.getUser());
         qna.update(requestDto);
     }
 
     @Transactional
-    public void deleteQna(Long productId, Long qnaId, UserDetailsImpl userDetails) {
-        Product product = getProductEntity(productId);
-        Qna qna = getQnaEntity(product, qnaId);
+    public void deleteQna(Long productId, Long qnaId, User user) {
+        checkProduct(productId);
+        Qna qna = getQnaEntity(qnaId);
+        checkQnaUser(user, qna.getUser());
         qnaRepository.delete(qna);
     }
 
+    /**
+     * 상품 정보가 있는지 확인
+     *
+     * @param productId 상품 고유 번호
+     */
+    public void checkProduct(Long productId) {
+        productRepository.findById(productId).orElseThrow(
+                () -> new IllegalArgumentException("상품 정보가 없습니다.")
+        );
+    }
 
+    /**
+     * 상품 정보가 있는지 확인 후 상품 정보 반환
+     *
+     * @param productId 상품 고유 번호
+     */
     public Product getProductEntity(Long productId) {
         return productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("상품 정보가 없습니다.")
         );
     }
 
-    public Qna getQnaEntity(Product product, Long qnaId) {
-        return qnaRepository.findByIdAndAndProduct(qnaId, product).orElseThrow(
+    /**
+     * Qna 정보를 확인 후 Entity 반환 홥니다
+     *
+     * @param qnaId Qna 고유 ID
+     */
+    public Qna getQnaEntity(Long qnaId) {
+        return qnaRepository.findById(qnaId).orElseThrow(
                 () -> new QnaNotFoundException(ResponseExceptionEnum.QNA_NOT_FOUND)
         );
+    }
+
+    /**
+     * Qna내의 유저 정보와 인가된 유저 정보를 확인 후 일치 하지 않으면 Exception
+     *
+     * @param detailUser 인가된 유저 정보
+     * @param qnaUser    qnaEntity 유저 정보
+     */
+    public void checkQnaUser(User detailUser, User qnaUser) {
+        if (!detailUser.getId().equals(qnaUser.getId())) {
+            throw new QnaCheckUserException(ResponseExceptionEnum.QNA_USER_NOT_VALID);
+        }
     }
 
 }

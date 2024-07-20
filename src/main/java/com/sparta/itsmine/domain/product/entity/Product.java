@@ -1,9 +1,11 @@
 package com.sparta.itsmine.domain.product.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.global.common.TimeStamp;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,8 +48,8 @@ public class Product extends TimeStamp {
     @Column(name = "dueDate")
     private LocalDateTime dueDate;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "qna_id")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Qna> qnaList = new ArrayList<>();
 
     @Enumerated(value = EnumType.STRING)

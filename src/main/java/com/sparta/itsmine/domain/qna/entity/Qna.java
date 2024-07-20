@@ -1,8 +1,10 @@
 package com.sparta.itsmine.domain.qna.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sparta.itsmine.domain.comment.entity.Comment;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
+import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,6 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
@@ -35,21 +38,28 @@ public class Qna extends TimeStamp {
 
     private boolean secretQna;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    @JsonBackReference
     private Product product;
 
     @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
-    private Qna(QnaRequestDto requestDto, Product product) {
+    private Qna(QnaRequestDto requestDto, User user, Product product) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
+        this.user = user;
         this.product = product;
         this.secretQna = requestDto.isSecretQna();
     }
 
-    public static Qna of(QnaRequestDto qnaRequestDTO, Product product) {
-        return new Qna(qnaRequestDTO, product);
+    public static Qna of(QnaRequestDto qnaRequestDTO, User user, Product product) {
+        return new Qna(qnaRequestDTO, user, product);
     }
 
     public void update(QnaRequestDto requestDto) {

@@ -19,7 +19,9 @@ public enum ResponseExceptionEnum {
     FAIL_TO_CHANGE_ROLE(HttpStatus.BAD_REQUEST, "Role 변경을 실패했습니다."),
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
     //QNA
-    QNA_NOT_FOUND(HttpStatus.NOT_FOUND, "문의 내용이 존재 하지 않습니다.");
+    QNA_ERROR(HttpStatus.BAD_REQUEST, "문의 오류 발생"),
+    QNA_NOT_FOUND(HttpStatus.NOT_FOUND, "문의 내용이 존재 하지 않습니다."),
+    QNA_USER_NOT_VALID(HttpStatus.BAD_REQUEST, "문의 내용 작성자가 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

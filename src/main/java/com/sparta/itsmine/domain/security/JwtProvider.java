@@ -1,18 +1,6 @@
 package com.sparta.itsmine.domain.security;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Base64;
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
 import com.sparta.itsmine.domain.user.utils.UserRole;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -24,8 +12,17 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
@@ -58,7 +55,7 @@ public class JwtProvider {
         Date date = new Date();
 
         // Access 토큰 만료기간
-        long accessTokenTime = 10 * 1000L; // 10초
+        long accessTokenTime = 10 * 100000L; // 10초
 
         return BEARER_PREFIX + Jwts.builder()
                 .setSubject(username)
@@ -162,14 +159,16 @@ public class JwtProvider {
      * 토큰에서 username 가져오기
      */
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()
+                .getSubject();
     }
 
     /**
      * 토큰에서 role 가져오기
      */
     public UserRole getRoleFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+                .getBody();
         String role = claims.get(AUTHORIZATION_KEY, String.class);
         return UserRole.valueOf(role);
     }

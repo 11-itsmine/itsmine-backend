@@ -2,19 +2,21 @@ package com.sparta.itsmine.domain.qna.controller;
 
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.NULL_QNA_LIST;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_CREATE_QNA;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_DELETE_QNA;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_QNA_LIST;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_UPDATE_QNA;
 
+import com.sparta.itsmine.domain.qna.dto.GetQnaResponseDto;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
-import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.service.QnaService;
 import com.sparta.itsmine.domain.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseUtils;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,56 +35,87 @@ public class QnaController {
 
     private final QnaService qnaService;
 
+    /**
+     * Qna 생성 합니다.
+     *
+     * @param requestDto  qna 생성을 위한 정보
+     * @param userDetails 인가된 유저 정보
+     */
     @PostMapping
     public ResponseEntity<HttpResponseDto> createQna(
             @PathVariable Long productId,
-            @Valid @RequestBody QnaRequestDto requestDTO,
+            @Valid @RequestBody QnaRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         User user = userDetails.getUser();
-        qnaService.createQna(productId, requestDTO, user);
+        qnaService.createQna(productId, requestDto, user);
         return ResponseUtils.of(SUCCESS_CREATE_QNA);
     }
 
+    /**
+     * 상품의 QNA 정보를 불러 옵니다.
+     *
+     * @param productId 상품 정보의 ID 입니다 해당 ID의 문의 내용을 불러옵니다.
+     */
     @GetMapping
     public ResponseEntity<HttpResponseDto> getQnaList(
-            @PathVariable Long productId
+            @PathVariable Long productId,
+            Pageable pageable
     ) {
 
-        List<Qna> qnaList = qnaService.getQnaList(productId);
+        Page<GetQnaResponseDto> qnaList = qnaService.getQnaList(productId, pageable);
 
         return qnaList == null ? ResponseUtils.of(NULL_QNA_LIST)
                 : ResponseUtils.of(SUCCESS_QNA_LIST, qnaList);
     }
 
+    /**
+     * 상품의 하나의 QNA 정보를 불러 옵니다.
+     *
+     * @param productId 상품 정보의 ID 입니다 해당 ID의 문의 내용을 불러옵니다.
+     * @param qnaId     Qna 고유 ID
+     */
     @GetMapping("/{qnaId}")
     public ResponseEntity<HttpResponseDto> getQna(
             @PathVariable Long productId,
-            @PathVariable Long qnaId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+            @PathVariable Long qnaId
     ) {
-        Qna qna = qnaService.getQna(productId, qnaId);
-        return ResponseUtils.of(SUCCESS_QNA_LIST, qna);
+        GetQnaResponseDto responseDto = qnaService.getQna(productId, qnaId);
+        return ResponseUtils.of(SUCCESS_QNA_LIST, responseDto);
     }
+
+    /**
+     * Qna 수정
+     *
+     * @param qnaId       QnA고유 ID
+     * @param requestDto  qna 생성을 위한 정보
+     * @param userDetails 인가된 유저 정보
+     */
 
     @PutMapping("/{qnaId}")
     public ResponseEntity<HttpResponseDto> updateQna(
-            @PathVariable Long productId,
             @PathVariable Long qnaId,
             @RequestBody QnaRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
-        qnaService.updateQna(productId, qnaId, requestDto, user);
+        qnaService.updateQna(qnaId, requestDto, user);
         return ResponseUtils.of(SUCCESS_UPDATE_QNA);
     }
 
+    /**
+     * Qna 삭제
+     *
+     * @param qnaId       QnA고유 ID
+     * @param productId   상품 고유 ID
+     * @param userDetails 인가된 유저 정보
+     */
     @DeleteMapping("/{qnaId}")
     public ResponseEntity<HttpResponseDto> deleteQna(
             @PathVariable Long productId,
             @PathVariable Long qnaId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
-        qnaService.deleteQna(productId, qnaId, userDetails);
-        return ResponseUtils.of(SUCCESS_UPDATE_QNA);
+        qnaService.deleteQna(productId, qnaId, user);
+        return ResponseUtils.of(SUCCESS_DELETE_QNA);
     }
 }
