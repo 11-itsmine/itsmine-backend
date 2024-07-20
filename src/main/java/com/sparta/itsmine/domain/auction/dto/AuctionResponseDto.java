@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.auction.dto;
 
+import com.sparta.itsmine.domain.user.entity.User;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
