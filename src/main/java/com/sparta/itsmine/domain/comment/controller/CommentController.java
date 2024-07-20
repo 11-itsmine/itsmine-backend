@@ -28,4 +28,12 @@ public class CommentController {
         commentService.addComment(qnaId,userDetails.getUser(),commentRequestDto);
         return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_CREATE);
     }
+
+    @GetMapping("/qnas/{qnaId}/comments")
+    public ResponseEntity<HttpResponseDto> getComment(
+            @PathVariable Long qnaId) {
+
+        CommentResponseDto comment = commentService.getCommentByQnaId(qnaId);
+        return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_GET, comment);
+    }
 }
