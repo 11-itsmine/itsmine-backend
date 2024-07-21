@@ -9,11 +9,13 @@ import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.entity.ProductRepository;
+import com.sparta.itsmine.domain.product.entity.ProductResponseDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -58,7 +60,8 @@ public class AuctionService {
 
     //유저 입찰 조회(queryDSL 조회)(각각 입찰한 상품 당 자신의 최대입찰가만 나오게끔)
     public List<GetAuctionByUserResponseDto> getAuctionByUser2(User user) {
-        List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid2(user.getId());
+        List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid2(
+                user.getId());
 
         return auctions.stream().toList();
     }
@@ -69,9 +72,27 @@ public class AuctionService {
         return auctionRepository.findByUserIdAndProductId(user.getId(), productId);
     }
 
-/*    낙찰 or 유찰은 상품 상태 확인하고 상품 관련된 입찰정보 삭제
-            (낙찰은 가격에 MAX 함수 이용해서 최대값만 남겨둠(이런 방식으로 패찰도 거름))
-            (유찰은 걍 다 삭제)
-            */
+    /*    낙찰 or 유찰은 상품 상태 확인하고 상품 관련된 입찰정보 삭제
+                (낙찰은 가격에 MAX 함수 이용해서 최대값만 남겨둠(이런 방식으로 패찰도 거름),(최대값이 여러개면 남은 레코드 중 가장 나중에 생긴 시간 것만 갖고오기))
+                (유찰은 걍 다 삭제)
+                */
+    //낙찰(유저 ID상관없이 최대 가격만 남기고 다 삭제하고 남은 것만 출력(이론상 1개가 남긴 하는데 동시에 추가될 가능성이 있을 수 있으니 그에 대한 예외처리가 필요함))
+    @Transactional
+    public AuctionResponseDto successfulAuction(Long productId) {
+        List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
+        auctionRepository.deleteAll(auctions);
+
+        Auction successfulBid = auctionRepository.findByProductId(productId);
+
+        return new AuctionResponseDto(successfulBid);
+    }
+
+    //유찰(상품ID로 조회해서 다 삭제(조건은 나중에))
+    @Transactional
+    public ProductResponseDto avoidedAuction(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow();
+        auctionRepository.deleteAllByProductId(productId);
+        return new ProductResponseDto(product);
+    }
 
 }
