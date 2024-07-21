@@ -65,10 +65,10 @@ public class AuctionService {
     }
 
     //상품 입찰 조회(자신이 입찰한 상품의 자신의 최대입찰가만 나오게끔)
-//    public AuctionResponseDto getAuctionByProduct(User user, Long productId) {
-//        Auction auction = auctionRepository.findByUserIdAndProductId(user.getId(), productId);
-//
-//        return new AuctionResponseDto(auction);
-//    }
+    public AuctionResponseDto getAuctionByProduct(User user, Long productId) {
+        Auction auction = auctionRepository.findByUserIdAndProductId(user.getId(), productId);
+
+        return new AuctionResponseDto(auction);
+    }
 
 }

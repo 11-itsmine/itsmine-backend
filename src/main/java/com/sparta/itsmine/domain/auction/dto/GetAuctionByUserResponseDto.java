@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.auction.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -13,6 +14,7 @@ public class GetAuctionByUserResponseDto {
     private Long productId;
     private Long bidPrice;
 
+    @QueryProjection
     public GetAuctionByUserResponseDto(Long productId, Long bidPrice, Long userId) {
         this.productId = productId;
         this.bidPrice = bidPrice;

@@ -10,5 +10,5 @@ public interface CustomAuctionRepository {
 
     List<GetAuctionByUserResponseDto> findAuctionAllByUserid2(Long userId);
 
-//    Auction findByUserIdAndProductId(Long id, Long productId);
+    Auction findByUserIdAndProductId(Long UserId, Long productId);
 }

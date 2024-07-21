@@ -8,6 +8,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
+import com.sparta.itsmine.domain.auction.dto.QGetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Repository;
 public class AuctionRepositoryImpl implements CustomAuctionRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-
 
 
     public List<Auction> findAuctionAllByUserid(Long userId) {
@@ -38,7 +38,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
         group by product_id;
     */
     public List<GetAuctionByUserResponseDto> findAuctionAllByUserid2(Long userId) {
-        return jpaQueryFactory
+        /*return jpaQueryFactory
                 .select(Projections.constructor(GetAuctionByUserResponseDto.class,
                         product.id,
                         auction.bidPrice.max(),
@@ -48,10 +48,25 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .innerJoin(auction.user, user)
                 .where(user.id.eq(userId))
                 .groupBy(product.id)
+                .fetch();*/
+
+        return jpaQueryFactory
+                .select(new QGetAuctionByUserResponseDto(product.id, auction.bidPrice.max(), user.id))
+                .from(auction)
+                .innerJoin(auction.product, product)
+                .innerJoin(auction.user, user)
+                .where(user.id.eq(userId))
+                .groupBy(product.id)
                 .fetch();
     }
 
-//    public Auction findByUserIdAndProductId(Long id, Long productId) {
-//
-//    }
+    public Auction findByUserIdAndProductId(Long UserId, Long productId) {
+        return jpaQueryFactory
+                .select(auction)
+                .from(auction)
+                .innerJoin(auction.product, product)
+                .innerJoin(auction.user, user)
+                .where(user.id.eq(UserId).and(product.id.eq(productId)))
+                .fetchOne();
+    }
 }
