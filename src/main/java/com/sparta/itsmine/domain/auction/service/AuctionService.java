@@ -30,7 +30,7 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
 
-    //입찰 생성(현재 입찰가(고른 상품에서 가장 높은 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리를 해줘야함)
+    //입찰 생성(현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리를 해줘야함,(조건은 나중에))
     @Transactional
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto) {
@@ -38,8 +38,15 @@ public class AuctionService {
         Long auctionPrice = requestDto.getBidPrice();
         GetAuctionByMaxedBidPriceResponseDto maxedBidPrice = auctionRepository.findByProductBidPrice(
                 productId);
-        if (auctionPrice <= maxedBidPrice.getBidPrice()) {
+
+        if (auctionPrice > product.getBuyNowPrice() || auctionPrice < product.getAuctionNowPrice()) {
             throw new IllegalArgumentException();
+        }
+
+        if (auctionRepository.existsByProductId(productId)) {
+            if (auctionPrice <= maxedBidPrice.getBidPrice()) {
+                throw new IllegalArgumentException();
+            }
         }
 
         Auction auction = new Auction(user, product, auctionPrice);
