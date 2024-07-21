@@ -69,4 +69,9 @@ public class AuctionService {
         return auctionRepository.findByUserIdAndProductId(user.getId(), productId);
     }
 
+/*    낙찰 or 유찰은 상품 상태 확인하고 상품 관련된 입찰정보 삭제
+            (낙찰은 가격에 MAX 함수 이용해서 최대값만 남겨둠(이런 방식으로 패찰도 거름))
+            (유찰은 걍 다 삭제)
+            */
+
 }

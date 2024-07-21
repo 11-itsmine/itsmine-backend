@@ -49,4 +49,6 @@ public class AuctionController {
     public GetAuctionByProductResponseDto getAuctionByProduct(@AuthenticationPrincipal UserDetailsImpl userDetails,@PathVariable Long product_id){
         return auctionService.getAuctionByProduct(userDetails.getUser(),product_id);
     }
+
+
 }
