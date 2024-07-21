@@ -1,0 +1,14 @@
+package com.sparta.itsmine.domain.auction.repository;
+
+import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
+import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
+import com.sparta.itsmine.domain.auction.entity.Auction;
+import java.util.List;
+
+public interface CustomAuctionRepository {
+    List<Auction> findAuctionAllByUserid(Long userId);
+
+    List<GetAuctionByUserResponseDto> findAuctionAllByUserid2(Long userId);
+
+//    Auction findByUserIdAndProductId(Long id, Long productId);
+}

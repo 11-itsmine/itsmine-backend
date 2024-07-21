@@ -1,5 +1,7 @@
 package com.sparta.itsmine.domain.auction.dto;
 
+import com.sparta.itsmine.domain.auction.entity.Auction;
+import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.user.entity.User;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -10,11 +12,18 @@ import lombok.Setter;
 public class AuctionResponseDto {
 
     private Long id;
-    private Long auctionPrice;
+    private Long userId;
+    private Long productId;
+    private Long bidPrice;
     private LocalDateTime createdAt;
     private LocalDateTime auctionedAt;
 
-    public AuctionResponseDto(AuctionRequestDto requestDto) {
-        this.auctionPrice=requestDto.getAuctionPrice();
+    public AuctionResponseDto(Auction auction) {
+        this.id = auction.getId();
+        this.userId = auction.getUser().getId();
+        this.productId = auction.getProduct().getId();
+        this.bidPrice = auction.getBidPrice();
+        this.createdAt = auction.getCreatedAt();
+        this.auctionedAt = auction.getAuctionedAt();
     }
 }

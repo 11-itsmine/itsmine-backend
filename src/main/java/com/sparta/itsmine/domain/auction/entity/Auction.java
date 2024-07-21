@@ -33,7 +33,7 @@ public class Auction extends TimeStamp {
     private Long id;
 
     @Column(nullable = false)
-    private Long auctionPrice;
+    private Long bidPrice;
 
     @CreatedDate
     @Column(updatable = false)
@@ -46,17 +46,17 @@ public class Auction extends TimeStamp {
     private LocalDateTime auctionedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="product_id")
+    @JoinColumn(name = "product_id")
     private Product product;
 
     @Builder
-    public Auction(User user,Product product,Long auctionPrice) {
-        this.user=user;
-        this.product=product;
-        this.auctionPrice = auctionPrice;
+    public Auction(User user, Product product, Long bidPrice) {
+        this.user = user;
+        this.product = product;
+        this.bidPrice = bidPrice;
     }
 }

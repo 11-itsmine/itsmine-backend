@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 public class AuctionRequestDto {
 
-    private Long auctionPrice;
+    private Long bidPrice;
 }
