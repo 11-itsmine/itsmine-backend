@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.auction.service;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
+import com.sparta.itsmine.domain.auction.dto.GetAuctionByMaxedBidPriceResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
@@ -29,12 +30,17 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
 
-    //입찰 생성(현재 입찰가 미만이거나 즉시구매가를 넘어서 입찰하려하면 예외처리를 해줘야함)
+    //입찰 생성(현재 입찰가(고른 상품에서 가장 높은 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리를 해줘야함)
     @Transactional
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto) {
         Product product = productRepository.findById(productId).orElseThrow();
         Long auctionPrice = requestDto.getBidPrice();
+        GetAuctionByMaxedBidPriceResponseDto maxedBidPrice = auctionRepository.findByProductBidPrice(
+                productId);
+        if (auctionPrice <= maxedBidPrice.getBidPrice()) {
+            throw new IllegalArgumentException();
+        }
 
         Auction auction = new Auction(user, product, auctionPrice);
 
@@ -76,7 +82,7 @@ public class AuctionService {
                 (낙찰은 가격에 MAX 함수 이용해서 최대값만 남겨둠(이런 방식으로 패찰도 거름),(최대값이 여러개면 남은 레코드 중 가장 나중에 생긴 시간 것만 갖고오기))
                 (유찰은 걍 다 삭제)
                 */
-    //낙찰(유저 ID상관없이 최대 가격만 남기고 다 삭제하고 남은 것만 출력(이론상 1개가 남긴 하는데 동시에 추가될 가능성이 있을 수 있으니 그에 대한 예외처리가 필요함))
+    //낙찰(유저 ID상관없이 최대 가격만 남기고 다 삭제하고 남은 것만 출력(이론상 1개가 남긴 하는데 동시에 추가될 가능성이 있을 수 있으니 그에 대한 예외처리가 필요함(입찰 생성에서 해결함)),(조건은 나중에))
     @Transactional
     public AuctionResponseDto successfulAuction(Long productId) {
         List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);

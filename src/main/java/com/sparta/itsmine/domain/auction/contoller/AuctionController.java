@@ -35,33 +35,34 @@ public class AuctionController {
 
     //유저(구매자(본인)) 입찰 조회(stream)
     @GetMapping("/auctions")
-    public List<AuctionResponseDto> getAuctionByUser(
+    public List<AuctionResponseDto> getAuctionByUserToList(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return auctionService.getAuctionByUser(userDetails.getUser());
     }
 
     //유저(구매자(본인)) 입찰 조회2(QueryDSL)
     @GetMapping("/auctions2")
-    public List<GetAuctionByUserResponseDto> getAuctionByUser2(
+    public List<GetAuctionByUserResponseDto> getAuctionByUserToList2(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return auctionService.getAuctionByUser2(userDetails.getUser());
     }
 
     //유저(구매자(본인)) 상품 입찰 조회
     @GetMapping("/product/{product_id}/auctions")
-    public GetAuctionByProductResponseDto getAuctionByProduct(@AuthenticationPrincipal UserDetailsImpl userDetails,@PathVariable Long product_id){
-        return auctionService.getAuctionByProduct(userDetails.getUser(),product_id);
+    public GetAuctionByProductResponseDto getAuctionByProduct(
+            @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long product_id) {
+        return auctionService.getAuctionByProduct(userDetails.getUser(), product_id);
     }
 
     //낙찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/successful")
-    public AuctionResponseDto successfulAuction(@PathVariable Long product_id){
+    public AuctionResponseDto successfulAuction(@PathVariable Long product_id) {
         return auctionService.successfulAuction(product_id);
     }
 
-    //유찰
+    //유찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/avoided")
-    public ProductResponseDto avoidedAuction(@PathVariable Long product_id){
+    public ProductResponseDto avoidedAuction(@PathVariable Long product_id) {
         return auctionService.avoidedAuction(product_id);
     }
 }
