@@ -7,7 +7,9 @@ import static com.sparta.itsmine.domain.user.entity.QUser.user;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
+import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
+import com.sparta.itsmine.domain.auction.dto.QGetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.QGetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import java.util.List;
@@ -38,18 +40,6 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
         group by product_id;
     */
     public List<GetAuctionByUserResponseDto> findAuctionAllByUserid2(Long userId) {
-        /*return jpaQueryFactory
-                .select(Projections.constructor(GetAuctionByUserResponseDto.class,
-                        product.id,
-                        auction.bidPrice.max(),
-                        user.id))
-                .from(auction)
-                .innerJoin(auction.product, product)
-                .innerJoin(auction.user, user)
-                .where(user.id.eq(userId))
-                .groupBy(product.id)
-                .fetch();*/
-
         return jpaQueryFactory
                 .select(new QGetAuctionByUserResponseDto(product.id, auction.bidPrice.max(), user.id))
                 .from(auction)
@@ -60,9 +50,9 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .fetch();
     }
 
-    public Auction findByUserIdAndProductId(Long UserId, Long productId) {
+    public GetAuctionByProductResponseDto findByUserIdAndProductId(Long UserId, Long productId) {
         return jpaQueryFactory
-                .select(auction)
+                .select(new QGetAuctionByProductResponseDto(product.id, auction.bidPrice.max(), user.id))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)

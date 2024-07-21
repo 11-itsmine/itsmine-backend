@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.auction.service;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
+import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
@@ -17,7 +18,6 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,17 +58,15 @@ public class AuctionService {
 
     //유저 입찰 조회(queryDSL 조회)(각각 입찰한 상품 당 자신의 최대입찰가만 나오게끔)
     public List<GetAuctionByUserResponseDto> getAuctionByUser2(User user) {
-        List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid2(
-                user.getId());
+        List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid2(user.getId());
 
         return auctions.stream().toList();
     }
 
     //상품 입찰 조회(자신이 입찰한 상품의 자신의 최대입찰가만 나오게끔)
-    public AuctionResponseDto getAuctionByProduct(User user, Long productId) {
-        Auction auction = auctionRepository.findByUserIdAndProductId(user.getId(), productId);
+    public GetAuctionByProductResponseDto getAuctionByProduct(User user, Long productId) {
 
-        return new AuctionResponseDto(auction);
+        return auctionRepository.findByUserIdAndProductId(user.getId(), productId);
     }
 
 }
