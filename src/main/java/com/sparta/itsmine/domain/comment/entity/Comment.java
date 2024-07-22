@@ -3,13 +3,7 @@ package com.sparta.itsmine.domain.comment.entity;
 import com.sparta.itsmine.domain.comment.dto.CommentRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.global.common.TimeStamp;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,7 +20,7 @@ public class Comment extends TimeStamp {
     @Column(nullable = false)
     private String content;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qna_id")
     private Qna qna;
 
