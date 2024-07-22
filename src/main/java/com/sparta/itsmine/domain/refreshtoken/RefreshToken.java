@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.security;
+package com.sparta.itsmine.domain.refreshtoken;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
