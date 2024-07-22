@@ -40,3 +40,5 @@ spring:
       - aws
 
 jwt-secret-key: ${JWT-KEY}
+
+admin-token: ${ADMIN-TOKEN}
