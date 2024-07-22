@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.comment.service;
 
+import com.sparta.itsmine.domain.comment.dto.AddCommentResponseDto;
 import com.sparta.itsmine.domain.comment.dto.CommentRequestDto;
 import com.sparta.itsmine.domain.comment.dto.CommentResponseDto;
 import com.sparta.itsmine.domain.comment.entity.Comment;
@@ -19,27 +20,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentAdapter commentAdapter;
-    private final QnaRepositoryJH qnaRepositoryJH;
+    private final QnaRepository qnaRepository;
     private final CommentRepository commentRepository;
 //  private final ProductRepository productRepository;
 
     // 댓글 작성
     @Transactional
-    public void addComment(Long qnaId, User user, CommentRequestDto commentRequestDto) {
+    public AddCommentResponseDto addComment(Long qnaId, User user, CommentRequestDto commentRequestDto) {
 
 //         판매자만 댓글 작성 가능
 //        equalsSeller(user.getId());
 
-        QnaJH qna = getQna(qnaId);
+        Qna qna = getQna(qnaId);
 
         commentAlreadyExists(qnaId);
 
         Comment comment = new Comment(commentRequestDto, qna);
+
         commentAdapter.save(comment);
+
+        return new AddCommentResponseDto(comment,user);
     }
 
     // 댓글 조회
-    public CommentResponseDto getCommentByQnaId(Long qnaId) {
+    public CommentResponseDto getComment(Long qnaId) {
 
         Comment comment = commentAdapter.findByQnaId(qnaId);
 
@@ -53,7 +57,7 @@ public class CommentService {
 //        equalsSeller(user.getId());
 
         // 댓글 가져오기
-        Comment comment = getComment(qnaId);
+        Comment comment = getCommentByQnaId(qnaId);
 
         comment.commentUpdate(requestDto);
     }
@@ -65,7 +69,7 @@ public class CommentService {
         // 판매자만 댓글 삭제 가능
 //        equalsSeller(user.getId());
 
-        Comment comment = getComment(qnaId);
+        Comment comment = getCommentByQnaId(qnaId);
 
         commentRepository.delete(comment);
     }
@@ -78,14 +82,14 @@ public class CommentService {
 //    }
 
     // QnA 가져오기
-    public QnaJH getQna(Long qnaId) {
-        return qnaRepositoryJH.findById(qnaId).orElseThrow(
+    public Qna getQna(Long qnaId) {
+        return qnaRepository.findById(qnaId).orElseThrow(
                 () -> new QnaNotFoundExceptionJH(ResponseExceptionEnum.QNAJH_NOT_FOUND)
         );
     }
 
     // 댓글 가져오기
-    public Comment getComment(Long qnaId) {
+    public Comment getCommentByQnaId(Long qnaId) {
         return commentAdapter.findByQnaId(qnaId);
     }
 
