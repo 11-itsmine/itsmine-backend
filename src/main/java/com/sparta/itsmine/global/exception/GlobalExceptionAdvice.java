@@ -1,10 +1,12 @@
 package com.sparta.itsmine.global.exception;
 
+import static com.sparta.itsmine.global.common.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
 import static com.sparta.itsmine.global.common.ResponseExceptionEnum.PRODUCT_IN_DATE;
 import static com.sparta.itsmine.global.common.ResponseExceptionEnum.USER_ERROR;
 
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseUtils;
+import com.sparta.itsmine.global.exception.category.CategoryException;
 import com.sparta.itsmine.global.exception.product.ProductException;
 import jdk.jshell.spi.ExecutionControl.UserException;
 import lombok.extern.slf4j.Slf4j;
@@ -26,5 +28,11 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<HttpResponseDto> handlerProductException(ProductException e) {
         log.error("에러 메세지: ", e);
         return ResponseUtils.of(PRODUCT_IN_DATE);
+    }
+
+    @ExceptionHandler(CategoryException.class)
+    public ResponseEntity<HttpResponseDto> handlerCategoryException(CategoryException e) {
+        log.error("에러 메세지: ", e);
+        return ResponseUtils.of(CATEGORY_NOT_FOUND);
     }
 }

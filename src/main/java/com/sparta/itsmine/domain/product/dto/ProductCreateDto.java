@@ -13,18 +13,17 @@ public class ProductCreateDto {
     String description;
     Integer auctionNowPrice;
     Integer currentPrice;
-    LocalDateTime dueDate;
-    Category category;
+    Integer dueDate;
+    String categoryName;
 //    String imageUrl;
 
-    public void toEntity() {
-
-        Product.builder()
+    public Product toEntity(Category category) {
+        return Product.builder()
                 .productName(productName)
                 .description(description)
                 .auctionNowPrice(auctionNowPrice)
                 .currentPrice(currentPrice)
-                .dueDate(dueDate)
+                .dueDate(LocalDateTime.now().plusHours(dueDate))
                 .category(category).build();
     }
 
@@ -34,6 +33,8 @@ public class ProductCreateDto {
         this.auctionNowPrice = Optional.ofNullable(auctionNowPrice)
                 .orElse(product.getAuctionNowPrice());
         this.currentPrice = Optional.ofNullable(currentPrice).orElse(product.getCurrentPrice());
-        this.dueDate = Optional.ofNullable(dueDate).orElse(product.getDueDate());
+        if (dueDate != null) {
+            product.setDueDateBid(LocalDateTime.now().plusHours(dueDate));
+        }
     }
 }

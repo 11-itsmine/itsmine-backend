@@ -24,7 +24,10 @@ public enum ResponseCodeEnum {
     SUCCESS_TO_UPDATE(HttpStatus.OK, "상품 수정 완료!"),
     SUCCESS_DELETE_PRODUCT(HttpStatus.OK, "상품 삭제 완료!"),
     SUCCESS_TO_LIKE(HttpStatus.OK, "좋아요가 완료 되었습니다"),
-    SUCCESS_TO_REMOVE_LIKE(HttpStatus.OK, "좋아요가 취소 되었습니다.");
+    SUCCESS_TO_REMOVE_LIKE(HttpStatus.OK, "좋아요가 취소 되었습니다."),
+
+    // 카테고리
+    SUCCESS_TO_MAKE_NEW_CATEGORY(HttpStatus.OK, "새로운 카테고리를 만드셨습니다.");
 
 
     private final HttpStatus httpStatus;

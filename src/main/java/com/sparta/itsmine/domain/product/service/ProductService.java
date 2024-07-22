@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -23,29 +24,34 @@ public class ProductService {
 
     private final ProductAdapter adapter;
 
+    @Transactional
     public ProductCreateDto createProduct(ProductCreateDto createDto, User user) {
-        adapter.findProductNameByUserId(createDto.getProductName(), user);
-        createDto.toEntity();
+        adapter.findProductNameByUserId(createDto, user);
         return createDto;
     }
 
+    @Transactional(readOnly = true)
     public GetProductResponseDto getProduct(Long productId) {
         return adapter.verifyProduct(productId);
     }
 
+    @Transactional(readOnly = true)
     public Page<GetProductResponseDto> getProductsWithPage(int page, int size, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return adapter.findAllProducts(pageable, user.getId());
     }
 
+    @Transactional
     public void updateProduct(ProductCreateDto createDto, Long productId) {
         createDto.updateProduct(adapter.getProduct(productId));
     }
 
+    @Transactional
     public void deleteProduct(Long productId) {
         adapter.getProduct(productId).setDeletedAt();
     }
 
+    @Transactional
     public ResponseCodeEnum addLikes(Long productId) {
         boolean like = adapter.getProduct(productId).toggleLike();
         if (like) {

@@ -24,7 +24,10 @@ public enum ResponseExceptionEnum {
     // 상품
     PRODUCT_IN_DATE(HttpStatus.BAD_REQUEST, "해당 상품이 입찰 경매 진행 중입니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
-    USER_MISMATCH(HttpStatus.BAD_REQUEST, "유저가 일치하지 않습니다");
+    USER_MISMATCH(HttpStatus.BAD_REQUEST, "유저가 일치하지 않습니다"),
+
+    // 카테고리
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

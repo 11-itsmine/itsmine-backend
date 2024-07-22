@@ -91,9 +91,8 @@ public class Product extends TimeStamp {
      * 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
      */
 
-    public User connectUser(User user) {
+    public void connectUser(User user) {
         this.user = user;
-        return user;
     }
 
     /**
@@ -108,8 +107,12 @@ public class Product extends TimeStamp {
         return this.getStatus();
     }
 
-    public boolean toggleLike() {
+    public Boolean toggleLike() {
         this.like = !this.like; // 현재 값의 반대로 설정
         return this.like;
+    }
+
+    public void setDueDateBid(LocalDateTime localDateTime) {
+        this.dueDate = localDateTime;
     }
 }

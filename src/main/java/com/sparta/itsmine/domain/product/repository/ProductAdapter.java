@@ -1,13 +1,18 @@
 package com.sparta.itsmine.domain.product.repository;
 
+import static com.sparta.itsmine.global.common.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
 import static com.sparta.itsmine.global.common.ResponseExceptionEnum.PRODUCT_IN_DATE;
 import static com.sparta.itsmine.global.common.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
 import static com.sparta.itsmine.global.common.ResponseExceptionEnum.USER_NOT_FOUND;
 
+import com.sparta.itsmine.domain.category.entity.Category;
+import com.sparta.itsmine.domain.category.repository.CategoryRepository;
 import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
+import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
+import com.sparta.itsmine.global.exception.category.CategoryNotFoundException;
 import com.sparta.itsmine.global.exception.product.ProductInDateException;
 import com.sparta.itsmine.global.exception.product.ProductNotFoundException;
 import com.sparta.itsmine.global.exception.user.UserNotFoundException;
@@ -25,16 +30,32 @@ import org.springframework.stereotype.Component;
 public class ProductAdapter {
 
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
-    public void findProductNameByUserId(String productName, User user) {
+    public void findProductNameByUserId(ProductCreateDto createDto, User user) {
         // 상품 존재 검증 - 만료 기한을 확인합니다.
         User user1 = userRepository.findByIdAndDeletedAtIsNull(user.getId()).orElseThrow(
                 () -> new UserNotFoundException(USER_NOT_FOUND)
         );
 
         Optional<Product> product = productRepository.findActiveProductByUserAndName(
-                user1.getId(), productName);
+                user.getId(), createDto.getProductName());
+
+        Category category = categoryRepository.findCategoryByCategoryName(
+                createDto.getCategoryName()).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND)
+        );
+
+        Product product1 = createDto.toEntity(category);
+        product1.connectUser(user);
+        productRepository.save(product1);
+
+        if (product.isEmpty()) {
+            return;
+        }
+
+        // 이미 상품이 존재할 떄의 처리
         if (product.get().getDueDate().isBefore(LocalDateTime.now())) {
             throw new ProductInDateException(PRODUCT_IN_DATE);
         }
