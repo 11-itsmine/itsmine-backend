@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.security;
+package com.sparta.itsmine.domain.refreshtoken;
 
 import java.util.Optional;
 

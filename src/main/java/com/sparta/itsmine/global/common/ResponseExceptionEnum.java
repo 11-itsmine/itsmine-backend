@@ -13,6 +13,7 @@ public enum ResponseExceptionEnum {
     USER_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "중복된 아이디 입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"),
     USER_DELETED(HttpStatus.UNAUTHORIZED, "탈퇴한 사용자입니다"),
+    USER_NOT_DELETED(HttpStatus.BAD_REQUEST, "탈퇴되지 않은 사용자입니다."),
     NOT_FOUND_AUTHENTICATION_INFO(HttpStatus.BAD_REQUEST, "사용자 정보가 일치하지 않습니다. 다시 시도해 주세요 :)"),
     INVALID_REFRESHTOKEN(HttpStatus.NOT_FOUND, "유효하지 않은 리프레쉬 토큰입니다."),
     FAIL_TO_CHANGE_ROLE(HttpStatus.BAD_REQUEST, "Role 변경을 실패했습니다."),
@@ -22,7 +23,8 @@ public enum ResponseExceptionEnum {
 
     // 상품
     PRODUCT_IN_DATE(HttpStatus.BAD_REQUEST, "해당 상품이 입찰 경매 진행 중입니다."),
-    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다.");
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
+    USER_MISMATCH(HttpStatus.BAD_REQUEST, "유저가 일치하지 않습니다");
 
     private final HttpStatus httpStatus;
     private final String message;

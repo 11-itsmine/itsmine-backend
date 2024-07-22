@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.security;
+package com.sparta.itsmine.global.security;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 
 import io.jsonwebtoken.Claims;
@@ -37,9 +39,10 @@ public class JwtProvider {
     public static final String REFRESH_TOKEN_COOKIE_NAME = "RefreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
 
-    public static final int REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000; // 2주
+    public static final Long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenAdapter refreshTokenAdapter;
 
     @Value("${jwt-secret-key}")
     private String secretKey;
@@ -95,7 +98,7 @@ public class JwtProvider {
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         cookie.setPath("/");
-        cookie.setMaxAge(REFRESH_TOKEN_TIME);
+        cookie.setMaxAge(Math.toIntExact(REFRESH_TOKEN_TIME));
 
         response.addCookie(cookie);
     }
@@ -155,7 +158,8 @@ public class JwtProvider {
     public boolean validateRefreshToken(String token) {
         log.info("Refresh 토큰 검증");
         String username = getUsernameFromToken(token);
-        return refreshTokenRepository.findByUsername(username).isPresent();
+        // 비어 있지 않으면 true 반환
+        return !refreshTokenAdapter.findByUsername(username).getRefreshToken().isBlank();
     }
 
     /**
