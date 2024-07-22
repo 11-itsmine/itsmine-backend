@@ -20,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<HttpResponseDto> createProcut(
+    public ResponseEntity<HttpResponseDto> createProduct(
             @RequestBody ProductCreateDto createDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
@@ -44,7 +45,7 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> getProduct(
-            @RequestParam Long productId
+            @PathVariable Long productId
     ) {
         return ResponseUtils.of(SUCCESS_TO_SEARCH_PRODUCTS, productService.getProduct(productId));
     }
@@ -65,7 +66,7 @@ public class ProductController {
     @PatchMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> updateProduct(
             @RequestBody ProductCreateDto createDto,
-            @RequestParam Long productId
+            @PathVariable Long productId
     ) {
         productService.updateProduct(createDto, productId);
         return ResponseUtils.of(SUCCESS_TO_UPDATE);
@@ -73,7 +74,7 @@ public class ProductController {
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> deleteProduct(
-            @RequestParam Long productId
+            @PathVariable Long productId
     ) {
         productService.deleteProduct(productId);
         return ResponseUtils.of(SUCCESS_DELETE_PRODUCT);
@@ -81,7 +82,7 @@ public class ProductController {
 
     @PostMapping("/{productId}/likes")
     public ResponseEntity<HttpResponseDto> addLikes(
-            @RequestParam Long productId
+            @PathVariable Long productId
     ) {
         return ResponseUtils.of(productService.addLikes(productId));
     }
