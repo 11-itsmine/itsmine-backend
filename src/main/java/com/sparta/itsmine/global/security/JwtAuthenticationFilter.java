@@ -1,33 +1,33 @@
-package com.sparta.itsmine.domain.security;
+package com.sparta.itsmine.global.security;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenService;
+import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
+import com.sparta.itsmine.domain.user.repository.UserAdapter;
+import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.HttpResponseDto;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.user.UserDeletedException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
-import com.sparta.itsmine.domain.user.utils.UserRole;
-import com.sparta.itsmine.global.common.HttpResponseDto;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtProvider jwtProvider;
-
+    @Autowired
+    private UserAdapter userAdapter;
     @Autowired
     private RefreshTokenService refreshTokenService;
 
@@ -37,7 +37,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
+            throws AuthenticationException {
         log.info("인증 시도");
         try {
             // json to object
@@ -58,10 +59,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication authResult) throws IOException {
+    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res,
+            FilterChain chain, Authentication authResult) throws IOException {
         log.info("인증 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getUserRole();
+
+        // 탈퇴 유저 확인
+        if (userAdapter.isDeleted(username)) {
+            throw new UserDeletedException(ResponseExceptionEnum.USER_DELETED);
+        }
 
         String accessToken = jwtProvider.createAccessToken(username, role);
         String refreshToken = jwtProvider.createRefreshToken(username, role);
@@ -69,7 +76,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 헤더에 액세스 토큰 추가
         res.addHeader(JwtProvider.AUTHORIZATION_HEADER, accessToken);
 
-        // 쿠키에 리프레시 토큰 추가
+        // 쿠키에 액세스 토큰 추가
         jwtProvider.addJwtToCookie(refreshToken, res);
 
         // DB에 리프레시 토큰이 이미 있으면 수정, 없으면 저장
@@ -93,7 +100,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     /**
      * 로그인 실패
      */
-    protected void unsuccessfulAuthentication(HttpServletRequest req, HttpServletResponse res, AuthenticationException failed) throws IOException {
+    protected void unsuccessfulAuthentication(HttpServletRequest req, HttpServletResponse res,
+            AuthenticationException failed) throws IOException {
         log.error("로그인 실패 : {}", failed.getMessage());
 
         // 응답 메시지 작성

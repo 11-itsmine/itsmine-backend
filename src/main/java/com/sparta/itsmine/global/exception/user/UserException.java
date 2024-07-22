@@ -13,4 +13,5 @@ public class UserException extends RuntimeException {
         super(responseExceptionEnum.getMessage());
         this.responseExceptionEnum = responseExceptionEnum;
     }
+
 }

@@ -1,5 +1,10 @@
 package com.sparta.itsmine.global.common.config;
 
+import com.sparta.itsmine.global.security.JwtAuthenticationFilter;
+import com.sparta.itsmine.global.security.JwtAuthorizationFilter;
+import com.sparta.itsmine.global.security.JwtProvider;
+import com.sparta.itsmine.global.security.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,13 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.sparta.itsmine.domain.security.JwtAuthenticationFilter;
-import com.sparta.itsmine.domain.security.JwtAuthorizationFilter;
-import com.sparta.itsmine.domain.security.JwtProvider;
-import com.sparta.itsmine.domain.security.UserDetailsServiceImpl;
-
-import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -37,7 +35,8 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+            throws Exception {
         return configuration.getAuthenticationManager();
     }
 

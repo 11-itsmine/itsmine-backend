@@ -1,18 +1,8 @@
-package com.sparta.itsmine.domain.security;
+package com.sparta.itsmine.global.security;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Base64;
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -24,8 +14,17 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
@@ -37,9 +36,10 @@ public class JwtProvider {
     public static final String REFRESH_TOKEN_COOKIE_NAME = "RefreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
 
-    public static final int REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000; // 2주
+    public static final Long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenAdapter refreshTokenAdapter;
 
     @Value("${jwt-secret-key}")
     private String secretKey;
@@ -58,7 +58,7 @@ public class JwtProvider {
         Date date = new Date();
 
         // Access 토큰 만료기간
-        long accessTokenTime = 10 * 1000L; // 10초
+        long accessTokenTime = 1000 * 1000L; // 1000초
 
         return BEARER_PREFIX + Jwts.builder()
                 .setSubject(username)
@@ -95,7 +95,7 @@ public class JwtProvider {
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         cookie.setPath("/");
-        cookie.setMaxAge(REFRESH_TOKEN_TIME);
+        cookie.setMaxAge(Math.toIntExact(REFRESH_TOKEN_TIME));
 
         response.addCookie(cookie);
     }
@@ -155,21 +155,24 @@ public class JwtProvider {
     public boolean validateRefreshToken(String token) {
         log.info("Refresh 토큰 검증");
         String username = getUsernameFromToken(token);
-        return refreshTokenRepository.findByUsername(username).isPresent();
+        // 비어 있지 않으면 true 반환
+        return !refreshTokenAdapter.findByUsername(username).getRefreshToken().isBlank();
     }
 
     /**
      * 토큰에서 username 가져오기
      */
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()
+                .getSubject();
     }
 
     /**
      * 토큰에서 role 가져오기
      */
     public UserRole getRoleFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+                .getBody();
         String role = claims.get(AUTHORIZATION_KEY, String.class);
         return UserRole.valueOf(role);
     }

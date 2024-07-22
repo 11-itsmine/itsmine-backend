@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.security;
+package com.sparta.itsmine.global.security;
 
 import java.io.IOException;
 
@@ -19,7 +19,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

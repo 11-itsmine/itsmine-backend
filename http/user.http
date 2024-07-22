@@ -3,11 +3,12 @@ POST http://localhost:8080/users
 Content-Type: application/json
 
 {
-  "username":"wkdgus1111",
-  "password":"wkdgus1004ok!",
-  "name":"주장현",
-  "nickname": "주짱",
-  "email":"wkdgus1111@naver.com"
+  "username":"{{username}}",
+  "password":"{{password}}",
+  "name":"{{name}}",
+  "email":"{{email}}",
+  "address": "화성시",
+  "nickname": "Jake"
 }
 
 ### 로그인
@@ -19,8 +20,34 @@ Content-Type: application/json
   "password":"{{password}}"
 }
 > {%
-  client.log(response.headers.valueOf("AccessToken"));
+  client.log(response.headers.valueOf("Authorization"));
   client.log(response.headers.valueOf("RefreshToken"));
-  client.global.set("AccessToken", response.headers.valueOf("AccessToken"));
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
   client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
+
+
+### 카테고리 추가하기
+POST http://localhost:8080/category
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "categoryName": "Hot Posts"
+}
+
+
+### 상품 등록하기
+POST http://localhost:8080/products
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "productName": "Shoes",
+  "description": "This is almost like a brandnew",
+  "auctionNowPrice": 150000,
+  "currentPrice": 80000,
+  "dueDate": 7,
+  "categoryName": "Hot Posts"
+}
+
