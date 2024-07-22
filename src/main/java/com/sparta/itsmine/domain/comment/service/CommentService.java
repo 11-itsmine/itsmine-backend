@@ -4,17 +4,12 @@ import com.sparta.itsmine.domain.comment.dto.CommentRequestDto;
 import com.sparta.itsmine.domain.comment.dto.CommentResponseDto;
 import com.sparta.itsmine.domain.comment.entity.Comment;
 import com.sparta.itsmine.domain.comment.repository.CommentAdapter;
-import com.sparta.itsmine.domain.comment.repository.CommentRepository;
 import com.sparta.itsmine.domain.qnaJH.QnaRepositoryJH;
 import com.sparta.itsmine.domain.qnaJH.entity.QnaJH;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
-import com.sparta.itsmine.global.exception.comment.CommentAlreadyExistsException;
-import com.sparta.itsmine.global.exception.comment.CommentEqualSellerException;
-import com.sparta.itsmine.global.exception.comment.CommentNotFoundException;
-import com.sparta.itsmine.global.exception.comment.QnaNotFoundExceptionJH;
+import com.sparta.itsmine.global.exception.comment.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,24 +17,34 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final CommentRepository commentRepository;
-    private final QnaRepositoryJH qnaRepositoryJH;
     private final CommentAdapter commentAdapter;
+    private final QnaRepositoryJH qnaRepositoryJH;
 //  private final ProductRepository productRepository;
 
     // 댓글 작성
     @Transactional
     public void addComment(Long qnaId, User user, CommentRequestDto commentRequestDto) {
 
-//      판매자만 댓글 작성 가능
+        // 판매자만 댓글 작성 가능
 //        equalsSeller(user.getId());
 
         QnaJH qna = getQna(qnaId);
 
-        commentExists(qnaId);
+        commentAlreadyExists(qnaId);
 
-        Comment comment = new Comment(commentRequestDto,qna);
-        commentRepository.save(comment);
+        Comment comment = new Comment(commentRequestDto, qna);
+        commentAdapter.save(comment);
+    }
+
+    // 댓글 조회
+    public CommentResponseDto getCommentByQnaId(Long qnaId) {
+
+        // 문의사항에 댓글 존재하는지 확인
+        commentExistsByQnaId(qnaId);
+
+        Comment comment = commentAdapter.findByQnaId(qnaId);
+
+        return new CommentResponseDto(comment, qnaId);
     }
 
     // 판매자 검증
@@ -56,8 +61,13 @@ public class CommentService {
         );
     }
 
-    // 문의사항에 이미 댓글이 있는지
-    private void commentExists(Long qnaId) {
-       commentAdapter.commentExists(qnaId);
+    // 문의사항에 이미 댓글이 있는지 확인
+    private void commentAlreadyExists(Long qnaId) {
+        commentAdapter.commentAlreadyExists(qnaId);
+    }
+
+    // QnA 댓글 존재 여부 확인
+    public void commentExistsByQnaId(Long qnaId) {
+        commentAdapter.commentExistsByQnaId(qnaId);
     }
 }

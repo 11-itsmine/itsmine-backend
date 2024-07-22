@@ -14,5 +14,10 @@ Content-Type: application/json
 Authorization: {{Authorization}}
 
 {
-  "content": "안됩니다"
+  "content": "안됩니다2"
 }
+
+### 1번 문의사항 댓글 조회
+GET http://localhost:8080/qnas/1/comments
+Content-Type: application/json
+Authorization: {{Authorization}}
