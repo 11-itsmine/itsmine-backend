@@ -1,7 +1,7 @@
 package com.sparta.itsmine.domain.qna.service;
 
 import com.sparta.itsmine.domain.product.entity.Product;
-import com.sparta.itsmine.domain.product.repository.ProductRepository;
+import com.sparta.itsmine.domain.product.entity.ProductRepository;
 import com.sparta.itsmine.domain.qna.dto.GetQnaResponseDto;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;

@@ -33,13 +33,13 @@ public class AuctionController {
     private final AuctionService auctionService;
 
     //구매자 입찰 생성
-    @PostMapping("/product/{product_id}/auctions")
+    @PostMapping("/product/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> createAuction(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long product_id,
+            @PathVariable Long productId,
             @Valid @RequestBody AuctionRequestDto requestDto) {
         AuctionResponseDto responseDto = auctionService.createAuction(userDetails.getUser(),
-                product_id,
+                productId,
                 requestDto);
         return ResponseUtils.of(AUCTION_SUCCESS_CREATE, responseDto);
     }
@@ -63,25 +63,25 @@ public class AuctionController {
     }
 
     //유저(구매자(본인)) 상품 입찰 조회
-    @GetMapping("/product/{product_id}/auctions")
+    @GetMapping("/product/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByProduct(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long product_id) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long productId) {
         GetAuctionByProductResponseDto responseDto = auctionService.getAuctionByProduct(
-                userDetails.getUser(), product_id);
+                userDetails.getUser(), productId);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
 
     //낙찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
-    @DeleteMapping("/product/{product_id}/auction/successful")
-    public ResponseEntity<HttpResponseDto> successfulAuction(@PathVariable Long product_id) {
-        AuctionResponseDto responseDto = auctionService.successfulAuction(product_id);
+    @DeleteMapping("/product/{productId}/auction/successful")
+    public ResponseEntity<HttpResponseDto> successfulAuction(@PathVariable Long productId) {
+        AuctionResponseDto responseDto = auctionService.successfulAuction(productId);
         return ResponseUtils.of(AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION, responseDto);
     }
 
     //유찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
-    @DeleteMapping("/product/{product_id}/auction/avoided")
-    public ResponseEntity<HttpResponseDto> avoidedAuction(@PathVariable Long product_id) {
-        ProductResponseDto responseDto = auctionService.avoidedAuction(product_id);
+    @DeleteMapping("/product/{productId}/auction/avoided")
+    public ResponseEntity<HttpResponseDto> avoidedAuction(@PathVariable Long productId) {
+        ProductResponseDto responseDto = auctionService.avoidedAuction(productId);
         return ResponseUtils.of(AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, responseDto);
     }
 }
