@@ -32,6 +32,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Autowired
     private RefreshTokenService refreshTokenService;
+    @Autowired
     private UserAdapter userAdapter;
 
     public JwtAuthenticationFilter(JwtProvider jwtProvider) {
