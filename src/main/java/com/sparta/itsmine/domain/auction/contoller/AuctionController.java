@@ -9,8 +9,12 @@ import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.entity.ProductResponseDto;
 import com.sparta.itsmine.domain.security.UserDetailsImpl;
+import com.sparta.itsmine.global.common.HttpResponseDto;
+import com.sparta.itsmine.global.common.ResponseCodeEnum;
+import com.sparta.itsmine.global.common.ResponseUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,42 +31,52 @@ public class AuctionController {
 
     //구매자 입찰 생성
     @PostMapping("/product/{product_id}/auctions")
-    public AuctionResponseDto createAuction(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<HttpResponseDto> createAuction(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long product_id,
             @RequestBody AuctionRequestDto requestDto) {
-        return auctionService.createAuction(userDetails.getUser(), product_id, requestDto);
+        AuctionResponseDto auction = auctionService.createAuction(userDetails.getUser(), product_id,
+                requestDto);
+        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_CREATE, auction);
     }
 
     //유저(구매자(본인)) 입찰 조회(stream)
     @GetMapping("/auctions")
-    public List<AuctionResponseDto> getAuctionByUserToList(
+    public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return auctionService.getAuctionByUser(userDetails.getUser());
+        List<AuctionResponseDto> auctions = auctionService.getAuctionByUser(userDetails.getUser());
+        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_GET, auctions);
     }
 
     //유저(구매자(본인)) 입찰 조회2(QueryDSL)
     @GetMapping("/auctions2")
-    public List<GetAuctionByUserResponseDto> getAuctionByUserToList2(
+    public ResponseEntity<HttpResponseDto> getAuctionByUserToList2(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return auctionService.getAuctionByUser2(userDetails.getUser());
+        List<GetAuctionByUserResponseDto> auctions = auctionService.getAuctionByUser2(
+                userDetails.getUser());
+        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_GET, auctions);
     }
 
     //유저(구매자(본인)) 상품 입찰 조회
     @GetMapping("/product/{product_id}/auctions")
-    public GetAuctionByProductResponseDto getAuctionByProduct(
+    public ResponseEntity<HttpResponseDto> getAuctionByProduct(
             @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long product_id) {
-        return auctionService.getAuctionByProduct(userDetails.getUser(), product_id);
+        GetAuctionByProductResponseDto auction = auctionService.getAuctionByProduct(
+                userDetails.getUser(), product_id);
+        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_GET, auction);
     }
 
     //낙찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/successful")
-    public AuctionResponseDto successfulAuction(@PathVariable Long product_id) {
-        return auctionService.successfulAuction(product_id);
+    public ResponseEntity<HttpResponseDto> successfulAuction(@PathVariable Long product_id) {
+        AuctionResponseDto auction = auctionService.successfulAuction(product_id);
+        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION, auction);
     }
 
     //유찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/avoided")
-    public ProductResponseDto avoidedAuction(@PathVariable Long product_id) {
-        return auctionService.avoidedAuction(product_id);
+    public ResponseEntity<HttpResponseDto> avoidedAuction(@PathVariable Long product_id) {
+        ProductResponseDto Product = auctionService.avoidedAuction(product_id);
+        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, Product);
     }
 }

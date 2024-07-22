@@ -17,7 +17,13 @@ public enum ResponseCodeEnum {
     COMMENT_SUCCESS_CREATE(HttpStatus.OK, "댓글 작성이 완료 되었습니다."),
     COMMENT_SUCCESS_GET(HttpStatus.OK, "댓글 조회가 완료 되었습니다."),
     COMMENT_SUCCESS_UPDATE(HttpStatus.OK,"댓글 수정이 완료 되었습니다."),
-    COMMENT_SUCCESS_DELETE(HttpStatus.OK,"댓글 삭제가 완료 되었습니다.")
+    COMMENT_SUCCESS_DELETE(HttpStatus.OK,"댓글 삭제가 완료 되었습니다."),
+
+    //경매
+    AUCTION_SUCCESS_CREATE(HttpStatus.CREATED, "경매 생성이 완료 되었습니다."),
+    AUCTION_SUCCESS_GET(HttpStatus.OK, "경매 조회가 완료 되었습니다."),
+    AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION(HttpStatus.OK,"낙찰 되었습니다."),
+    AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION(HttpStatus.OK,"유찰 되었습니다.")
     ;
 
     private final HttpStatus httpStatus;

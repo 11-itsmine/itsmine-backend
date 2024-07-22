@@ -12,6 +12,8 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.entity.ProductRepository;
 import com.sparta.itsmine.domain.product.entity.ProductResponseDto;
 import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
@@ -39,7 +41,9 @@ public class AuctionService {
         GetAuctionByMaxedBidPriceResponseDto maxedBidPrice = auctionRepository.findByProductBidPrice(
                 productId);
 
-        if (auctionPrice > product.getBuyNowPrice() || auctionPrice < product.getAuctionNowPrice()) {
+        //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
+        if (auctionPrice > product.getBuyNowPrice()
+                || auctionPrice < product.getAuctionNowPrice()) {
             throw new IllegalArgumentException();
         }
 
@@ -59,11 +63,15 @@ public class AuctionService {
     public List<AuctionResponseDto> getAuctionByUser(User user) {
 
         List<Auction> auctions = auctionRepository.findAuctionAllByUserid(user.getId());
+        if (auctions == null) {
+            throw new AuctionNotFoundException(ResponseExceptionEnum.AUCTION_NOT_FOUND);
+        }
 
         Map<Long, Auction> maxBidAuctions = auctions.stream()
-                .collect(Collectors.toMap(auction -> auction.getProduct().getId(),
-                        Function.identity(),
-                        BinaryOperator.maxBy(Comparator.comparingLong(Auction::getBidPrice))));
+                .collect(Collectors.toMap(auction -> auction.getProduct().getId(),//key로 사용
+                        Function.identity(),//객체 자체를 값으로 사용
+                        BinaryOperator.maxBy(Comparator.comparingLong(
+                                Auction::getBidPrice))));//동일한 key에 대해 중복값이 있을 때 최대값을 선택
 
         return maxBidAuctions.values().stream()
                 .map(AuctionResponseDto::new)
@@ -75,14 +83,22 @@ public class AuctionService {
     public List<GetAuctionByUserResponseDto> getAuctionByUser2(User user) {
         List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid2(
                 user.getId());
+        if (auctions == null) {
+            throw new AuctionNotFoundException(ResponseExceptionEnum.AUCTION_NOT_FOUND);
+        }
 
         return auctions.stream().toList();
     }
 
     //상품 입찰 조회(자신이 입찰한 상품의 자신의 최대입찰가만 나오게끔)
     public GetAuctionByProductResponseDto getAuctionByProduct(User user, Long productId) {
+        GetAuctionByProductResponseDto productAuctions = auctionRepository.findByUserIdAndProductId(
+                user.getId(), productId);
+        if (productAuctions == null) {
+            throw new AuctionNotFoundException(ResponseExceptionEnum.AUCTION_NOT_FOUND);
+        }
 
-        return auctionRepository.findByUserIdAndProductId(user.getId(), productId);
+        return productAuctions;
     }
 
     /*    낙찰 or 유찰은 상품 상태 확인하고 상품 관련된 입찰정보 삭제
@@ -93,6 +109,10 @@ public class AuctionService {
     @Transactional
     public AuctionResponseDto successfulAuction(Long productId) {
         List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
+        if (auctions == null) {
+            throw new AuctionNotFoundException(ResponseExceptionEnum.AUCTION_NOT_FOUND);
+        }
+
         auctionRepository.deleteAll(auctions);
 
         Auction successfulBid = auctionRepository.findByProductId(productId);
