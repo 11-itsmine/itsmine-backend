@@ -17,6 +17,17 @@ public enum ResponseCodeEnum {
     USER_UPDATE_SUCCESS(HttpStatus.OK, "유저 정보 수정을 완료했습니다."),
     USER_SUCCESS_SIGNUP(HttpStatus.OK, "님의 회원가입을 완료 했습니다."),
     REISSUE_ACCESS_TOKEN(HttpStatus.OK, "억세스 토큰 재발급을 완료했습니다."),
+
+    // 상품
+    SUCCESS_SAVE_PRODUCT(HttpStatus.OK, "성공적으로 상품을 등록했습니다."),
+    SUCCESS_TO_SEARCH_PRODUCTS(HttpStatus.OK, "고객님의 상품 조회가 완료되었습니다."),
+    SUCCESS_TO_UPDATE(HttpStatus.OK, "상품 수정 완료!"),
+    SUCCESS_DELETE_PRODUCT(HttpStatus.OK, "상품 삭제 완료!"),
+    SUCCESS_TO_LIKE(HttpStatus.OK, "좋아요가 완료 되었습니다"),
+    SUCCESS_TO_REMOVE_LIKE(HttpStatus.OK, "좋아요가 취소 되었습니다."),
+
+    // 카테고리
+    SUCCESS_TO_MAKE_NEW_CATEGORY(HttpStatus.OK, "새로운 카테고리를 만드셨습니다."),
     //QnA
     SUCCESS_CREATE_QNA(HttpStatus.CREATED, "문의 내용이 등록 되었습니다."),
     SUCCESS_QNA_LIST(HttpStatus.OK, "문의 목록 조회"),

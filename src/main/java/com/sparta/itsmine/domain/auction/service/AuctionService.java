@@ -11,21 +11,14 @@ import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
+import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
-import com.sparta.itsmine.domain.product.entity.ProductRepository;
-import com.sparta.itsmine.domain.product.entity.ProductResponseDto;
+import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.Auction.AuctionImpossibleBid;
 import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
 import jakarta.transaction.Transactional;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +39,7 @@ public class AuctionService {
                 productId);
 
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
-        if (auctionPrice > product.getBuyNowPrice()
+        if (auctionPrice > product.getCurrentPrice()
                 || auctionPrice < product.getAuctionNowPrice()) {
             throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
         }
