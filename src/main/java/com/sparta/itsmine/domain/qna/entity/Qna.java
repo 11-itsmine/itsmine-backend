@@ -1,6 +1,5 @@
 package com.sparta.itsmine.domain.qna.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sparta.itsmine.domain.comment.entity.Comment;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
@@ -44,7 +43,6 @@ public class Qna extends TimeStamp {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    @JsonBackReference
     private Product product;
 
     @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
