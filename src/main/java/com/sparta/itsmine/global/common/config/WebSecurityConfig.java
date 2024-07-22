@@ -15,10 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.sparta.itsmine.domain.security.JwtAuthenticationFilter;
-import com.sparta.itsmine.domain.security.JwtAuthorizationFilter;
-import com.sparta.itsmine.domain.security.JwtProvider;
-import com.sparta.itsmine.domain.security.UserDetailsServiceImpl;
+import com.sparta.itsmine.global.security.JwtAuthenticationFilter;
+import com.sparta.itsmine.global.security.JwtAuthorizationFilter;
+import com.sparta.itsmine.global.security.JwtProvider;
+import com.sparta.itsmine.global.security.UserDetailsServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 

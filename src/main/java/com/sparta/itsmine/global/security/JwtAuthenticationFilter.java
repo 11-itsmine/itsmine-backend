@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.security;
+package com.sparta.itsmine.global.security;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
@@ -12,15 +12,17 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.itsmine.domain.refreshtoken.RefreshTokenService;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
+import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.HttpResponseDto;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.user.UserDeletedException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -30,6 +32,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Autowired
     private RefreshTokenService refreshTokenService;
+    private UserAdapter userAdapter;
 
     public JwtAuthenticationFilter(JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
@@ -63,13 +66,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getUserRole();
 
+        // 탈퇴 유저 확인
+        if (userAdapter.isDeleted(username)) {
+            throw new UserDeletedException(ResponseExceptionEnum.USER_DELETED);
+        }
+
         String accessToken = jwtProvider.createAccessToken(username, role);
         String refreshToken = jwtProvider.createRefreshToken(username, role);
 
         // 헤더에 액세스 토큰 추가
         res.addHeader(JwtProvider.AUTHORIZATION_HEADER, accessToken);
 
-        // 쿠키에 리프레시 토큰 추가
+        // 쿠키에 액세스 토큰 추가
         jwtProvider.addJwtToCookie(refreshToken, res);
 
         // DB에 리프레시 토큰이 이미 있으면 수정, 없으면 저장
