@@ -1,3 +1,4 @@
+
 //package com.sparta.itsmine.global.common.aws.config;
 //
 //import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -31,3 +32,4 @@
 //                .build();
 //    }
 //}
+
