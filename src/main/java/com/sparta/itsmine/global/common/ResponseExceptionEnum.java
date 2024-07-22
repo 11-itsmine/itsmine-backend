@@ -21,9 +21,6 @@ public enum ResponseExceptionEnum {
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
     USER_MISMATCH(HttpStatus.BAD_REQUEST, "유저가 일치하지 않습니다"),
 
-    ;
-    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
-
     // 댓글
     COMMENT_EQUAL_SELLER(HttpStatus.BAD_REQUEST, "해당 상품 판매자만 접근이 가능합니다"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
