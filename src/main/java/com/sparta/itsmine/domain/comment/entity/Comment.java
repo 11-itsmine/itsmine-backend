@@ -20,7 +20,7 @@ public class Comment extends TimeStamp {
     @Column(nullable = false)
     private String content;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qna_id")
     private QnaJH qna;
 

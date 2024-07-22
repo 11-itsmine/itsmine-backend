@@ -41,12 +41,6 @@ public class CommentService {
     // 댓글 조회
     public CommentResponseDto getCommentByQnaId(Long qnaId) {
 
-        // 문의사항 존재하는지 확인
-        getQna(qnaId);
-
-        // 문의사항에 댓글 존재하는지 확인
-        commentExistsByQnaId(qnaId);
-
         Comment comment = commentAdapter.findByQnaId(qnaId);
 
         return new CommentResponseDto(comment, qnaId);
@@ -54,20 +48,26 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional
-    public void updateComment(Long qnaId,
-                              Long commentId,
-                              CommentRequestDto requestDto,
-                              User user) {
+    public void updateComment(Long qnaId, CommentRequestDto requestDto, User user) {
 //         판매자만 댓글 수정 가능
 //        equalsSeller(user.getId());
 
-        // 문의사항 존재하는지 확인
-        getQna(qnaId);
-
         // 댓글 가져오기
-        Comment comment = getComment(qnaId,commentId);
+        Comment comment = getComment(qnaId);
 
         comment.commentUpdate(requestDto);
+    }
+
+    // 댓글 삭제
+    @Transactional
+    public void deleteComment(Long qnaId, User user) {
+
+        // 판매자만 댓글 삭제 가능
+//        equalsSeller(user.getId());
+
+        Comment comment = getComment(qnaId);
+
+        commentRepository.delete(comment);
     }
 
     // 판매자 확인
@@ -85,17 +85,12 @@ public class CommentService {
     }
 
     // 댓글 가져오기
-    public Comment getComment(Long qnaId, Long commentId) {
-        return commentAdapter.findByQnaIdAndId(qnaId,commentId);
+    public Comment getComment(Long qnaId) {
+        return commentAdapter.findByQnaId(qnaId);
     }
 
     // 문의사항에 이미 댓글이 있는지 확인
     private void commentAlreadyExists(Long qnaId) {
         commentAdapter.commentAlreadyExists(qnaId);
-    }
-
-    // QnA 댓글 존재 여부 확인
-    public void commentExistsByQnaId(Long qnaId) {
-        commentAdapter.commentExistsByQnaId(qnaId);
     }
 }
