@@ -14,7 +14,7 @@ Content-Type: application/json
 Authorization: {{Authorization}}
 
 {
-  "content": "안됩니다2"
+  "content": "안됩니다1"
 }
 
 ### 1번 문의사항 댓글 조회
@@ -23,10 +23,15 @@ Content-Type: application/json
 Authorization: {{Authorization}}
 
 ### 1번 문의사항 댓글 수정
-PATCH http://localhost:8080/qnas/1/comments/1
+PATCH http://localhost:8080/qnas/1/comments
 Content-Type: application/json
 Authorization: {{Authorization}}
 
 {
-  "content": "댓글 수정"
+  "content": "댓글 수정하기하기"
 }
+
+### 1번 문의사항 댓글 삭제
+DELETE http://localhost:8080/qnas/1/comments
+Content-Type: application/json
+Authorization: {{Authorization}}

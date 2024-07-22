@@ -33,10 +33,10 @@ public enum ResponseExceptionEnum {
 
     // 카테고리
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리를 찾을 수 없습니다."),
+
     // 댓글
     COMMENT_EQUAL_SELLER(HttpStatus.BAD_REQUEST, "해당 상품 판매자만 접근이 가능합니다"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
-    QNAJH_NOT_FOUND(HttpStatus.NOT_FOUND, "문의 사항을 찾을 수 없습니다."),
     COMMENT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "해당 문의사항에는 이미 댓글이 작성 되어 있습니다."),
 
     //경매
