@@ -9,14 +9,15 @@ import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_TO_UPDAT
 import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.service.ProductService;
-import com.sparta.itsmine.domain.security.UserDetailsImpl;
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.PageableResponse;
 import com.sparta.itsmine.global.common.ResponseUtils;
+import com.sparta.itsmine.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,7 +71,7 @@ public class ProductController {
         return ResponseUtils.of(SUCCESS_TO_UPDATE);
     }
 
-    @PatchMapping("/{productId}")
+    @DeleteMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> deleteProduct(
             @RequestParam Long productId
     ) {

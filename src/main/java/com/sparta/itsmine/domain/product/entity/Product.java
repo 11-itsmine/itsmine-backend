@@ -13,24 +13,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "product")
+@NoArgsConstructor
 public class Product extends TimeStamp {
 
-    // 시작 날짜와 끝 날짜를 혹시 모르니 생성해 둡니다.
-    private LocalDateTime startDate;
-    // 입찰, 낙찰, 유찰
-    // 상품이 등록이 되는 즉시 입찰 시작이기 때문에 바로 입찰로 상태를 변경한다.
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ProductStatus status;
     /**
      * 컬럼 - 연관관계 컬럼을 제외한 컬럼을 정의합니다.
      */
@@ -46,11 +41,21 @@ public class Product extends TimeStamp {
     private Integer currentPrice;
     @Column(nullable = false)
     private Integer AuctionNowPrice;
+    // 입찰, 낙찰, 유찰
+    // 상품이 등록이 되는 즉시 입찰 시작이기 때문에 바로 입찰로 상태를 변경한다.
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+
+    // 시작 날짜와 끝 날짜를 혹시 모르니 생성해 둡니다.
+    @Column(nullable = false)
+    private LocalDateTime startDate;
+    @Column(nullable = false)
     private LocalDateTime dueDate;
     private LocalDateTime deletedAt;
 
-
-    private boolean like;
+    @Column(name = "`like`", nullable = false)  // Use backticks in the annotation
+    private Boolean like;
 
     /**
      * 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
