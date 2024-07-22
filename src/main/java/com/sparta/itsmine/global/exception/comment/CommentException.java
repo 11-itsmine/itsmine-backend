@@ -1,17 +1,13 @@
-package com.sparta.itsmine.global.exception.user;
-
+package com.sparta.itsmine.global.exception.comment;
 
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import lombok.Getter;
 
 @Getter
-public class UserException extends RuntimeException {
-
+public class CommentException extends RuntimeException{
     private final ResponseExceptionEnum responseExceptionEnum;
-
-    public UserException(ResponseExceptionEnum responseExceptionEnum) {
+    public CommentException(ResponseExceptionEnum responseExceptionEnum) {
         super(responseExceptionEnum.getMessage());
         this.responseExceptionEnum = responseExceptionEnum;
     }
-
 }

@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.security;
+package com.sparta.itsmine.global.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
