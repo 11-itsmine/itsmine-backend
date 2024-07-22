@@ -26,14 +26,14 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
 
-    public List<Auction> findAuctionAllByUserid(Long userId) {
+/*    public List<Auction> findAuctionAllByUserid(Long userId) {
         return jpaQueryFactory
                 .select(auction)
                 .from(auction)
                 .innerJoin(auction.user, user)
                 .where(user.id.eq(userId))
                 .fetch();
-    }
+    }*/
 
 
     /*
@@ -43,7 +43,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
         group by product_id;
     */
     //자신이 고른 상품 전체 조회
-    public List<GetAuctionByUserResponseDto> findAuctionAllByUserid2(Long userId) {
+    public List<GetAuctionByUserResponseDto> findAuctionAllByUserid(Long userId) {
         return jpaQueryFactory
                 .select(new QGetAuctionByUserResponseDto(product.id, auction.bidPrice.max(),
                         user.id))

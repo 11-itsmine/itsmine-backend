@@ -16,6 +16,7 @@ import com.sparta.itsmine.domain.security.UserDetailsImpl;
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseCodeEnum;
 import com.sparta.itsmine.global.common.ResponseUtils;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,49 +39,51 @@ public class AuctionController {
     public ResponseEntity<HttpResponseDto> createAuction(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long product_id,
-            @RequestBody AuctionRequestDto requestDto) {
-        AuctionResponseDto auction = auctionService.createAuction(userDetails.getUser(), product_id,
+            @Valid @RequestBody AuctionRequestDto requestDto) {
+        AuctionResponseDto responseDto = auctionService.createAuction(userDetails.getUser(),
+                product_id,
                 requestDto);
-        return ResponseUtils.of(AUCTION_SUCCESS_CREATE, auction);
+        return ResponseUtils.of(AUCTION_SUCCESS_CREATE, responseDto);
     }
 
-    //유저(구매자(본인)) 입찰 조회(stream)
+/*    //유저(구매자(본인)) 입찰 조회(stream)
     @GetMapping("/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<AuctionResponseDto> auctions = auctionService.getAuctionByUser(userDetails.getUser());
-        return ResponseUtils.of(AUCTION_SUCCESS_GET, auctions);
-    }
+        List<AuctionResponseDto> responseDto = auctionService.getAuctionByUser(
+                userDetails.getUser());
+        return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
+    }*/
 
-    //유저(구매자(본인)) 입찰 조회2(QueryDSL)
-    @GetMapping("/auctions2")
+    //유저(구매자(본인)) 입찰 조회(QueryDSL)
+    @GetMapping("/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByUserToList2(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<GetAuctionByUserResponseDto> auctions = auctionService.getAuctionByUser2(
+        List<GetAuctionByUserResponseDto> responseDto = auctionService.getAuctionByUser(
                 userDetails.getUser());
-        return ResponseUtils.of(AUCTION_SUCCESS_GET, auctions);
+        return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
 
     //유저(구매자(본인)) 상품 입찰 조회
     @GetMapping("/product/{product_id}/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByProduct(
             @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long product_id) {
-        GetAuctionByProductResponseDto auction = auctionService.getAuctionByProduct(
+        GetAuctionByProductResponseDto responseDto = auctionService.getAuctionByProduct(
                 userDetails.getUser(), product_id);
-        return ResponseUtils.of(AUCTION_SUCCESS_GET, auction);
+        return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
 
     //낙찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/successful")
     public ResponseEntity<HttpResponseDto> successfulAuction(@PathVariable Long product_id) {
-        AuctionResponseDto auction = auctionService.successfulAuction(product_id);
-        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION, auction);
+        AuctionResponseDto responseDto = auctionService.successfulAuction(product_id);
+        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION, responseDto);
     }
 
     //유찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/avoided")
     public ResponseEntity<HttpResponseDto> avoidedAuction(@PathVariable Long product_id) {
-        ProductResponseDto Product = auctionService.avoidedAuction(product_id);
-        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, Product);
+        ProductResponseDto responseDto = auctionService.avoidedAuction(product_id);
+        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, responseDto);
     }
 }

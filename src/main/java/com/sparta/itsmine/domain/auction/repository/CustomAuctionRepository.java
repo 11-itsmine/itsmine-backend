@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface CustomAuctionRepository {
 
-    List<Auction> findAuctionAllByUserid(Long userId);
+//    List<Auction> findAuctionAllByUserid(Long userId);
 
     //자신이 고른 상품 전체 조회
-    List<GetAuctionByUserResponseDto> findAuctionAllByUserid2(Long userId);
+    List<GetAuctionByUserResponseDto> findAuctionAllByUserid(Long userId);
 
     //자신이 고른 상품 조회
     GetAuctionByProductResponseDto findByUserIdAndProductId(Long UserId, Long productId);

@@ -1,4 +1,3 @@
-/*
 package com.sparta.itsmine.global.common.aws.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -31,4 +30,4 @@ public class S3Config {
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .build();
     }
-}*/
+}

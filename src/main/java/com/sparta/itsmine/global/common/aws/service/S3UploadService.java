@@ -1,4 +1,3 @@
-/*
 package com.sparta.itsmine.global.common.aws.service;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -15,11 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-*/
-/**
- * putObject() 메소드가 파일을 저장해주는 메소드 getURl()을 통해 파일이 저장된 URL을 return 해주고, 이 URL로 이동 시 해당 파일이 오픈됨 (버킷
- * 정책 변경을 하지 않았으면 파일은 업로드 되지만 해당 URL로 이동 시 accessDenied 됨)
- *//*
+//*
+// * putObject() 메소드가 파일을 저장해주는 메소드 getURl()을 통해 파일이 저장된 URL을 return 해주고, 이 URL로 이동 시 해당 파일이 오픈됨 (버킷
+// * 정책 변경을 하지 않았으면 파일은 업로드 되지만 해당 URL로 이동 시 accessDenied 됨)
+
 
 @Slf4j
 @Service
@@ -42,11 +40,9 @@ public class S3UploadService {
         return amazonS3.getUrl(bucket, originalFilename).toString();
     }
 
-    */
-/*
-     * 로컬 파일 다운로드 할 때에는 UrlResource() 메소드에 "file:" + 로컬 파일 경로를 넣어주면 로컬 파일이 다운로드 되었음
-     * S3에 올라간 파일은 위와 같이 amazonS3.getUrl(버킷이름, 파일이름)을 통해 파일 다운로드를 할 수 있음
-     *//*
+//     * 로컬 파일 다운로드 할 때에는 UrlResource() 메소드에 "file:" + 로컬 파일 경로를 넣어주면 로컬 파일이 다운로드 되었음
+//     * S3에 올라간 파일은 위와 같이 amazonS3.getUrl(버킷이름, 파일이름)을 통해 파일 다운로드를 할 수 있음
+
 
 
     public ResponseEntity<UrlResource> downloadImage(String originalFilename) {
@@ -77,4 +73,4 @@ public class S3UploadService {
             throw new IllegalArgumentException("Invalid file URL", e);
         }
     }
-}*/
+}

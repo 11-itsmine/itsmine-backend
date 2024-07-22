@@ -63,7 +63,7 @@ public class AuctionService {
         return new AuctionResponseDto(auction);
     }
 
-    //유저 입찰 조회(queryDSL,stream 조회)(각각 입찰한 상품 당 자신의 최대입찰가만 나오게끔)
+/*    //유저 입찰 조회(queryDSL,stream 조회)(각각 입찰한 상품 당 자신의 최대입찰가만 나오게끔)
     public List<AuctionResponseDto> getAuctionByUser(User user) {
 
         List<Auction> auctions = auctionRepository.findAuctionAllByUserid(user.getId());
@@ -72,20 +72,20 @@ public class AuctionService {
         }
 
         Map<Long, Auction> maxBidAuctions = auctions.stream()
-                .collect(Collectors.toMap(auction -> auction.getProduct().getId(),//key로 사용
-                        Function.identity(),//객체 자체를 값으로 사용
-                        BinaryOperator.maxBy(Comparator.comparingLong(
+                .collect(Collectors.toMap(auction -> auction.getProduct().getId(),//auction이란 이름으로 빼서 key로 사용
+                        Function.identity(),//객체 자체를 값으로 사용//
+                        BinaryOperator.maxBy(Comparator.comparingLong(//Comparator쓰면 비교가 가능함
                                 Auction::getBidPrice))));//동일한 key에 대해 중복값이 있을 때 최대값을 선택
 
         return maxBidAuctions.values().stream()
                 .map(AuctionResponseDto::new)
                 .collect(Collectors.toList());
 
-    }
+    }*/
 
-    //유저 입찰 조회(queryDSL 조회)(각각 입찰한 상품 당 자신의 최대입찰가만 나오게끔)
-    public List<GetAuctionByUserResponseDto> getAuctionByUser2(User user) {
-        List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid2(
+    //유저 입찰 조회(queryDSL 조회)(각각 입찰한 상품 당 자신의 최대입찰가만 나오게끔)(유지보수 할때 더 좋음)
+    public List<GetAuctionByUserResponseDto> getAuctionByUser(User user) {
+        List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid(
                 user.getId());
         if (auctions == null) {
             throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
