@@ -55,9 +55,10 @@ public class QnaService {
                     , true, pageable);
 
             List<GetQnaResponseDto> getQnaResponseDtoList = Stream.concat(
-                    qnaList.stream().map(GetQnaResponseDto::of),
-                    qnaListSecret.stream().map(GetQnaResponseDto::of)
-            ).collect(Collectors.toList());
+                            qnaList.stream().map(GetQnaResponseDto::of),
+                            qnaListSecret.stream().map(GetQnaResponseDto::of)
+                    ).sorted((list, listSecret) -> listSecret.getCreateAt().compareTo(list.getCreateAt()))
+                    .collect(Collectors.toList());
             return new PageImpl<>(getQnaResponseDtoList, pageable, getQnaResponseDtoList.size());
         }
 
