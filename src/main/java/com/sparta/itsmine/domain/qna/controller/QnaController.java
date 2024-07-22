@@ -80,8 +80,7 @@ public class QnaController {
             @PathVariable Long productId,
             @PathVariable Long qnaId
     ) {
-        GetQnaResponseDto responseDto = qnaService.getQna(productId, qnaId);
-        return ResponseUtils.of(SUCCESS_QNA_LIST, responseDto);
+        return ResponseUtils.of(SUCCESS_QNA_LIST, qnaService.getQna(productId, qnaId));
     }
 
     /**
