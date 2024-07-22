@@ -77,7 +77,7 @@ public class Product extends TimeStamp {
         this.category = category;
 
         // set up initialized values
-        this.status = ProductStatus.AUCTION;
+        this.status = ProductStatus.BID;
         this.startDate = LocalDateTime.now();
         this.like = false;
     }
