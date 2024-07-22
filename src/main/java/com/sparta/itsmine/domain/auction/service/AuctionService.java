@@ -1,6 +1,9 @@
 package com.sparta.itsmine.domain.auction.service;
 
 
+import static com.sparta.itsmine.global.common.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID;
+import static com.sparta.itsmine.global.common.ResponseExceptionEnum.AUCTION_NOT_FOUND;
+
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByMaxedBidPriceResponseDto;
@@ -13,6 +16,7 @@ import com.sparta.itsmine.domain.product.entity.ProductRepository;
 import com.sparta.itsmine.domain.product.entity.ProductResponseDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.Auction.AuctionImpossibleBid;
 import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.Comparator;
@@ -44,12 +48,12 @@ public class AuctionService {
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
         if (auctionPrice > product.getBuyNowPrice()
                 || auctionPrice < product.getAuctionNowPrice()) {
-            throw new IllegalArgumentException();
+            throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
         }
 
         if (auctionRepository.existsByProductId(productId)) {
             if (auctionPrice <= maxedBidPrice.getBidPrice()) {
-                throw new IllegalArgumentException();
+                throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
             }
         }
 
@@ -64,7 +68,7 @@ public class AuctionService {
 
         List<Auction> auctions = auctionRepository.findAuctionAllByUserid(user.getId());
         if (auctions == null) {
-            throw new AuctionNotFoundException(ResponseExceptionEnum.AUCTION_NOT_FOUND);
+            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
         }
 
         Map<Long, Auction> maxBidAuctions = auctions.stream()
@@ -84,7 +88,7 @@ public class AuctionService {
         List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid2(
                 user.getId());
         if (auctions == null) {
-            throw new AuctionNotFoundException(ResponseExceptionEnum.AUCTION_NOT_FOUND);
+            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
         }
 
         return auctions.stream().toList();
@@ -95,7 +99,7 @@ public class AuctionService {
         GetAuctionByProductResponseDto productAuctions = auctionRepository.findByUserIdAndProductId(
                 user.getId(), productId);
         if (productAuctions == null) {
-            throw new AuctionNotFoundException(ResponseExceptionEnum.AUCTION_NOT_FOUND);
+            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
         }
 
         return productAuctions;
@@ -110,7 +114,7 @@ public class AuctionService {
     public AuctionResponseDto successfulAuction(Long productId) {
         List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
         if (auctions == null) {
-            throw new AuctionNotFoundException(ResponseExceptionEnum.AUCTION_NOT_FOUND);
+            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
         }
 
         auctionRepository.deleteAll(auctions);

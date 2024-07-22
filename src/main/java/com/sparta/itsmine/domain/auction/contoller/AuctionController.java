@@ -1,5 +1,9 @@
 package com.sparta.itsmine.domain.auction.contoller;
 
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.AUCTION_SUCCESS_CREATE;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.AUCTION_SUCCESS_GET;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
@@ -37,7 +41,7 @@ public class AuctionController {
             @RequestBody AuctionRequestDto requestDto) {
         AuctionResponseDto auction = auctionService.createAuction(userDetails.getUser(), product_id,
                 requestDto);
-        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_CREATE, auction);
+        return ResponseUtils.of(AUCTION_SUCCESS_CREATE, auction);
     }
 
     //유저(구매자(본인)) 입찰 조회(stream)
@@ -45,7 +49,7 @@ public class AuctionController {
     public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<AuctionResponseDto> auctions = auctionService.getAuctionByUser(userDetails.getUser());
-        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_GET, auctions);
+        return ResponseUtils.of(AUCTION_SUCCESS_GET, auctions);
     }
 
     //유저(구매자(본인)) 입찰 조회2(QueryDSL)
@@ -54,7 +58,7 @@ public class AuctionController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<GetAuctionByUserResponseDto> auctions = auctionService.getAuctionByUser2(
                 userDetails.getUser());
-        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_GET, auctions);
+        return ResponseUtils.of(AUCTION_SUCCESS_GET, auctions);
     }
 
     //유저(구매자(본인)) 상품 입찰 조회
@@ -63,20 +67,20 @@ public class AuctionController {
             @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long product_id) {
         GetAuctionByProductResponseDto auction = auctionService.getAuctionByProduct(
                 userDetails.getUser(), product_id);
-        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_GET, auction);
+        return ResponseUtils.of(AUCTION_SUCCESS_GET, auction);
     }
 
     //낙찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/successful")
     public ResponseEntity<HttpResponseDto> successfulAuction(@PathVariable Long product_id) {
         AuctionResponseDto auction = auctionService.successfulAuction(product_id);
-        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION, auction);
+        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION, auction);
     }
 
     //유찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/avoided")
     public ResponseEntity<HttpResponseDto> avoidedAuction(@PathVariable Long product_id) {
         ProductResponseDto Product = auctionService.avoidedAuction(product_id);
-        return ResponseUtils.of(ResponseCodeEnum.AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, Product);
+        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, Product);
     }
 }
