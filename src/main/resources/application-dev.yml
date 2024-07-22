@@ -1,0 +1,44 @@
+server:
+  port: ${SERVER-PORT:8080}
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  datasource:
+    url: jdbc:mysql://${DB-URL}/itsmine
+    username: ${DB-USER}
+    password: ${DB-PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  sql:
+    init:
+      encoding: UTF-8
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        #show_sql: true
+        format_sql: true
+        connection:
+          CharSet: utf-8
+          characterEncoding: utf-8
+          useUnicode: true
+  web:
+    resources:
+      static-locations: classpath:/static/
+  thymeleaf:
+    suffix: .html
+    prefix: classpath:templates/
+
+  profiles:
+    include:
+      - aws
+
+jwt-secret-key: ${JWT-KEY}
+
+admin-token: ${ADMIN-TOKEN}
