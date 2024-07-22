@@ -6,11 +6,12 @@ import com.sparta.itsmine.domain.comment.dto.CommentResponseDto;
 import com.sparta.itsmine.domain.comment.entity.Comment;
 import com.sparta.itsmine.domain.comment.repository.CommentAdapter;
 import com.sparta.itsmine.domain.comment.repository.CommentRepository;
-import com.sparta.itsmine.domain.qnaJH.QnaRepositoryJH;
-import com.sparta.itsmine.domain.qnaJH.entity.QnaJH;
+import com.sparta.itsmine.domain.product.repository.ProductRepository;
+import com.sparta.itsmine.domain.qna.entity.Qna;
+import com.sparta.itsmine.domain.qna.repository.QnaRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
-import com.sparta.itsmine.global.exception.comment.*;
+import com.sparta.itsmine.global.exception.qna.QnaNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +23,14 @@ public class CommentService {
     private final CommentAdapter commentAdapter;
     private final QnaRepository qnaRepository;
     private final CommentRepository commentRepository;
-//  private final ProductRepository productRepository;
+  private final ProductRepository productRepository;
 
     // 댓글 작성
     @Transactional
     public AddCommentResponseDto addComment(Long qnaId, User user, CommentRequestDto commentRequestDto) {
 
-//         판매자만 댓글 작성 가능
-//        equalsSeller(user.getId());
+        //판매자만 댓글 작성 가능
+        equalsSeller(qnaId, user.getId());
 
         Qna qna = getQna(qnaId);
 
@@ -53,8 +54,8 @@ public class CommentService {
     // 댓글 수정
     @Transactional
     public void updateComment(Long qnaId, CommentRequestDto requestDto, User user) {
-//         판매자만 댓글 수정 가능
-//        equalsSeller(user.getId());
+        //판매자만 댓글 수정 가능
+        equalsSeller(qnaId, user.getId());
 
         // 댓글 가져오기
         Comment comment = getCommentByQnaId(qnaId);
@@ -66,8 +67,8 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long qnaId, User user) {
 
-        // 판매자만 댓글 삭제 가능
-//        equalsSeller(user.getId());
+        //판매자만 댓글 삭제 가능
+        equalsSeller(qnaId, user.getId());
 
         Comment comment = getCommentByQnaId(qnaId);
 
@@ -75,16 +76,15 @@ public class CommentService {
     }
 
     // 판매자 확인
-//    public void equalsSeller(Long userId) {
-//        if (!productRepository.findByUserId(userId).equals(userId)) {
-//            throw new CommentEqualSellerException(ResponseExceptionEnum.COMMENT_EQUAL_SELLER);
-//        }
-//    }
+    public void equalsSeller(Long qnaId, Long userId) {
+        commentAdapter.equalsSeller(qnaId, userId);
+    }
+
 
     // QnA 가져오기
     public Qna getQna(Long qnaId) {
         return qnaRepository.findById(qnaId).orElseThrow(
-                () -> new QnaNotFoundExceptionJH(ResponseExceptionEnum.QNAJH_NOT_FOUND)
+                () -> new QnaNotFoundException(ResponseExceptionEnum.QNA_NOT_FOUND)
         );
     }
 

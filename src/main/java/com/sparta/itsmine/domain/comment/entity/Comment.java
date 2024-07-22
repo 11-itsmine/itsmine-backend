@@ -1,7 +1,7 @@
 package com.sparta.itsmine.domain.comment.entity;
 
 import com.sparta.itsmine.domain.comment.dto.CommentRequestDto;
-import com.sparta.itsmine.domain.qnaJH.entity.Qna;
+import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.*;
 import lombok.Getter;
