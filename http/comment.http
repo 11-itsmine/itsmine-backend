@@ -21,3 +21,12 @@ Authorization: {{Authorization}}
 GET http://localhost:8080/qnas/1/comments
 Content-Type: application/json
 Authorization: {{Authorization}}
+
+### 1번 문의사항 댓글 수정
+PATCH http://localhost:8080/qnas/1/comments/1
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "content": "댓글 수정"
+}

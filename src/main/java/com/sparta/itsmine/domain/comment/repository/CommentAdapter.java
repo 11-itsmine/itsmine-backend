@@ -18,7 +18,19 @@ public class CommentAdapter {
     }
 
     public Comment findByQnaId(Long qnaId) {
-        return commentRepository.findByQnaId(qnaId);
+        Comment comment = commentRepository.findByQnaId(qnaId);
+        if (comment == null) {
+            throw new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND);
+        }
+        return comment;
+    }
+
+    public Comment findByQnaIdAndId(Long qnaId, Long id) {
+        Comment comment = commentRepository.findByQnaIdAndId(qnaId, id);
+        if (comment == null) {
+            throw new CommentNotFoundException(ResponseExceptionEnum.COMMENT_NOT_FOUND);
+        }
+        return comment;
     }
 
     public void commentAlreadyExists(Long qnaId) {

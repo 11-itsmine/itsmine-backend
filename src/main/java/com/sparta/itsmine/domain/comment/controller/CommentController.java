@@ -20,6 +20,7 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    // 댓글 생성
     @PostMapping("/qnas/{qnaId}/comments")
     public ResponseEntity<HttpResponseDto> addComment(
             @PathVariable Long qnaId,
@@ -29,11 +30,24 @@ public class CommentController {
         return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_CREATE);
     }
 
+    // 댓글 조회
     @GetMapping("/qnas/{qnaId}/comments")
     public ResponseEntity<HttpResponseDto> getComment(
             @PathVariable Long qnaId) {
 
         CommentResponseDto comment = commentService.getCommentByQnaId(qnaId);
         return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_GET, comment);
+    }
+
+    // 댓글 수정
+    @PatchMapping("/qnas/{qnaId}/comments/{commentId}")
+    public ResponseEntity<HttpResponseDto> updateComment(
+            @PathVariable Long qnaId,
+            @PathVariable Long commentId,
+            @RequestBody CommentRequestDto commentRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        commentService.updateComment(qnaId,commentId,commentRequestDto,userDetails.getUser());
+        return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_UPDATE);
     }
 }
