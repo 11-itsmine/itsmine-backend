@@ -14,9 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,8 +43,8 @@ public class Qna extends TimeStamp {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> commentList = new ArrayList<>();
+    @OneToOne(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Comment comment = new Comment();
 
     private Qna(QnaRequestDto requestDto, User user, Product product) {
         this.title = requestDto.getTitle();
