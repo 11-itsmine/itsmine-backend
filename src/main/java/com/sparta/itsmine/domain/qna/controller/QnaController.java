@@ -9,10 +9,10 @@ import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_UPDATE_Q
 import com.sparta.itsmine.domain.qna.dto.GetQnaResponseDto;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.service.QnaService;
-import com.sparta.itsmine.domain.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseUtils;
+import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -60,10 +60,12 @@ public class QnaController {
     @GetMapping
     public ResponseEntity<HttpResponseDto> getQnaList(
             @PathVariable Long productId,
-            Pageable pageable
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
 
-        Page<GetQnaResponseDto> qnaList = qnaService.getQnaList(productId, pageable);
+        Page<GetQnaResponseDto> qnaList = qnaService.getQnaList(productId, pageable,
+                userDetails.getUser());
 
         return qnaList == null ? ResponseUtils.of(NULL_QNA_LIST)
                 : ResponseUtils.of(SUCCESS_QNA_LIST, qnaList);
