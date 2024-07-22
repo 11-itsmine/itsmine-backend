@@ -1,10 +1,8 @@
 package com.sparta.itsmine.domain.comment.dto;
 
 import com.sparta.itsmine.domain.comment.entity.Comment;
-import com.sparta.itsmine.domain.qnaJH.entity.QnaJH;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+import lombok.Getter;
 
 @Getter
 public class CommentResponseDto {

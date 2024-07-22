@@ -3,8 +3,6 @@ package com.sparta.itsmine.domain.user.service;
 
 import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
 
-import java.time.LocalDateTime;
-
 import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
@@ -17,12 +15,11 @@ import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.user.UserAlreadyExistsException;
 import com.sparta.itsmine.global.exception.user.UserDeletedException;
 import com.sparta.itsmine.global.exception.user.UserNotDeletedException;
-
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +52,8 @@ public class UserService {
 
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        User user = new User(requestDto.getUsername(), encodedPassword, requestDto.getName(), requestDto.getNickname(), requestDto.getEmail(), role, requestDto.getAddress());
+        User user = new User(requestDto.getUsername(), encodedPassword, requestDto.getName(),
+                requestDto.getNickname(), requestDto.getEmail(), role, requestDto.getAddress());
         userRepository.save(user);
         return requestDto.getName();
     }
@@ -73,7 +71,7 @@ public class UserService {
     @Transactional
     public void withdraw(User user) {
 
-        if(user.getDeletedAt() != null) {
+        if (user.getDeletedAt() != null) {
             throw new UserDeletedException(ResponseExceptionEnum.USER_DELETED);
         }
 
@@ -85,7 +83,7 @@ public class UserService {
     public void resign(Long userId) {
 
         User user = userAdapter.findById(userId);
-        if(user.getDeletedAt() == null) {
+        if (user.getDeletedAt() == null) {
             throw new UserNotDeletedException(ResponseExceptionEnum.USER_NOT_DELETED);
         }
 

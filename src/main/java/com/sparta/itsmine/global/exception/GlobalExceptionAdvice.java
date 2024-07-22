@@ -8,6 +8,7 @@ import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseUtils;
 import com.sparta.itsmine.global.exception.category.CategoryException;
 import com.sparta.itsmine.global.exception.product.ProductException;
+import com.sparta.itsmine.global.exception.qna.QnaException;
 import jdk.jshell.spi.ExecutionControl.UserException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +35,11 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<HttpResponseDto> handlerCategoryException(CategoryException e) {
         log.error("에러 메세지: ", e);
         return ResponseUtils.of(CATEGORY_NOT_FOUND);
+    }
+
+    @ExceptionHandler(QnaException.class)
+    public ResponseEntity<HttpResponseDto> handleUserException(QnaException e) {
+        log.error("에러 메세지: ", e);
+        return ResponseUtils.of(ResponseExceptionEnum.USER_ERROR);
     }
 }
