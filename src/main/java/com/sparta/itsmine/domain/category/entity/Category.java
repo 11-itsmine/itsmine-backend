@@ -7,13 +7,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AccessLevel;
+import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@Table(name = "category")
+@NoArgsConstructor
 public class Category extends TimeStamp {
 
     /**
@@ -23,14 +27,19 @@ public class Category extends TimeStamp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
-    Long id;
+    private Long id;
 
     @Column(nullable = false, unique = true)
-    String catergoryName;
+    private String categoryName;
 
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
+
+    @Builder
+    public Category(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
     /**
      * 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
