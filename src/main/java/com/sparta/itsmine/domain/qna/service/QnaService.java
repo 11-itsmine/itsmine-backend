@@ -51,7 +51,8 @@ public class QnaService {
             //인가된 유저랑 QnA 비밀글 작성자 본인일 경우
         } else {
             qnaList = qnaRepository.findAllByProductAndSecretQna(product, false, pageable);
-            qnaListSecret = qnaRepository.findAllByProductAndUserAndSecretQna(product, user
+            qnaListSecret = qnaRepository.findAllByProductAndUserAndSecretQna(product,
+                    user.getId()
                     , true, pageable);
 
             List<GetQnaResponseDto> getQnaResponseDtoList = Stream.concat(
@@ -61,7 +62,6 @@ public class QnaService {
                     .collect(Collectors.toList());
             return new PageImpl<>(getQnaResponseDtoList, pageable, getQnaResponseDtoList.size());
         }
-
     }
 
     public GetQnaResponseDto getQna(Long productId, Long qnaId) {

@@ -68,7 +68,7 @@ public class QnaController {
                 userDetails.getUser());
 
         return qnaList == null ? of(NULL_QNA_LIST)
-                : of(SUCCESS_QNA_LIST, qnaList);
+                : of(SUCCESS_QNA_LIST, qnaList.getContent());
     }
 
     /**

@@ -8,7 +8,7 @@ Content-Type: application/json
   "name":"{{name}}",
   "email":"{{email}}",
   "address": "화성시",
-  "nickname": "Jake"
+  "nickname": "Jake2"
 }
 
 ### 로그인
@@ -96,6 +96,18 @@ Authorization: {{Authorization}}
 }
 
 
+###QnA 생성
+POST http://localhost:8080/products/1/qnas
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "순모 문의 내용 비밀글",
+  "content": "내용12345",
+  "secretQna": true
+}
+
+
 
 ###QnA 리스트 조회
 GET http://localhost:8080/products/1/qnas
@@ -104,7 +116,7 @@ Authorization: {{Authorization}}
 
 
 ###QnA 단건 조회
-GET http://localhost:8080/products/1/qnas/2
+GET http://localhost:8080/products/1/qnas/1
 Authorization: {{Authorization}}
 
 
