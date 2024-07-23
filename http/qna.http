@@ -56,6 +56,36 @@ Content-Type: application/json
 %}
 
 
+### 유저 회원 가입3
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username": "username987",
+  "password": "password97!",
+  "name": "마야",
+  "email": "clsrn77990",
+  "address": "화성시",
+  "nickname": "Jake3"
+}
+
+### 로그인3
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "username": "username987",
+  "password": "password97!"
+}
+> {%
+  client.log(response.headers.valueOf("Authorization"));
+  client.log(response.headers.valueOf("RefreshToken"));
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
+%}
+
+
+
 ###로그 아웃
 GET http://localhost:8080/users/logout
 Authorization: {{Authorization}}
@@ -90,23 +120,10 @@ Content-Type: application/json
 Authorization: {{Authorization}}
 
 {
-  "title": "순모 문의 내용 비밀글",
-  "content": "내용12345",
-  "secretQna": false
-}
-
-
-###QnA 생성
-POST http://localhost:8080/products/1/qnas
-Content-Type: application/json
-Authorization: {{Authorization}}
-
-{
-  "title": "순모 문의 내용 비밀글",
-  "content": "내용12345",
+  "title": "마야 문의 내용글2",
+  "content": "내용123452",
   "secretQna": true
 }
-
 
 
 ###QnA 리스트 조회
