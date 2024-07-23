@@ -7,6 +7,7 @@ import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_RESIGN_SUCC
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SUCCESS_GET;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_UPDATE_SUCCESS;
+import static com.sparta.itsmine.global.common.ResponseUtils.*;
 
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
@@ -41,7 +42,7 @@ public class UserController {
             @RequestBody SignupRequestDto requestDto
     ) {
         String username = userService.signup(requestDto);
-        return ResponseUtils.of(USER_SIGNUP_SUCCESS, username);
+        return of(USER_SIGNUP_SUCCESS, username);
     }
 
     @GetMapping("/logout")
@@ -50,7 +51,7 @@ public class UserController {
         HttpServletResponse response
     ) {
         userService.logout(userDetails.getUsername(), response);
-        return ResponseUtils.of(SUCCESS_LOGOUT);
+        return of(SUCCESS_LOGOUT);
     }
 
     @GetMapping("/{userId}")
@@ -58,7 +59,7 @@ public class UserController {
         @PathVariable Long userId
     ) {
         UserResponseDto response = userService.getUser(userId);
-        return ResponseUtils.of(USER_SUCCESS_GET, response);
+        return of(USER_SUCCESS_GET, response);
     }
 
     @DeleteMapping("/withdraw")
@@ -66,7 +67,7 @@ public class UserController {
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         userService.withdraw(userDetails.getUser());
-        return ResponseUtils.of(USER_DELETE_SUCCESS);
+        return of(USER_DELETE_SUCCESS);
     }
 
     @PutMapping("/resign/{userId}")
@@ -74,7 +75,7 @@ public class UserController {
         @PathVariable Long userId
     ) {
         userService.resign(userId);
-        return ResponseUtils.of(USER_RESIGN_SUCCESS);
+        return of(USER_RESIGN_SUCCESS);
     }
 
     @PutMapping("/update")
@@ -83,6 +84,6 @@ public class UserController {
         @RequestBody ProfileUpdateRequestDto updateDto
     ) {
         userService.update(userDetails.getUser(), updateDto);
-        return ResponseUtils.of(USER_UPDATE_SUCCESS);
+        return of(USER_UPDATE_SUCCESS);
     }
 }
