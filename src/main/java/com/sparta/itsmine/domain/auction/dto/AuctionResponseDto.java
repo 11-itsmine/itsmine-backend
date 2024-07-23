@@ -12,7 +12,7 @@ public class AuctionResponseDto {
     private Long id;
     private Long userId;
     private Long productId;
-    private Long bidPrice;
+    private Integer bidPrice;
     private LocalDateTime createdAt;
     private LocalDateTime auctionedAt;
 

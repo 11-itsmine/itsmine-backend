@@ -1,4 +1,4 @@
-/*package com.sparta.itsmine.domain.auction.utils;
+package com.sparta.itsmine.domain.auction.utils;
 
 public enum AuctionStatus {
 
@@ -20,4 +20,4 @@ public enum AuctionStatus {
         public static final String BIDDING = "AUCTION_BIDDING";//입찰
         public static final String SUCCESSFUL_BID = "AUCTION_SUCCESSFUL_BID";//낙찰
     }
-}*/
+}

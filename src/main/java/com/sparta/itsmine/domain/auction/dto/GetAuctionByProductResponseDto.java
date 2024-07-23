@@ -11,10 +11,10 @@ public class GetAuctionByProductResponseDto {
 
     private Long userId;
     private Long productId;
-    private Long bidPrice;
+    private Integer bidPrice;
 
     @QueryProjection
-    public GetAuctionByProductResponseDto(Long productId, Long bidPrice, Long userId) {
+    public GetAuctionByProductResponseDto(Long productId, Integer bidPrice, Long userId) {
         this.productId = productId;
         this.bidPrice = bidPrice;
         this.userId = userId;

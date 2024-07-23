@@ -47,15 +47,6 @@ public class AuctionController {
         return ResponseUtils.of(AUCTION_SUCCESS_CREATE, responseDto);
     }
 
-/*    //유저(구매자(본인)) 입찰 조회(stream)
-    @GetMapping("/auctions")
-    public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<AuctionResponseDto> responseDto = auctionService.getAuctionByUser(
-                userDetails.getUser());
-        return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
-    }*/
-
     //유저(구매자(본인)) 입찰 조회(QueryDSL)
     @GetMapping("/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
@@ -74,17 +65,4 @@ public class AuctionController {
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
 
-/*    //낙찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
-    @DeleteMapping("/product/{productId}/auction/successful")
-    public ResponseEntity<HttpResponseDto> successfulAuction(@PathVariable Long productId) {
-        AuctionResponseDto responseDto = auctionService.successfulAuction(productId);
-        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION, responseDto);
-    }
-
-    //유찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
-    @DeleteMapping("/product/{productId}/auction/avoided")
-    public ResponseEntity<HttpResponseDto> avoidedAuction(@PathVariable Long productId) {
-        ProductResponseDto responseDto = auctionService.avoidedAuction(productId);
-        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, responseDto);
-    }*/
 }

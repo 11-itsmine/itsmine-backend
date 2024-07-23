@@ -8,10 +8,10 @@ import com.sparta.itsmine.domain.auction.entity.Auction;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface CustomAuctionRepository {
-
-//    List<Auction> findAuctionAllByUserid(Long userId);
 
     //자신이 고른 상품 전체 조회
     Page<GetAuctionByUserResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable);

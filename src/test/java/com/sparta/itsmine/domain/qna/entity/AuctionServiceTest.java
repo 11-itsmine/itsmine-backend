@@ -46,7 +46,7 @@ public class AuctionServiceTest {
 
         //GetAuctionByUserResponseDto 객체를 생성하여 테스트 데이터를 만듭니다.
 
-        GetAuctionByUserResponseDto auctionDto = new GetAuctionByUserResponseDto(1L, 200L, 1L);
+        GetAuctionByUserResponseDto auctionDto = new GetAuctionByUserResponseDto(1L, 200, 1L);
         List<GetAuctionByUserResponseDto> auctionList = Collections.singletonList(auctionDto);
 
         auctionPage = new PageImpl<>(auctionList, pageable, auctionList.size());
@@ -62,9 +62,9 @@ public class AuctionServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals(1L, result.getContent().get(0).getProductId());
-        assertEquals(200L, result.getContent().get(0).getBidPrice());
-        assertEquals(1L, result.getContent().get(0).getUserId());
+        assertEquals(1, result.getContent().get(0).getProductId());
+        assertEquals(200, result.getContent().get(0).getBidPrice());
+        assertEquals(1, result.getContent().get(0).getUserId());
         //verify: 특정 메서드가 호출되었는지 검증합니다.
         verify(auctionRepository, times(1)).findAuctionAllByUserid(testUser.getId(), pageable);
     }

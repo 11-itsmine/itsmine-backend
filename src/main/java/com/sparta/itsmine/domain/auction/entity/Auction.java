@@ -34,7 +34,7 @@ public class Auction extends TimeStamp {
     private Long id;
 
     @Column(nullable = false)
-    private Long bidPrice;
+    private Integer bidPrice;
 
     @CreatedDate
     @Column(updatable = false)
@@ -56,10 +56,11 @@ public class Auction extends TimeStamp {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_status" ,referencedColumnName = "status")
-    private Product productStatus;
+    private Product productStatus;//연결을 하면 안됨
+
 
     @Builder
-    public Auction(User user, Product product, Long bidPrice , Product productStatus) {
+    public Auction(User user, Product product, Integer bidPrice , Product productStatus) {
         this.user = user;
         this.product = product;
         this.bidPrice = bidPrice;
