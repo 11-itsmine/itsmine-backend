@@ -33,7 +33,7 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "categoryName": "Hot Posts"
+  "categoryName": "New Posts"
 }
 
 
@@ -43,11 +43,44 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "productName": "Shoes",
+  "productName": "Damn6",
   "description": "This is almost like a brandnew",
   "auctionNowPrice": 150000,
   "currentPrice": 80000,
   "dueDate": 7,
-  "categoryName": "Hot Posts"
+  "categoryName": "New Posts"
 }
+
+### 특정 상품 조회하기
+GET http://localhost:8080/products/1
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+### 상품 조회 페이지네이션
+GET http://localhost:8080/products?page=0&size=5
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+### 상품 수정
+PATCH http://localhost:8080/products/1
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "productName": "이정빈"
+}
+
+
+### 상품 좋아요
+POST http://localhost:8080/products/1/likes
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+### 상품 삭제
+DELETE http://localhost:8080/products/1
+Authorization: {{Authorization}}
+Content-Type: application/json
 
