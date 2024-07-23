@@ -43,4 +43,8 @@ public class UserAdapter {
 		}
 		return false;
 	}
+
+	public void delete(User user) {
+		userRepository.delete(user);
+	}
 }
