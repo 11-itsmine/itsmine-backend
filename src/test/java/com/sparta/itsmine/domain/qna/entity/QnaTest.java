@@ -26,7 +26,7 @@ class QnaTest {
                 .address("충남 어딘가")
                 .email("fltnsah@nate.com")
                 .build();
-        product = new Product(1L, "마우스", "마우스 팝니다", 50000, 1000);
+//        product = new Product(1L, "마우스", "마우스 팝니다", 50000, 1000);
     }
 
     @Test

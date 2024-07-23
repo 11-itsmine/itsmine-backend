@@ -17,6 +17,9 @@ import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,10 +58,10 @@ public class AuctionController {
 
     //유저(구매자(본인)) 입찰 조회(QueryDSL)
     @GetMapping("/auctions")
-    public ResponseEntity<HttpResponseDto> getAuctionByUserToList2(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<GetAuctionByUserResponseDto> responseDto = auctionService.getAuctionByUser(
-                userDetails.getUser());
+    public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
+            @AuthenticationPrincipal UserDetailsImpl userDetails, Pageable pageable) {
+        Page<GetAuctionByUserResponseDto> responseDto = auctionService.getAuctionByUser(
+                userDetails.getUser(),pageable);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
 

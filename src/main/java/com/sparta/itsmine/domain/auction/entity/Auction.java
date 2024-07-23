@@ -25,7 +25,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "auctions")
+@Table(name = "auctions")//bidPrice로 주로 조회하는데 카디널리티가 낮아 인덱싱을 안함
 public class Auction extends TimeStamp {
 
     @Id
@@ -59,4 +59,5 @@ public class Auction extends TimeStamp {
         this.product = product;
         this.bidPrice = bidPrice;
     }
+
 }

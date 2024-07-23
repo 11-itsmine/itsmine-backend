@@ -20,6 +20,8 @@ import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,7 +35,7 @@ public class AuctionService {
     @Transactional
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto) {
-        Product product = productRepository.findById(productId).orElseThrow();
+        Product product = product(productId);
         Long auctionPrice = requestDto.getBidPrice();
         GetAuctionByMaxedBidPriceResponseDto maxedBidPrice = auctionRepository.findByProductBidPrice(
                 productId);
@@ -66,7 +68,7 @@ public class AuctionService {
 
         Map<Long, Auction> maxBidAuctions = auctions.stream()
                 .collect(Collectors.toMap(auction -> auction.getProduct().getId(),//auction이란 이름으로 빼서 key로 사용
-                        Function.identity(),//객체 자체를 값으로 사용//
+                        Function.identity(),//객체 자체를 값으로 사용
                         BinaryOperator.maxBy(Comparator.comparingLong(//Comparator쓰면 비교가 가능함
                                 Auction::getBidPrice))));//동일한 key에 대해 중복값이 있을 때 최대값을 선택
 
@@ -77,14 +79,14 @@ public class AuctionService {
     }*/
 
     //유저 입찰 조회(queryDSL 조회)(각각 입찰한 상품 당 자신의 최대입찰가만 나오게끔)(유지보수 할때 더 좋음)
-    public List<GetAuctionByUserResponseDto> getAuctionByUser(User user) {
-        List<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid(
-                user.getId());
+    public Page<GetAuctionByUserResponseDto> getAuctionByUser(User user, Pageable pageable) {
+        Page<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid(
+                user.getId(), pageable);
         if (auctions == null) {
             throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
         }
 
-        return auctions.stream().toList();
+        return auctions;
     }
 
     //상품 입찰 조회(자신이 입찰한 상품의 자신의 최대입찰가만 나오게끔)
@@ -120,9 +122,13 @@ public class AuctionService {
     //유찰(상품ID로 조회해서 다 삭제(조건은 나중에))
     @Transactional
     public ProductResponseDto avoidedAuction(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow();
+        Product product = product(productId);
         auctionRepository.deleteAllByProductId(productId);
         return new ProductResponseDto(product);
+    }
+
+    public Product product(Long productId) {
+        return productRepository.findById(productId).orElseThrow();
     }
 
 }
