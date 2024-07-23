@@ -7,7 +7,6 @@ import static com.sparta.itsmine.domain.user.entity.QUser.user;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByMaxedBidPriceResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
@@ -62,9 +61,10 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
         where product_id=product_id
     */
     //해당 상품 최고가 찾기
-    public GetAuctionByMaxedBidPriceResponseDto findByProductBidPrice(Long productId){
+    public GetAuctionByMaxedBidPriceResponseDto findByProductBidPrice(Long productId) {
         return jpaQueryFactory
-                .select(new QGetAuctionByMaxedBidPriceResponseDto(product.id, auction.bidPrice.max()))
+                .select(new QGetAuctionByMaxedBidPriceResponseDto(product.id,
+                        auction.bidPrice.max()))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .where(product.id.eq(productId))

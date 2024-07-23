@@ -11,8 +11,9 @@ import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
-import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
+import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.exception.Auction.AuctionImpossibleBid;
@@ -28,12 +29,13 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
+    private final ProductAdapter adapter;
 
     //입찰 생성(현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리를 해줘야함,(조건은 나중에))
     @Transactional
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto) {
-        Product product = productRepository.findById(productId).orElseThrow();
+        Product product = adapter.getProduct(productId);
         Long auctionPrice = requestDto.getBidPrice();
         GetAuctionByMaxedBidPriceResponseDto maxedBidPrice = auctionRepository.findByProductBidPrice(
                 productId);
@@ -119,10 +121,10 @@ public class AuctionService {
 
     //유찰(상품ID로 조회해서 다 삭제(조건은 나중에))
     @Transactional
-    public ProductResponseDto avoidedAuction(Long productId) {
+    public GetProductResponseDto avoidedAuction(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow();
         auctionRepository.deleteAllByProductId(productId);
-        return new ProductResponseDto(product);
+        return new GetProductResponseDto(product);
     }
 
 }
