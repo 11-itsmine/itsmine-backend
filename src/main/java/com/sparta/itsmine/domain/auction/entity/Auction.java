@@ -2,6 +2,7 @@ package com.sparta.itsmine.domain.auction.entity;
 
 
 import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.Column;
@@ -53,11 +54,16 @@ public class Auction extends TimeStamp {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_status" ,referencedColumnName = "status")
+    private Product productStatus;
+
     @Builder
-    public Auction(User user, Product product, Long bidPrice) {
+    public Auction(User user, Product product, Long bidPrice , Product productStatus) {
         this.user = user;
         this.product = product;
         this.bidPrice = bidPrice;
+        this.productStatus= productStatus;
     }
 
 }

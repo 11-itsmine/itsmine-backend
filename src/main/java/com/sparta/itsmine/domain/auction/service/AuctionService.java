@@ -41,8 +41,8 @@ public class AuctionService {
                 productId);
 
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
-        if (auctionPrice > product.getCurrentPrice()
-                || auctionPrice < product.getAuctionNowPrice()) {
+        if (auctionPrice < product.getCurrentPrice()
+                && auctionPrice > product.getAuctionNowPrice()) {
             throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
         }
 
@@ -52,7 +52,7 @@ public class AuctionService {
             }
         }
 
-        Auction auction = new Auction(user, product, auctionPrice);
+        Auction auction = new Auction(user, product, auctionPrice, product);
 
         auctionRepository.save(auction);
         return new AuctionResponseDto(auction);

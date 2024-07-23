@@ -3,6 +3,8 @@ package com.sparta.itsmine.domain.product.service;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_TO_LIKE;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_TO_REMOVE_LIKE;
 
+import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
+import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
@@ -23,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductAdapter adapter;
+    private final AuctionService auctionService;
+    private final AuctionRepository auctionRepository;
 
     @Transactional
     public ProductCreateDto createProduct(ProductCreateDto createDto, User user) {
@@ -46,9 +50,11 @@ public class ProductService {
         createDto.updateProduct(adapter.getProduct(productId));
     }
 
+    //상품 경매를 취소했을 때 유찰
     @Transactional
     public void deleteProduct(Long productId) {
         adapter.getProduct(productId).setDeletedAt();
+        auctionService.avoidedAuction(productId);
     }
 
     @Transactional
