@@ -22,7 +22,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("productName") String productName);
 
     @Cacheable("productById")
-    Optional<Product> findByIdAndDeletedAtIsNull(Long productId);
+    @Query("SELECT p FROM Product p WHERE p.id = :productId AND p.deletedAt IS NULL")
+    Optional<Product> findActiveProductById(@Param("productId") Long productId);
 
     @Cacheable("productsByUser")
     Page<Product> findAllByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
