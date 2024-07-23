@@ -23,7 +23,7 @@ public class ProductCreateDto {
                 .description(description)
                 .auctionNowPrice(auctionNowPrice)
                 .currentPrice(currentPrice)
-                .dueDate(LocalDateTime.now().plusHours(dueDate))
+                .dueDate(LocalDateTime.now().plusSeconds(dueDate))
                 .category(category).build();
     }
 
@@ -34,7 +34,7 @@ public class ProductCreateDto {
                 .orElse(product.getAuctionNowPrice());
         this.currentPrice = Optional.ofNullable(currentPrice).orElse(product.getCurrentPrice());
         if (dueDate != null) {
-            product.setDueDateBid(LocalDateTime.now().plusHours(dueDate));
+            product.setDueDateBid(LocalDateTime.now().plusSeconds(dueDate));
         }
     }
 }

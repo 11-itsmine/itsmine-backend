@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.auction.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 

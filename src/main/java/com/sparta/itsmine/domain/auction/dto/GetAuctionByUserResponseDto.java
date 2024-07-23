@@ -2,6 +2,8 @@ package com.sparta.itsmine.domain.auction.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.sparta.itsmine.domain.auction.entity.Auction;
+import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;

@@ -40,6 +40,7 @@ public class AuctionService {
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto) {
         Product product = product(productId);
+        ProductStatus status = product.getStatus();
         Integer auctionPrice = requestDto.getBidPrice();
 
         GetAuctionByMaxedBidPriceResponseDto maxedBidPrice = auctionRepository.findByProductBidPrice(
@@ -47,7 +48,7 @@ public class AuctionService {
 
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
         if (auctionPrice < product.getCurrentPrice()
-                && auctionPrice > product.getAuctionNowPrice()) {
+                || auctionPrice > product.getAuctionNowPrice()) {
             throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
         }
 
@@ -58,12 +59,12 @@ public class AuctionService {
             }
         }
 
-        //현재 상품 상태가 경매 중이 아니면 예외처리
+        //현재 상품 상태가 입찰 중이 아니면 예외처리
         if (!product.getStatus().equals(ProductStatus.BID)) {
             throw new AuctionImpossibleBidCauseStatus(AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS);
         }
 
-        Auction auction = new Auction(user, product, auctionPrice, product);
+        Auction auction = new Auction(user, product, auctionPrice, status);
 
         auctionRepository.save(auction);
 
@@ -71,6 +72,7 @@ public class AuctionService {
         if (auctionPrice.equals(product.getAuctionNowPrice())) {
             successfulAuction(productId);
         }
+
         return new AuctionResponseDto(auction);
 
     }
@@ -113,6 +115,11 @@ public class AuctionService {
         }
 
         auctionRepository.deleteAll(auctions);
+
+        Auction auction=auctionRepository.findByProductId(productId);
+        auction.turnStatus(ProductStatus.SUCCESS_BID);
+        auctionRepository.save(auction);
+
         Product product = product(productId);
         product.turnStatus(ProductStatus.SUCCESS_BID);
         productRepository.save(product);

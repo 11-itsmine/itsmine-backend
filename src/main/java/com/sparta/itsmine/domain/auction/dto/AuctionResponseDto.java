@@ -14,7 +14,6 @@ public class AuctionResponseDto {
     private Long productId;
     private Integer bidPrice;
     private LocalDateTime createdAt;
-    private LocalDateTime auctionedAt;
 
     public AuctionResponseDto(Auction auction) {
         this.id = auction.getId();
@@ -22,6 +21,5 @@ public class AuctionResponseDto {
         this.productId = auction.getProduct().getId();
         this.bidPrice = auction.getBidPrice();
         this.createdAt = auction.getCreatedAt();
-        this.auctionedAt = auction.getAuctionedAt();
     }
 }

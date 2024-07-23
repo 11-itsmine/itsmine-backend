@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
+import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
 import org.junit.jupiter.api.BeforeEach;

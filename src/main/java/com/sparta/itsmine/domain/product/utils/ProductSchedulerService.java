@@ -51,9 +51,10 @@ public class ProductSchedulerService {
         }
     }
 
-    //낙찰은 SUCCESS_BID로 상태를 바꿔주는 메소드가 필요한데 없는 거 같음(입찰 생성할 때 상품 즉시구매가를 넣으면 바꿔주는게 좋다고 생각함(Auction에서))
+    //낙찰은 SUCCESS_BID로 상태를 바꿔주는 메소드가 필요한데 없는 거 같음(입찰 생성할 때 상품 즉시구매가를 넣으면 바꿔주는게 좋다고 생각함(Auction에서(했음)))
     //유찰은 낙찰자가 없을 때(dueDate가 마감 될 때까지 입찰자가 아무도 없거나(했음),낙찰자가 낙찰을 취소했을 때(이건 고민해봐야함),상품 경매를 취소했을 때(ProductService에서(했음)))
-    private void updateProductStatusFailBid(Product product) {
+    @Transactional
+    public void updateProductStatusFailBid(Product product) {
         if (LocalDateTime.now().isAfter(product.getDueDate()) && product.getStatus() != FAIL_BID) {
             product.turnStatus(FAIL_BID);
             productRepository.save(product);
@@ -61,7 +62,8 @@ public class ProductSchedulerService {
     }
 
     //낙찰은 dueDate가 마감 될 때 입찰 기록이 존재하면 낙찰
-    private void updateProductStatusSuccessBid(Product product) {
+    @Transactional
+    public void updateProductStatusSuccessBid(Product product) {
         if (LocalDateTime.now().isAfter(product.getDueDate()) && product.getStatus() != SUCCESS_BID) {
             product.turnStatus(SUCCESS_BID);
             productRepository.save(product);

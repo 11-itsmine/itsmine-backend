@@ -7,6 +7,8 @@ import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,16 +38,6 @@ public class Auction extends TimeStamp {
     @Column(nullable = false)
     private Integer bidPrice;
 
-    @CreatedDate
-    @Column(updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime auctionedAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -54,17 +46,21 @@ public class Auction extends TimeStamp {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_status" ,referencedColumnName = "status")
-    private Product productStatus;//연결을 하면 안됨
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
 
 
     @Builder
-    public Auction(User user, Product product, Integer bidPrice , Product productStatus) {
+    public Auction(User user, Product product, Integer bidPrice ,ProductStatus status) {
         this.user = user;
         this.product = product;
         this.bidPrice = bidPrice;
-        this.productStatus= productStatus;
+        this.status=status;
     }
 
+    public ProductStatus turnStatus(ProductStatus status) {
+        this.status=status;
+        return this.getStatus();
+    }
 }
