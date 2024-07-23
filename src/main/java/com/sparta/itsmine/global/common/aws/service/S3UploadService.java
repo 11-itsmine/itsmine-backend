@@ -25,7 +25,7 @@
 //
 //    private final AmazonS3 amazonS3;
 //
-//    @Value("${cloud.aws.s3.bucket}")
+//    @Value("${CLOUD_AWS_S3_BUCKET}")
 //    private String bucket;
 //
 //    public String saveFile(MultipartFile multipartFile) throws IOException {
