@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.auction.service;
 
 
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.global.common.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID;
 import static com.sparta.itsmine.global.common.ResponseExceptionEnum.AUCTION_NOT_FOUND;
 
@@ -36,6 +37,7 @@ public class AuctionService {
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto) {
         Product product = adapter.getProduct(productId);
+        product.turnStatus(BID); // 입찰 시작 상태로 전환
         Long auctionPrice = requestDto.getBidPrice();
         GetAuctionByMaxedBidPriceResponseDto maxedBidPrice = auctionRepository.findByProductBidPrice(
                 productId);
@@ -122,9 +124,7 @@ public class AuctionService {
     //유찰(상품ID로 조회해서 다 삭제(조건은 나중에))
     @Transactional
     public GetProductResponseDto avoidedAuction(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow();
         auctionRepository.deleteAllByProductId(productId);
-        return new GetProductResponseDto(product);
+        return new GetProductResponseDto(adapter.getProduct(productId));
     }
-
 }
