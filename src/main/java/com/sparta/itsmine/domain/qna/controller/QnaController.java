@@ -12,6 +12,8 @@ import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.service.QnaService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.HttpResponseDto;
+import com.sparta.itsmine.global.common.ResponseUtils;
+import com.sparta.itsmine.global.security.UserDetailsImpl;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

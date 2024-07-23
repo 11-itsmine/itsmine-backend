@@ -6,7 +6,6 @@ import com.sparta.itsmine.domain.comment.dto.CommentResponseDto;
 import com.sparta.itsmine.domain.comment.entity.Comment;
 import com.sparta.itsmine.domain.comment.repository.CommentAdapter;
 import com.sparta.itsmine.domain.comment.repository.CommentRepository;
-import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
 import com.sparta.itsmine.domain.user.entity.User;
@@ -23,7 +22,6 @@ public class CommentService {
     private final CommentAdapter commentAdapter;
     private final QnaRepository qnaRepository;
     private final CommentRepository commentRepository;
-  private final ProductRepository productRepository;
 
     // 댓글 작성
     @Transactional
