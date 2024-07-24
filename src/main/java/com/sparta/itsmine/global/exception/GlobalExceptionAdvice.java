@@ -1,8 +1,7 @@
 package com.sparta.itsmine.global.exception;
 
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.PRODUCT_IN_DATE;
 import static com.sparta.itsmine.global.common.ResponseExceptionEnum.USER_ERROR;
+import static com.sparta.itsmine.global.common.ResponseUtils.of;
 
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseExceptionEnum;
@@ -23,24 +22,24 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(UserException.class)
     public ResponseEntity<HttpResponseDto> handleUserException(UserException e) {
         log.error("에러 메세지: ", e);
-        return ResponseUtils.of(USER_ERROR);
+        return of(USER_ERROR);
     }
 
     @ExceptionHandler(ProductException.class)
     public ResponseEntity<HttpResponseDto> handlerProductException(ProductException e) {
         log.error("에러 메세지: ", e);
-        return ResponseUtils.of(PRODUCT_IN_DATE);
+        return of(e.getResponseExceptionEnum());
     }
 
     @ExceptionHandler(CategoryException.class)
     public ResponseEntity<HttpResponseDto> handlerCategoryException(CategoryException e) {
         log.error("에러 메세지: ", e);
-        return ResponseUtils.of(CATEGORY_NOT_FOUND);
+        return of(e.getResponseExceptionEnum());
     }
 
     @ExceptionHandler(QnaException.class)
     public ResponseEntity<HttpResponseDto> handleUserException(QnaException e) {
         log.error("에러 메세지: ", e);
-        return ResponseUtils.of(USER_ERROR);
+        return of(e.getResponseExceptionEnum());
     }
 }
