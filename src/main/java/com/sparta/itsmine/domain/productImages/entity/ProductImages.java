@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.productDetails.entity;
+package com.sparta.itsmine.domain.productImages.entity;
 
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.user.entity.User;
@@ -14,7 +14,7 @@ import lombok.Getter;
 
 @Getter
 @Entity
-public class ProductDetails extends TimeStamp {
+public class ProductImages extends TimeStamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +26,7 @@ public class ProductDetails extends TimeStamp {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

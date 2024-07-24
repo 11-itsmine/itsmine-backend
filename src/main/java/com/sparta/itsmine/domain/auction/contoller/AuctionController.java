@@ -1,9 +1,9 @@
 package com.sparta.itsmine.domain.auction.contoller;
 
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.AUCTION_SUCCESS_CREATE;
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION;
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION;
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.AUCTION_SUCCESS_GET;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_CREATE;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_GET;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
@@ -11,8 +11,8 @@ import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
-import com.sparta.itsmine.global.common.HttpResponseDto;
-import com.sparta.itsmine.global.common.ResponseUtils;
+import com.sparta.itsmine.global.common.response.HttpResponseDto;
+import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import java.util.List;

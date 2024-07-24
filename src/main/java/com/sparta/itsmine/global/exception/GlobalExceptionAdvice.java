@@ -1,12 +1,12 @@
 package com.sparta.itsmine.global.exception;
 
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.PRODUCT_IN_DATE;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.USER_ERROR;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_IN_DATE;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_ERROR;
 
-import com.sparta.itsmine.global.common.HttpResponseDto;
-import com.sparta.itsmine.global.common.ResponseExceptionEnum;
-import com.sparta.itsmine.global.common.ResponseUtils;
+import com.sparta.itsmine.global.common.response.HttpResponseDto;
+import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.exception.category.CategoryException;
 import com.sparta.itsmine.global.exception.product.ProductException;
 import com.sparta.itsmine.global.exception.qna.QnaException;

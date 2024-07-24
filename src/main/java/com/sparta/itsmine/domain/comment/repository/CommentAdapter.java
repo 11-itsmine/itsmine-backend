@@ -4,7 +4,7 @@ import com.sparta.itsmine.domain.comment.entity.Comment;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
-import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.comment.CommentAlreadyExistsException;
 import com.sparta.itsmine.global.exception.comment.CommentEqualSellerException;
 import com.sparta.itsmine.global.exception.comment.CommentNotFoundException;

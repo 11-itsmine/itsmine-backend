@@ -15,7 +15,6 @@ public class ProductCreateDto {
     Integer currentPrice;
     Integer dueDate;
     String categoryName;
-    String imageUrl;
 
     public Product toEntity(Category category) {
         return Product.builder()

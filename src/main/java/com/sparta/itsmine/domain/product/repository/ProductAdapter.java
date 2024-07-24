@@ -1,9 +1,9 @@
 package com.sparta.itsmine.domain.product.repository;
 
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.PRODUCT_IN_DATE;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.USER_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_IN_DATE;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
 
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.category.repository.CategoryRepository;

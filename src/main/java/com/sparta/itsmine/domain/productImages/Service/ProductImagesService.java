@@ -1,4 +1,4 @@
-package com.sparta.itsmine.global.common.aws.service;
+package com.sparta.itsmine.domain.productImages.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -13,17 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class S3Service {
+public class ProductImagesService {
 
     private final AmazonS3 amazonS3;
     private final UserRepository userRepository;
