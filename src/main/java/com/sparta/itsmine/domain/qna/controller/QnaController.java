@@ -5,13 +5,13 @@ import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_CREATE_Q
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_DELETE_QNA;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_QNA_LIST;
 import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_UPDATE_QNA;
+import static com.sparta.itsmine.global.common.ResponseUtils.of;
 
 import com.sparta.itsmine.domain.qna.dto.GetQnaResponseDto;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.service.QnaService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.HttpResponseDto;
-import com.sparta.itsmine.global.common.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class QnaController {
     ) {
         User user = userDetails.getUser();
         qnaService.createQna(productId, requestDto, user);
-        return ResponseUtils.of(SUCCESS_CREATE_QNA);
+        return of(SUCCESS_CREATE_QNA);
     }
 
     /**
@@ -60,13 +60,15 @@ public class QnaController {
     @GetMapping
     public ResponseEntity<HttpResponseDto> getQnaList(
             @PathVariable Long productId,
-            Pageable pageable
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
 
-        Page<GetQnaResponseDto> qnaList = qnaService.getQnaList(productId, pageable);
+        Page<GetQnaResponseDto> qnaList = qnaService.getQnaList(productId, pageable,
+                userDetails.getUser());
 
-        return qnaList == null ? ResponseUtils.of(NULL_QNA_LIST)
-                : ResponseUtils.of(SUCCESS_QNA_LIST, qnaList);
+        return qnaList == null ? of(NULL_QNA_LIST)
+                : of(SUCCESS_QNA_LIST, qnaList.getContent());
     }
 
     /**
@@ -80,7 +82,7 @@ public class QnaController {
             @PathVariable Long productId,
             @PathVariable Long qnaId
     ) {
-        return ResponseUtils.of(SUCCESS_QNA_LIST, qnaService.getQna(productId, qnaId));
+        return of(SUCCESS_QNA_LIST, qnaService.getQna(productId, qnaId));
     }
 
     /**
@@ -98,7 +100,7 @@ public class QnaController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         qnaService.updateQna(qnaId, requestDto, user);
-        return ResponseUtils.of(SUCCESS_UPDATE_QNA);
+        return of(SUCCESS_UPDATE_QNA);
     }
 
     /**
@@ -115,6 +117,6 @@ public class QnaController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         qnaService.deleteQna(productId, qnaId, user);
-        return ResponseUtils.of(SUCCESS_DELETE_QNA);
+        return of(SUCCESS_DELETE_QNA);
     }
 }

@@ -41,6 +41,6 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(QnaException.class)
     public ResponseEntity<HttpResponseDto> handleUserException(QnaException e) {
         log.error("에러 메세지: ", e);
-        return ResponseUtils.of(ResponseExceptionEnum.USER_ERROR);
+        return ResponseUtils.of(USER_ERROR);
     }
 }
