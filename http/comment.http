@@ -8,6 +8,11 @@ Content-Type: application/json
 }
 > {%client.global.set("Authorization", response.headers.valueOf("Authorization"));%}
 
+###로그 아웃
+GET http://localhost:8080/users/logout
+Authorization: {{Authorization}}
+
+
 ### 1번 문의사항 댓글 달기
 POST http://localhost:8080/qnas/1/comments
 Content-Type: application/json
@@ -35,3 +40,37 @@ Authorization: {{Authorization}}
 DELETE http://localhost:8080/qnas/1/comments
 Content-Type: application/json
 Authorization: {{Authorization}}
+
+### 카테고리 추가
+POST http://localhost:8080/category
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "categoryName": "전자"
+}
+
+### 상품 등록
+POST http://localhost:8080/products
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "productName": "상품명1",
+  "description": "상품 내용1",
+  "currentPrice": 50000,
+  "auctionNowPrice": 60000,
+  "categoryName": "전자",
+  "dueDate": 5
+}
+
+###QnA 생성
+POST http://localhost:8080/products/1/qnas
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "순모 문의 내용 비밀글",
+  "content": "내용12345",
+  "secretQna": false
+}

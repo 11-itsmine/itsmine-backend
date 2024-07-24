@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.auction.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,10 +10,10 @@ import lombok.Setter;
 public class GetAuctionByMaxedBidPriceResponseDto {
 
     private Long productId;
-    private Long bidPrice;
+    private Integer bidPrice;
 
     @QueryProjection
-    public GetAuctionByMaxedBidPriceResponseDto(Long productId, Long bidPrice) {
+    public GetAuctionByMaxedBidPriceResponseDto(Long productId, Integer bidPrice) {
         this.productId = productId;
         this.bidPrice = bidPrice;
     }

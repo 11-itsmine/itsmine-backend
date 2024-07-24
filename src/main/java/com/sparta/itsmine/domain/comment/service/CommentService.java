@@ -92,7 +92,7 @@ public class CommentService {
     }
 
     // 문의사항에 이미 댓글이 있는지 확인
-    private void commentAlreadyExists(Long qnaId) {
+    void commentAlreadyExists(Long qnaId) {
         commentAdapter.commentAlreadyExists(qnaId);
     }
 }

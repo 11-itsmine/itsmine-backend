@@ -10,7 +10,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
 
     void deleteAllByProductId(Long productId);
 
-    Auction findByProductId(Long productId);
-
     boolean existsByProductId(Long productId);
+
+    Auction findByProductId(Long productId);
 }
