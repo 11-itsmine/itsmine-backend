@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,8 +37,14 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<GetProductResponseDto> getProductsWithPage(int page, int size, Long userId) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.ASC, "createdAt"));
         return adapter.findAllProducts(pageable, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<GetProductResponseDto> getLikeProductsWithPage(int page, int size, Long userId) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.ASC, "createdAt"));
+        return adapter.findAllLikeProduct(pageable, userId);
     }
 
     @Transactional

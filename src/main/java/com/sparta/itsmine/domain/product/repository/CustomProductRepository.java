@@ -6,6 +6,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface CustomProductRepository {
 
+    long updateProductsToFailBid();
+
     Optional<Product> findActiveProductByUserAndName(@Param("userId") Long userId,
             @Param("productName") String productName);
 

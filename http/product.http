@@ -8,7 +8,7 @@ Content-Type: application/json
   "name":"{{name}}",
   "email":"{{email}}",
   "address": "화성시",
-  "nickname": "Jake"
+  "nickname": "Jake3"
 }
 
 ### 로그인
@@ -43,11 +43,11 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "productName": "Damn6",
+  "productName": "Jake",
   "description": "This is almost like a brandnew",
   "auctionNowPrice": 150000,
   "currentPrice": 80000,
-  "dueDate": 7,
+  "dueDate": 3,
   "categoryName": "New Posts"
 }
 
@@ -63,6 +63,13 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 
+### 좋아요 게시물 조회
+GET https://localhost:8080/products/likes?page=0&size=5
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+
 ### 상품 수정
 PATCH http://localhost:8080/products/1
 Authorization: {{Authorization}}
@@ -74,7 +81,7 @@ Content-Type: application/json
 
 
 ### 상품 좋아요
-POST http://localhost:8080/products/1/likes
+POST http://localhost:8080/products/3/likes
 Authorization: {{Authorization}}
 Content-Type: application/json
 

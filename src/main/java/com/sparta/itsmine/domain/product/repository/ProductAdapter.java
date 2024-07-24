@@ -71,6 +71,11 @@ public class ProductAdapter {
                 .map(GetProductResponseDto::new);
     }
 
+    public Page<GetProductResponseDto> findAllLikeProduct(Pageable pageable, Long userId) {
+        return productRepository.findAllByUserIdAndLikeTrueAndDeletedAtIsNull(userId, pageable)
+                .map(GetProductResponseDto::new);
+    }
+
     public Product getProduct(Long productId) {
         return productRepository.findActiveProductById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));

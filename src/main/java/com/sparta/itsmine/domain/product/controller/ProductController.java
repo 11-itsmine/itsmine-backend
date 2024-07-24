@@ -62,6 +62,19 @@ public class ProductController {
         return of(SUCCESS_TO_SEARCH_PRODUCTS, responseEntity);
     }
 
+    @GetMapping("/likes")
+    public ResponseEntity<HttpResponseDto> getAllLikeProductsWithPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        Page<GetProductResponseDto> responseDto = productService.getLikeProductsWithPage(page, size,
+                userDetails.getUser().getId());
+        PageableResponse<GetProductResponseDto> responseEntity = new PageableResponse<>(
+                responseDto);
+        return of(SUCCESS_TO_SEARCH_PRODUCTS, responseEntity);
+    }
+
     @PatchMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> updateProduct(
             @RequestBody ProductCreateDto createDto,

@@ -113,7 +113,7 @@ public class Product extends TimeStamp {
         this.currentPrice = Optional.ofNullable(createDto.getCurrentPrice())
                 .orElse(product.getCurrentPrice());
         if (hour != null) {
-            this.dueDate = product.getDueDate().plusHours(hour);
+            this.dueDate = product.getDueDate().plusSeconds(hour);
         } else {
             this.dueDate = product.getDueDate();
         }
@@ -133,7 +133,7 @@ public class Product extends TimeStamp {
     }
 
     public void setDueDateBid(Integer hours) {
-        this.dueDate = this.getDueDate().plusHours(hours);
+        this.dueDate = this.getDueDate().plusSeconds(hours);
     }
 
     public void setCategory(Category category) {
