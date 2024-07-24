@@ -1,11 +1,12 @@
 package com.sparta.itsmine.domain.category.controller;
 
 
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_TO_MAKE_NEW_CATEGORY;
+import static com.sparta.itsmine.global.common.ResponseUtils.of;
+
 import com.sparta.itsmine.domain.category.dto.CategoryDto;
 import com.sparta.itsmine.domain.category.service.CategoryService;
 import com.sparta.itsmine.global.common.HttpResponseDto;
-import com.sparta.itsmine.global.common.ResponseCodeEnum;
-import com.sparta.itsmine.global.common.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,6 @@ public class CategoryController {
             @RequestBody CategoryDto categoryName
     ) {
         categoryService.createCategory(categoryName);
-        return ResponseUtils.of(ResponseCodeEnum.SUCCESS_TO_MAKE_NEW_CATEGORY);
+        return of(SUCCESS_TO_MAKE_NEW_CATEGORY);
     }
 }

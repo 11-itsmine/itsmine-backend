@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.product.entity;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SAVED;
 
 import com.sparta.itsmine.domain.category.entity.Category;
+import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
@@ -17,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,14 +37,14 @@ public class Product extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Long id;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String productName;
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)
     private Integer currentPrice;
     @Column(nullable = false)
-    private Integer AuctionNowPrice;
+    private Integer auctionNowPrice;
     // 입찰, 낙찰, 유찰
     // 상품이 등록이 되는 즉시 입찰 시작이기 때문에 바로 입찰로 상태를 변경한다.
     @Column(nullable = false)
@@ -79,7 +81,7 @@ public class Product extends TimeStamp {
         this.productName = productName;
         this.description = description;
         this.currentPrice = currentPrice;
-        AuctionNowPrice = auctionNowPrice;
+        this.auctionNowPrice = auctionNowPrice;
         this.dueDate = dueDate;
         this.category = category;
 
@@ -100,13 +102,29 @@ public class Product extends TimeStamp {
     /**
      * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
      */
+
+    public void updateProduct(Product product, ProductCreateDto createDto, Integer hour) {
+        this.productName = Optional.ofNullable(createDto.getProductName())
+                .orElse(product.getProductName());
+        this.description = Optional.ofNullable(createDto.getDescription())
+                .orElse(product.getDescription());
+        this.auctionNowPrice = Optional.ofNullable(createDto.getAuctionNowPrice())
+                .orElse(product.getAuctionNowPrice());
+        this.currentPrice = Optional.ofNullable(createDto.getCurrentPrice())
+                .orElse(product.getCurrentPrice());
+        if (hour != null) {
+            this.dueDate = product.getDueDate().plusSeconds(hour);
+        } else {
+            this.dueDate = product.getDueDate();
+        }
+    }
+
     public void setDeletedAt() {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public ProductStatus turnStatus(ProductStatus status) {
+    public void turnStatus(ProductStatus status) {
         this.status = status;
-        return this.getStatus();
     }
 
     public Boolean toggleLike() {
@@ -114,7 +132,11 @@ public class Product extends TimeStamp {
         return this.like;
     }
 
-    public void setDueDateBid(LocalDateTime localDateTime) {
-        this.dueDate = localDateTime;
+    public void setDueDateBid(Integer hours) {
+        this.dueDate = this.getDueDate().plusSeconds(hours);
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

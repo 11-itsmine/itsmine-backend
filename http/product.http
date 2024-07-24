@@ -1,0 +1,93 @@
+### 유저 회원 가입
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password}}",
+  "name":"{{name}}",
+  "email":"{{email}}",
+  "address": "화성시",
+  "nickname": "Jake3"
+}
+
+### 로그인
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password}}"
+}
+> {%
+  client.log(response.headers.valueOf("Authorization"));
+  client.log(response.headers.valueOf("RefreshToken"));
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
+%}
+
+
+### 카테고리 추가하기
+POST http://localhost:8080/category
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "categoryName": "New Posts"
+}
+
+
+### 상품 등록하기
+POST http://localhost:8080/products
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "productName": "Jake",
+  "description": "This is almost like a brandnew",
+  "auctionNowPrice": 150000,
+  "currentPrice": 80000,
+  "dueDate": 3,
+  "categoryName": "New Posts"
+}
+
+### 특정 상품 조회하기
+GET http://localhost:8080/products/2
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+### 상품 조회 페이지네이션
+GET http://localhost:8080/products?page=0&size=5
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+### 좋아요 게시물 조회
+GET https://localhost:8080/products/likes?page=0&size=5
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+
+### 상품 수정
+PATCH http://localhost:8080/products/1
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "productName": "이정빈"
+}
+
+
+### 상품 좋아요
+POST http://localhost:8080/products/3/likes
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+### 상품 삭제
+DELETE http://localhost:8080/products/1
+Authorization: {{Authorization}}
+Content-Type: application/json
+
