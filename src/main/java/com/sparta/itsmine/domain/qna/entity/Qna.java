@@ -46,7 +46,7 @@ public class Qna extends TimeStamp {
     @OneToOne(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
     private Comment comment;
 
-    private Qna(QnaRequestDto requestDto, User user, Product product) {
+    public Qna(QnaRequestDto requestDto, User user, Product product) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
         this.user = user;

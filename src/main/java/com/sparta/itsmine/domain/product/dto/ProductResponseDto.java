@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class GetProductResponseDto {
+public class ProductResponseDto {
 
     private final Long id;
     private final String productName;
@@ -16,7 +16,7 @@ public class GetProductResponseDto {
     private final LocalDateTime dueDate;
     private final Category category;
 
-    public GetProductResponseDto(Product product) {
+    public ProductResponseDto(Product product) {
         this.id = product.getId();
         this.productName = product.getProductName();
         this.description = product.getDescription();

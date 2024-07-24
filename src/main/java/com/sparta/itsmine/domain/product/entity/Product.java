@@ -41,6 +41,7 @@ public class Product extends TimeStamp {
     private String productName;
     @Column(nullable = false)
     private String description;
+    // TODO : 시작 가격을 명시해주고 추적하자
     @Column(nullable = false)
     private Integer currentPrice;
     @Column(nullable = false)

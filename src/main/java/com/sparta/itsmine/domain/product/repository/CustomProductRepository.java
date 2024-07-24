@@ -8,7 +8,7 @@ public interface CustomProductRepository {
 
     long updateProductsToFailBid();
 
-    Optional<Product> findActiveProductByUserAndName(@Param("userId") Long userId,
+    Optional<Product> existActiveProductByUserAndName(@Param("userId") Long userId,
             @Param("productName") String productName);
 
     Optional<Product> findActiveProductById(@Param("productId") Long productId);
