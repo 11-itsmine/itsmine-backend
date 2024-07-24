@@ -12,7 +12,6 @@ import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.service.QnaService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.HttpResponseDto;
-import com.sparta.itsmine.global.common.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -62,13 +61,15 @@ public class QnaController {
     @GetMapping
     public ResponseEntity<HttpResponseDto> getQnaList(
             @PathVariable Long productId,
-            Pageable pageable
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
 
-        Page<GetQnaResponseDto> qnaList = qnaService.getQnaList(productId, pageable);
+        Page<GetQnaResponseDto> qnaList = qnaService.getQnaList(productId, pageable,
+                userDetails.getUser());
 
         return qnaList == null ? of(NULL_QNA_LIST)
-                : of(SUCCESS_QNA_LIST, qnaList);
+                : of(SUCCESS_QNA_LIST, qnaList.getContent());
     }
 
     /**
@@ -82,7 +83,7 @@ public class QnaController {
             @PathVariable Long productId,
             @PathVariable Long qnaId
     ) {
-        return of(SUCCESS_QNA_LIST, qnaService.getQna(productId, qnaId));
+        return ResponseUtils.of(SUCCESS_QNA_LIST, qnaService.getQna(productId, qnaId));
     }
 
     /**
