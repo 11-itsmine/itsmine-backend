@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.product.repository;
 
 import static com.sparta.itsmine.domain.product.entity.QProduct.product;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.FAIL_BID;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -27,7 +28,7 @@ public class ProductRepositoryImpl implements CustomProductRepository {
                 .update(product)
                 .set(product.status, FAIL_BID)
                 .where(product.dueDate.loe(java.time.LocalDateTime.now())
-                        .and(product.status.ne(FAIL_BID)))
+                        .and(product.status.eq(BID)))
                 .execute();
     }
 

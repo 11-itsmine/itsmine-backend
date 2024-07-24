@@ -13,7 +13,7 @@ public class ProductSchedulerService {
 
     private final ProductRepository productRepository;
 
-    @Scheduled(fixedRate = 1000)  // Schedule this method to run every second
+    @Scheduled(fixedRate = 2000)
     public void updateProductStatuses() {
         long updatedCount = productRepository.updateProductsToFailBid();
         if (updatedCount != 0L) {
