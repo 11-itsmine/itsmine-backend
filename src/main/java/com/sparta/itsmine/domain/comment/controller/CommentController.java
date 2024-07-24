@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.*;
 import static com.sparta.itsmine.global.common.ResponseUtils.of;
 
 @RestController
@@ -30,7 +31,7 @@ public class CommentController {
             @RequestBody @Valid CommentRequestDto commentRequestDto) {
 
         AddCommentResponseDto comment = commentService.addComment(qnaId,userDetails.getUser(),commentRequestDto);
-        return of(ResponseCodeEnum.COMMENT_SUCCESS_CREATE, comment);
+        return of(COMMENT_SUCCESS_CREATE, comment);
     }
 
     // 댓글 조회
@@ -39,7 +40,7 @@ public class CommentController {
             @PathVariable Long qnaId) {
 
         CommentResponseDto comment = commentService.getComment(qnaId);
-        return of(ResponseCodeEnum.COMMENT_SUCCESS_GET, comment);
+        return of(COMMENT_SUCCESS_GET, comment);
     }
 
     // 댓글 수정
@@ -50,7 +51,7 @@ public class CommentController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         commentService.updateComment(qnaId,commentRequestDto,userDetails.getUser());
-        return of(ResponseCodeEnum.COMMENT_SUCCESS_UPDATE);
+        return of(COMMENT_SUCCESS_UPDATE);
     }
 
     // 댓글 삭제
@@ -60,6 +61,6 @@ public class CommentController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         commentService.deleteComment(qnaId,userDetails.getUser());
-        return of(ResponseCodeEnum.COMMENT_SUCCESS_DELETE);
+        return of(COMMENT_SUCCESS_DELETE);
     }
 }
