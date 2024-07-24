@@ -10,7 +10,7 @@ import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
-import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
+import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
@@ -81,7 +81,7 @@ public class AuctionController {
     //유찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
     @DeleteMapping("/product/{product_id}/auction/avoided")
     public ResponseEntity<HttpResponseDto> avoidedAuction(@PathVariable Long product_id) {
-        ProductResponseDto responseDto = auctionService.avoidedAuction(product_id);
+        GetProductResponseDto responseDto = auctionService.avoidedAuction(product_id);
         return ResponseUtils.of(AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, responseDto);
     }
 }

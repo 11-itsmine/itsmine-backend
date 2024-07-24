@@ -27,10 +27,12 @@ GET http://localhost:8080/users/logout
 Content-Type: application/json
 Authorization: {{Authorization}}
 
+
 ### 유저 조회
 GET http://localhost:8080/users/5
 Content-Type: application/json
 Authorization: {{Authorization}}
+
 
 ### 회원 탈퇴
 DELETE http://localhost:8080/users/withdraw
@@ -48,6 +50,7 @@ Content-Type: application/json
 Authorization: {{Authorization}}
 
 {
+
   "email":"seongchankim1@asd.com",
   "address": "서울시2",
   "nickname": "SCK3"

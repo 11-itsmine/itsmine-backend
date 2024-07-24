@@ -16,7 +16,6 @@ import com.sparta.itsmine.global.exception.category.CategoryNotFoundException;
 import com.sparta.itsmine.global.exception.product.ProductInDateException;
 import com.sparta.itsmine.global.exception.product.ProductNotFoundException;
 import com.sparta.itsmine.global.exception.user.UserNotFoundException;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,40 +32,38 @@ public class ProductAdapter {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
-    public void findProductNameByUserId(ProductCreateDto createDto, User user) {
-        // 상품 존재 검증 - 만료 기한을 확인합니다.
-        User user1 = userRepository.findByIdAndDeletedAtIsNull(user.getId()).orElseThrow(
-                () -> new UserNotFoundException(USER_NOT_FOUND)
-        );
-
-        Optional<Product> product = productRepository.findActiveProductByUserAndName(
-                user.getId(), createDto.getProductName());
+    public GetProductResponseDto createOrUpdateProduct(ProductCreateDto createDto, Long userId) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         Category category = categoryRepository.findCategoryByCategoryName(
-                createDto.getCategoryName()).orElseThrow(
-                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND)
-        );
+                        createDto.getCategoryName())
+                .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
 
-        Product product1 = createDto.toEntity(category);
-        product1.connectUser(user);
-        productRepository.save(product1);
+        Optional<Product> existingProduct = productRepository.findActiveProductByUserAndName(userId,
+                createDto.getProductName());
 
-        if (product.isEmpty()) {
-            return;
-        }
-
-        // 이미 상품이 존재할 떄의 처리
-        if (product.get().getDueDate().isBefore(LocalDateTime.now())) {
+        if (existingProduct.isPresent()) {
             throw new ProductInDateException(PRODUCT_IN_DATE);
         }
-        product.get().connectUser(user);
+
+        Product newProduct = createProduct(createDto, user, category);
+        productRepository.save(newProduct);
+        return new GetProductResponseDto(newProduct);
+    }
+
+    private Product createProduct(ProductCreateDto createDto, User user, Category category) {
+        Product newProduct = createDto.toEntity(category);
+        newProduct.connectUser(user);
+        newProduct.setDueDateBid(createDto.getDueDate());
+        newProduct.setCategory(category);
+        return newProduct;
     }
 
     public GetProductResponseDto verifyProduct(Long productId) {
-        return new GetProductResponseDto(
-                productRepository.findByIdAndDeletedAtIsNull(productId).orElseThrow(
-                        () -> new ProductNotFoundException(PRODUCT_NOT_FOUND)
-                ));
+        Product product = productRepository.findActiveProductById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+        return new GetProductResponseDto(product);
     }
 
     public Page<GetProductResponseDto> findAllProducts(Pageable pageable, Long userId) {
@@ -74,9 +71,17 @@ public class ProductAdapter {
                 .map(GetProductResponseDto::new);
     }
 
+    public Page<GetProductResponseDto> findAllLikeProduct(Pageable pageable, Long userId) {
+        return productRepository.findAllByUserIdAndLikeTrueAndDeletedAtIsNull(userId, pageable)
+                .map(GetProductResponseDto::new);
+    }
+
     public Product getProduct(Long productId) {
-        return productRepository.findByIdAndDeletedAtIsNull(productId).orElseThrow(
-                () -> new ProductNotFoundException(PRODUCT_NOT_FOUND)
-        );
+        return productRepository.findActiveProductById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+    }
+
+    public void saveProduct(Product product) {
+        productRepository.save(product);
     }
 }
