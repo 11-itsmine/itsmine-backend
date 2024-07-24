@@ -4,8 +4,7 @@ import com.sparta.itsmine.domain.comment.dto.AddCommentResponseDto;
 import com.sparta.itsmine.domain.comment.dto.CommentRequestDto;
 import com.sparta.itsmine.domain.comment.dto.CommentResponseDto;
 import com.sparta.itsmine.domain.comment.service.CommentService;
-import com.sparta.itsmine.global.common.HttpResponseDto;
-import com.sparta.itsmine.global.common.ResponseCodeEnum;
+import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.*;
-import static com.sparta.itsmine.global.common.ResponseUtils.of;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.*;
+import static com.sparta.itsmine.global.common.response.ResponseUtils.of;
 
 @RestController
 @RequestMapping("/qnas/{qnaId}/comments")

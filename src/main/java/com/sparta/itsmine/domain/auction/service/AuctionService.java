@@ -1,10 +1,10 @@
 package com.sparta.itsmine.domain.auction.service;
 
 
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.AUCTION_NOT_FOUND;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;

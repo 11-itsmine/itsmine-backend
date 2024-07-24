@@ -1,14 +1,13 @@
 package com.sparta.itsmine.domain.qna.entity;
 
 import static com.sparta.itsmine.domain.user.utils.UserRole.USER;
-import static com.sparta.itsmine.global.common.ResponseExceptionEnum.AUCTION_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_NOT_FOUND;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
-import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
 import org.junit.jupiter.api.BeforeEach;

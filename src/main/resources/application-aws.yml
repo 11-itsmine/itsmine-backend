@@ -4,8 +4,18 @@
 #      accessKey: ${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
 #      secretKey: ${CLOUD_AWS_CREDENTIALS_SECRETKEY}
 #    s3:
-#      bucket: itsmine-bucket
+#      bucket: itsmineBucket
 #    region:
 #      static: ${CLOUD_AWS_REGION_STATIC}
 #    stack:
 #      auto: false
+
+cloud:
+  aws:
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCKET}
+    stack.auto: false
+    region.static: ${CLOUD_AWS_REGION_STATIC}
+    credentials:
+      accessKey: ${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
+      secretKey: ${CLOUD_AWS_CREDENTIALS_SECRETKEY}
