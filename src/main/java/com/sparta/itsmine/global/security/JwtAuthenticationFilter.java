@@ -16,8 +16,8 @@ import com.sparta.itsmine.domain.refreshtoken.RefreshTokenService;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.utils.UserRole;
-import com.sparta.itsmine.global.common.HttpResponseDto;
-import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.common.response.HttpResponseDto;
+import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.user.UserDeletedException;
 
 import jakarta.servlet.FilterChain;

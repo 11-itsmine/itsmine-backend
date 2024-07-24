@@ -1,6 +1,6 @@
-package com.sparta.itsmine.global.common.aws.controller;
+package com.sparta.itsmine.domain.productImages.controller;
 
-import com.sparta.itsmine.global.common.aws.service.S3Service;
+import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +13,15 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/s3")
-public class S3Controller {
+public class ProductImagesController {
 
-    private final S3Service s3Service;
+    private final ProductImagesService productImagesService;
 
     // 파일 업로드 엔드포인트
     @PostMapping("/upload")
     public ResponseEntity<List<String>> uploadFiles(@RequestParam("file") List<MultipartFile> files) {
         try {
-            List<String> fileUrls = s3Service.saveFiles(files);
+            List<String> fileUrls = productImagesService.saveFiles(files);
             return ResponseEntity.ok(fileUrls); // S3에 저장된 파일 URL 리스트 반환
         } catch (IOException e) {
             return ResponseEntity.status(500).body(Collections.singletonList("파일 업로드 중 오류가 발생했습니다."));
@@ -43,7 +43,7 @@ public class S3Controller {
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteFile(@RequestParam("fileUrl") String fileUrl) {
         try {
-            s3Service.deleteFile(fileUrl);
+            productImagesService.deleteFile(fileUrl);
             return ResponseEntity.ok("파일 삭제 완료");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("파일 삭제 중 오류가 발생했습니다.");
