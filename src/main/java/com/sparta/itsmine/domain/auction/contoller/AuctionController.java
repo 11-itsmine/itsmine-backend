@@ -17,6 +17,9 @@ import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,55 +36,33 @@ public class AuctionController {
     private final AuctionService auctionService;
 
     //구매자 입찰 생성
-    @PostMapping("/product/{product_id}/auctions")
+    @PostMapping("/product/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> createAuction(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long product_id,
-            @Valid @RequestBody AuctionRequestDto requestDto) {
+            @PathVariable Long productId,
+            @RequestBody AuctionRequestDto requestDto) {
         AuctionResponseDto responseDto = auctionService.createAuction(userDetails.getUser(),
-                product_id,
+                productId,
                 requestDto);
         return ResponseUtils.of(AUCTION_SUCCESS_CREATE, responseDto);
     }
 
-/*    //유저(구매자(본인)) 입찰 조회(stream)
-    @GetMapping("/auctions")
-    public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<AuctionResponseDto> responseDto = auctionService.getAuctionByUser(
-                userDetails.getUser());
-        return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
-    }*/
-
     //유저(구매자(본인)) 입찰 조회(QueryDSL)
     @GetMapping("/auctions")
-    public ResponseEntity<HttpResponseDto> getAuctionByUserToList2(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<GetAuctionByUserResponseDto> responseDto = auctionService.getAuctionByUser(
-                userDetails.getUser());
+    public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
+            @AuthenticationPrincipal UserDetailsImpl userDetails, Pageable pageable) {
+        Page<GetAuctionByUserResponseDto> responseDto = auctionService.getAuctionByUser(
+                userDetails.getUser(),pageable);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
 
     //유저(구매자(본인)) 상품 입찰 조회
-    @GetMapping("/product/{product_id}/auctions")
+    @GetMapping("/product/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByProduct(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long product_id) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long productId) {
         GetAuctionByProductResponseDto responseDto = auctionService.getAuctionByProduct(
-                userDetails.getUser(), product_id);
+                userDetails.getUser(), productId);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
 
-    //낙찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
-    @DeleteMapping("/product/{product_id}/auction/successful")
-    public ResponseEntity<HttpResponseDto> successfulAuction(@PathVariable Long product_id) {
-        AuctionResponseDto responseDto = auctionService.successfulAuction(product_id);
-        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION, responseDto);
-    }
-
-    //유찰(테스트용으로 서비스의 기능 자체는 어디로 가야할지 고민해봐야함)
-    @DeleteMapping("/product/{product_id}/auction/avoided")
-    public ResponseEntity<HttpResponseDto> avoidedAuction(@PathVariable Long product_id) {
-        GetProductResponseDto responseDto = auctionService.avoidedAuction(product_id);
-        return ResponseUtils.of(AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION, responseDto);
-    }
 }
