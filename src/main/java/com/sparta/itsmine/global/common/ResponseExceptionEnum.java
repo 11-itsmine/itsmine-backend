@@ -42,7 +42,9 @@ public enum ResponseExceptionEnum {
     //경매
     AUCTION_IMPOSSIBLE_BID(HttpStatus.BAD_REQUEST,
             "상품의 입찰가보다 낮거나 즉시구매가보다 높은 입찰가입니다 입찰 금액을 확인해주세요."),
-    AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "입찰 기록을 찾을 수 없습니다.");
+    AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "입찰 기록을 찾을 수 없습니다."),
+    AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS(HttpStatus.BAD_REQUEST,
+            "이미 낙찰됐거나 유찰된 상품입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
