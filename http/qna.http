@@ -1,0 +1,154 @@
+### 유저 회원 가입
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password}}",
+  "name":"{{name}}",
+  "email":"{{email}}",
+  "address": "화성시",
+  "nickname": "Jake2"
+}
+
+### 로그인
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password}}"
+}
+> {%
+  client.log(response.headers.valueOf("Authorization"));
+  client.log(response.headers.valueOf("RefreshToken"));
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
+%}
+
+
+### 유저 회원 가입1
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username": "username1234",
+  "password": "password1234!",
+  "name": "이순모",
+  "email": "fltnsah@nate.com",
+  "address": "화성시",
+  "nickname": "7777"
+}
+
+### 로그인2
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "username": "username1234",
+  "password": "password1234!"
+}
+> {%
+  client.log(response.headers.valueOf("Authorization"));
+  client.log(response.headers.valueOf("RefreshToken"));
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
+%}
+
+
+### 유저 회원 가입3
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username": "username987",
+  "password": "password97!",
+  "name": "마야",
+  "email": "clsrn77990",
+  "address": "화성시",
+  "nickname": "Jake3"
+}
+
+### 로그인3
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "username": "username987",
+  "password": "password97!"
+}
+> {%
+  client.log(response.headers.valueOf("Authorization"));
+  client.log(response.headers.valueOf("RefreshToken"));
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
+%}
+
+
+
+###로그 아웃
+GET http://localhost:8080/users/logout
+Authorization: {{Authorization}}
+
+
+### 카테고리 추가
+POST http://localhost:8080/category
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "categoryName": "전자"
+}
+
+### 상품 등록
+POST http://localhost:8080/products
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "productName": "상품명1",
+  "description": "상품 내용1",
+  "currentPrice": 50000,
+  "auctionNowPrice": 60000,
+  "categoryName": "전자",
+  "dueDate": 5
+}
+
+###QnA 생성
+POST http://localhost:8080/products/1/qnas
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "마야 문의 내용글2",
+  "content": "내용123452",
+  "secretQna": true
+}
+
+
+###QnA 리스트 조회
+GET http://localhost:8080/products/1/qnas
+Authorization: {{Authorization}}
+
+
+
+###QnA 단건 조회
+GET http://localhost:8080/products/1/qnas/1
+Authorization: {{Authorization}}
+
+
+
+###QnA 수정
+PUT http://localhost:8080/products/1/qnas/15
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "수정 - 순모제목",
+  "content": "수정 - 내용",
+  "secretQna": true
+}
+
+###QnA 삭제
+DELETE http://localhost:8080/products/1/qnas/3
+Authorization: {{Authorization}}
