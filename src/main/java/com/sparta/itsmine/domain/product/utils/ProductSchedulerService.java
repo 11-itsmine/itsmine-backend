@@ -15,10 +15,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
+@EnableScheduling
 @RequiredArgsConstructor
 public class ProductSchedulerService {
 
@@ -27,11 +29,13 @@ public class ProductSchedulerService {
     private final AuctionService auctionService;
     private final AuctionRepository auctionRepository;
 
-    @PostConstruct
-    public void scheduleProductUpdates() {
-        List<Product> products = productRepository.findAll();
-        products.forEach(this::scheduleProductUpdate);
-    }
+    @Scheduled(fixedRate = 1000)  // Schedule this method to run every second
+    public void updateProductStatuses() {
+        long updatedCount = productRepository.updateProductsToFailBid();
+        if (updatedCount != 0L) {
+            System.out.println(
+                    "Updated " + updatedCount + " product(s) at " + java.time.LocalDateTime.now());
+        }
 
     private void scheduleProductUpdate(Product product) {
         if (product.getStartDate() != null && product.getDueDate() != null) {

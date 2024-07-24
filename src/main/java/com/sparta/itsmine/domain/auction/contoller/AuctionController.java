@@ -10,7 +10,7 @@ import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
-import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
+import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
 import com.sparta.itsmine.global.common.HttpResponseDto;
 import com.sparta.itsmine.global.common.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
