@@ -3,12 +3,12 @@ POST http://localhost:8080/users
 Content-Type: application/json
 
 {
-  "username":"{{username}}",
-  "password":"{{password}}",
-  "name":"{{name}}",
-  "email":"{{email}}",
-  "address": "화성시",
-  "nickname": "Jake"
+  "username":"seongchankim",
+  "password":"12345678!@#ASD",
+  "name":"김성찬",
+  "email":"seongchankim@asd.com",
+  "address": "서울시",
+  "nickname": "SCK"
 }
 
 ### 로그인
@@ -16,71 +16,42 @@ POST http://localhost:8080/users/login
 Content-Type: application/json
 
 {
-  "username":"{{username}}",
-  "password":"{{password}}"
+  "username":"seongchankim",
+  "password":"12345678!@#ASD"
 }
-> {%
-  client.log(response.headers.valueOf("Authorization"));
-  client.log(response.headers.valueOf("RefreshToken"));
-  client.global.set("Authorization", response.headers.valueOf("Authorization"));
-  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
-%}
+> {%client.global.set("Authorization", response.headers.valueOf("Authorization"));%}
 
 
-### 카테고리 추가하기
-POST http://localhost:8080/category
-Authorization: {{Authorization}}
+### 로그아웃
+GET http://localhost:8080/users/logout
 Content-Type: application/json
+Authorization: {{Authorization}}
+
+
+### 유저 조회
+GET http://localhost:8080/users/5
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+
+### 회원 탈퇴
+DELETE http://localhost:8080/users/withdraw
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 회원 복구
+PUT http://localhost:8080/users/resign/5
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 회원 정보 수정
+PUT http://localhost:8080/users/update
+Content-Type: application/json
+Authorization: {{Authorization}}
 
 {
-  "categoryName": "New Posts"
+
+  "email":"seongchankim1@asd.com",
+  "address": "서울시2",
+  "nickname": "SCK3"
 }
-
-
-### 상품 등록하기
-POST http://localhost:8080/products
-Authorization: {{Authorization}}
-Content-Type: application/json
-
-{
-  "productName": "Damn6",
-  "description": "This is almost like a brandnew",
-  "auctionNowPrice": 150000,
-  "currentPrice": 80000,
-  "dueDate": 7,
-  "categoryName": "New Posts"
-}
-
-### 특정 상품 조회하기
-GET http://localhost:8080/products/1
-Authorization: {{Authorization}}
-Content-Type: application/json
-
-
-### 상품 조회 페이지네이션
-GET http://localhost:8080/products?page=0&size=5
-Authorization: {{Authorization}}
-Content-Type: application/json
-
-
-### 상품 수정
-PATCH http://localhost:8080/products/1
-Authorization: {{Authorization}}
-Content-Type: application/json
-
-{
-  "productName": "이정빈"
-}
-
-
-### 상품 좋아요
-POST http://localhost:8080/products/1/likes
-Authorization: {{Authorization}}
-Content-Type: application/json
-
-
-### 상품 삭제
-DELETE http://localhost:8080/products/1
-Authorization: {{Authorization}}
-Content-Type: application/json
-

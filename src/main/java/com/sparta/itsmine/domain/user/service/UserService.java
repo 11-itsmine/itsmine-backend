@@ -65,6 +65,9 @@ public class UserService {
 
     public UserResponseDto getUser(Long userId) {
         User user = userAdapter.findById(userId);
+        if (user.getDeletedAt() != null) {
+            throw new UserDeletedException(ResponseExceptionEnum.USER_DELETED);
+        }
         return new UserResponseDto(user);
     }
 
