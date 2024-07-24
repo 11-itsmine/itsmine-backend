@@ -1,20 +1,20 @@
 package com.sparta.itsmine.domain.user.controller;
 
 
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_LOGOUT;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_DELETE_SUCCESS;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_RESIGN_SUCCESS;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_SUCCESS_GET;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_UPDATE_SUCCESS;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_LOGOUT;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_DELETE_SUCCESS;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_RESIGN_SUCCESS;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SUCCESS_GET;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.USER_UPDATE_SUCCESS;
 
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
 import com.sparta.itsmine.domain.user.service.UserService;
-import com.sparta.itsmine.global.common.response.HttpResponseDto;
-import com.sparta.itsmine.global.common.response.ResponseUtils;
+import com.sparta.itsmine.global.common.HttpResponseDto;
+import com.sparta.itsmine.global.common.ResponseUtils;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

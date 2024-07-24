@@ -7,7 +7,7 @@ import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.qna.QnaCheckUserException;
 import com.sparta.itsmine.global.exception.qna.QnaNotFoundException;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.sparta.itsmine.global.exception.qna;
 
-import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 
 public class QnaNotFoundException extends QnaException {
 

@@ -1,13 +1,13 @@
 package com.sparta.itsmine.domain.product.service;
 
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_LIKE;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_REMOVE_LIKE;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_TO_LIKE;
+import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_TO_REMOVE_LIKE;
 
 import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
+import com.sparta.itsmine.global.common.ResponseCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

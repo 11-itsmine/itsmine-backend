@@ -11,7 +11,7 @@ import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
-import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.common.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.user.UserAlreadyExistsException;
 import com.sparta.itsmine.global.exception.user.UserDeletedException;
 import com.sparta.itsmine.global.exception.user.UserNotDeletedException;

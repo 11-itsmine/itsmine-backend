@@ -1,4 +1,4 @@
-package com.sparta.itsmine.global.common.config;
+package com.sparta.itsmine.global.common.aws.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

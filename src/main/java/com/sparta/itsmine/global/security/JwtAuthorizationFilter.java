@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.itsmine.domain.user.utils.UserRole;
-import com.sparta.itsmine.global.common.response.HttpResponseDto;
+import com.sparta.itsmine.global.common.HttpResponseDto;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

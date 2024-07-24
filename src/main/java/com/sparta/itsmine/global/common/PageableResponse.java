@@ -1,4 +1,4 @@
-package com.sparta.itsmine.global.common.response;
+package com.sparta.itsmine.global.common;
 
 import java.util.List;
 import lombok.Getter;
