@@ -9,6 +9,7 @@ import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
+import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.global.common.ResponseCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,6 @@ public class ProductService {
 
     private final ProductAdapter adapter;
     private final AuctionService auctionService;
-    private final AuctionRepository auctionRepository;
 
     @Transactional
     public GetProductResponseDto createOrUpdateProduct(ProductCreateDto createDto, Long userId) {
@@ -58,11 +58,12 @@ public class ProductService {
         adapter.saveProduct(product);
     }
 
-    //상품 경매를 취소했을 때 유찰
+    //상품 경매를 취소했을 때 유찰(상품 올린 걸 취소할 시 상태 변화는 유찰로 변해야 되지 않나)
     @Transactional
     public void deleteProduct(Long productId) {
         Product product = adapter.getProduct(productId);
         product.setDeletedAt();
+        product.turnStatus(ProductStatus.FAIL_BID);
         adapter.saveProduct(product);
         auctionService.avoidedAuction(productId);
     }
