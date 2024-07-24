@@ -1,16 +1,16 @@
 package com.sparta.itsmine.domain.product.controller;
 
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_DELETE_PRODUCT;
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_SAVE_PRODUCT;
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_TO_SEARCH_PRODUCTS;
-import static com.sparta.itsmine.global.common.ResponseCodeEnum.SUCCESS_TO_UPDATE;
-import static com.sparta.itsmine.global.common.ResponseUtils.of;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_DELETE_PRODUCT;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_SAVE_PRODUCT;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_SEARCH_PRODUCTS;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_UPDATE;
+import static com.sparta.itsmine.global.common.response.ResponseUtils.of;
 
 import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.service.ProductService;
-import com.sparta.itsmine.global.common.HttpResponseDto;
-import com.sparta.itsmine.global.common.PageableResponse;
+import com.sparta.itsmine.global.common.response.HttpResponseDto;
+import com.sparta.itsmine.global.common.response.PageableResponse;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -1,7 +1,7 @@
 package com.sparta.itsmine.global.exception.user;
 
 
-import com.sparta.itsmine.global.common.ResponseExceptionEnum;
+import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
 import lombok.Getter;
 
 @Getter
