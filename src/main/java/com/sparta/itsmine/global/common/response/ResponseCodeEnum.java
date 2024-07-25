@@ -46,7 +46,10 @@ public enum ResponseCodeEnum {
     AUCTION_SUCCESS_CREATE(HttpStatus.CREATED, "경매 생성이 완료 되었습니다."),
     AUCTION_SUCCESS_GET(HttpStatus.OK, "경매 조회가 완료 되었습니다."),
     AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION(HttpStatus.OK, "낙찰 되었습니다."),
-    AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION(HttpStatus.OK, "유찰 되었습니다.");
+    AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION(HttpStatus.OK, "유찰 되었습니다."),
+
+    //채팅
+    CHAT_SUCCESS_CREATE(HttpStatus.CREATED, "방 생성 완료");
 
     private final HttpStatus httpStatus;
     private final String message;

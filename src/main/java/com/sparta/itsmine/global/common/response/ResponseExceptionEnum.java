@@ -45,6 +45,7 @@ public enum ResponseExceptionEnum {
     AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "입찰 기록을 찾을 수 없습니다."),
     AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS(HttpStatus.BAD_REQUEST,
             "이미 낙찰됐거나 유찰된 상품입니다.");
+    
 
     private final HttpStatus httpStatus;
     private final String message;
