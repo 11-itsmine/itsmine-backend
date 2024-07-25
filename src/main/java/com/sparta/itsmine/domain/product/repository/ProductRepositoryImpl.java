@@ -34,7 +34,7 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
     @Cacheable("products")
     @Override
-    public Optional<Product> findActiveProductByUserAndName(Long userId, String productName) {
+    public Optional<Product> existActiveProductByUserAndName(Long userId, String productName) {
         Product foundProduct = queryFactory
                 .selectFrom(product)
                 .where(product.user.id.eq(userId)
