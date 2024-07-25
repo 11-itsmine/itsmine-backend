@@ -55,3 +55,8 @@ Authorization: {{Authorization}}
   "address": "서울시2",
   "nickname": "SCK3"
 }
+
+### 현재 유저 이름 조회
+GET http://localhost:8080/users/username
+Content-Type: application/json
+Authorization: {{Authorization}}
