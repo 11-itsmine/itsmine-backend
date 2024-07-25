@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,19 +42,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
-            throws AuthenticationException {
+        throws AuthenticationException {
         log.info("인증 시도");
         try {
             // json to object
             LoginRequestDto requestDto = new ObjectMapper()
-                    .readValue(req.getInputStream(), LoginRequestDto.class);
+                .readValue(req.getInputStream(), LoginRequestDto.class);
 
             return getAuthenticationManager().authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            requestDto.getUsername(),
-                            requestDto.getPassword(),
-                            null
-                    )
+                new UsernamePasswordAuthenticationToken(
+                    requestDto.getUsername(),
+                    requestDto.getPassword(),
+                    null
+                )
             );
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -63,7 +64,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res,
-            FilterChain chain, Authentication authResult) throws IOException {
+        FilterChain chain, Authentication authResult) throws IOException {
         log.info("인증 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getUserRole();
@@ -80,12 +81,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         res.addHeader(JwtProvider.AUTHORIZATION_HEADER, accessToken);
 
         // 쿠키에 액세스 토큰 추가
-        jwtProvider.addJwtToCookie(refreshToken, res);
+        jwtProvider.addJwtToCookie(accessToken, res);
 
         // DB에 리프레시 토큰이 이미 있으면 수정, 없으면 저장
         refreshTokenService.save(username, refreshToken);
 
         log.info("로그인 성공 : {}", username);
+        log.info("액세스 토큰 : {}", accessToken);
+        log.info("리프레시 토큰 : {}", refreshToken);
+
+        // SecurityContextHolder에 인증 정보 설정
+        SecurityContextHolder.getContext().setAuthentication(authResult);
 
         // 응답 메시지 작성
         res.setStatus(SC_OK);
@@ -94,17 +100,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // JSON 응답 생성
         String jsonResponse = new ObjectMapper().writeValueAsString(
-                new HttpResponseDto(SC_OK, "로그인 성공")
+            new HttpResponseDto(SC_OK, "로그인 성공")
         );
 
         res.getWriter().write(jsonResponse);
+
+        // 리디렉션 추가
+        res.sendRedirect("/chat");
     }
 
-    /**
-     * 로그인 실패
-     */
+    @Override
     protected void unsuccessfulAuthentication(HttpServletRequest req, HttpServletResponse res,
-            AuthenticationException failed) throws IOException {
+        AuthenticationException failed) throws IOException {
         log.error("로그인 실패 : {}", failed.getMessage());
 
         // 응답 메시지 작성
@@ -114,7 +121,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // JSON 응답 생성
         String jsonResponse = new ObjectMapper().writeValueAsString(
-                new HttpResponseDto(SC_UNAUTHORIZED, "로그인 실패: " + failed.getMessage())
+            new HttpResponseDto(SC_UNAUTHORIZED, "로그인 실패: " + failed.getMessage())
         );
 
         res.getWriter().write(jsonResponse);

@@ -1,46 +1,98 @@
 package com.sparta.itsmine.chat.service;
 
-import com.sparta.itsmine.chat.dto.ChatMessageDto;
+import com.sparta.itsmine.chat.dto.MessageType;
 import com.sparta.itsmine.chat.entity.ChatRoom;
-import com.sparta.itsmine.chat.entity.JoinChat;
 import com.sparta.itsmine.chat.entity.Message;
-import com.sparta.itsmine.chat.repository.ChatRoomAdapter;
-import com.sparta.itsmine.chat.repository.JoinChatAdapter;
-import com.sparta.itsmine.chat.repository.MessageAdapter;
-import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.chat.repository.ChatRoomRepository;
+import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class ChatService {
 
-    private final ChatRoomAdapter chatRoomAdapter;
-    private final JoinChatAdapter joinChatAdapter;
-    private final MessageAdapter messageAdapter;
+    public static final String USER_COUNT = "USER_COUNT"; // 채팅룸에 입장한 클라이언트수 저장
+    public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
+    // Redis CacheKeys
+    private static final String CHAT_ROOMS = "CHAT_ROOM"; // 채팅룸 저장
+    private final ChannelTopic channelTopic;
+    private final RedisTemplate redisTemplate;
+    private final ChatRoomRepository chatRoomRepository;
+    @Resource(name = "redisTemplate")
+    private HashOperations<String, Long, ChatRoom> hashOpsChatRoom;
+    @Resource(name = "redisTemplate")
+    private HashOperations<String, String, String> hashOpsEnterInfo;
+    @Resource(name = "redisTemplate")
+    private ValueOperations<String, String> valueOps;
 
+    /**
+     * destination정보에서 roomId 추출
+     */
+    public String getRoomId(String destination) {
+        int lastIndex = destination.lastIndexOf('/');
+        if (lastIndex != -1) {
+            return destination.substring(lastIndex + 1);
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * 채팅방에 메시지 발송
+     */
+    public void sendChatMessage(Message message) {
+
+        if (MessageType.ENTER.equals(message.getType())) {
+            message.setMessage(message.getSender() + "님이 방에 입장했습니다.");
+            message.setSender("[알림]");
+        } else if (ChatMessage.MessageType.QUIT.equals(message.getType())) {
+            message.setMessage(message.getSender() + "님이 방에서 나갔습니다.");
+            message.setSender("[알림]");
+        }
+        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
+    }
+
+    public void setUserEnterInfo(String sessionId, String roomId) {
+        hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
+    }
+
+    // 모든 채팅방 조회
     public List<ChatRoom> findAllRoom() {
-        return chatRoomAdapter.findAll();
+        return hashOpsChatRoom.values(CHAT_ROOMS);
     }
 
-    public ChatRoom findRoomById(Long id) {
-        return chatRoomAdapter.findById(id);
+    // 특정 채팅방 조회
+    public ChatRoom findRoomById(String id) {
+        return hashOpsChatRoom.get(CHAT_ROOMS, id);
     }
 
-    public ChatRoom createRoom() {
-        return chatRoomAdapter.save(ChatRoom.createRoom());
+    // 채팅방 생성 : 서버간 채팅방 공유를 위해 redis hash에 저장한다.
+    public ChatRoom createChatRoom(String name) {
+        ChatRoom chatRoom = ChatRoom.create(name);
+        hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
+        return chatRoom;
     }
 
-    public Message createMessage(Long roomId, ChatMessageDto message, User user) {
-        ChatRoom room = chatRoomAdapter.findById(roomId); //방 찾기
-        JoinChat joinChat = joinChatAdapter.findByUserIdAndChatRoomId(user.getId(),
-                roomId); //참여된 채팅 찾기
-        return messageAdapter.save(Message.createMessage(room, user, joinChat));
+    // 유저가 입장한 채팅방ID와 유저 세션ID 맵핑 정보 저장
+    public void setUserEnterInfo(String sessionId, String roomId) {
+        hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
     }
 
-    // 채팅방 채팅내용 불러오기
-    public List<Message> findAllByJoinChatId(Long joinChatId) {
-        return messageAdapter.findAllByJoinChatId(joinChatId);
+    // 유저 세션으로 입장해 있는 채팅방 ID 조회
+    public String getUserEnterRoomId(String sessionId) {
+        return hashOpsEnterInfo.get(ENTER_INFO, sessionId);
     }
+
+    // 유저 세션정보와 맵핑된 채팅방ID 삭제
+    public void removeUserEnterInfo(String sessionId) {
+        hashOpsEnterInfo.delete(ENTER_INFO, sessionId);
+    }
+
 }
+

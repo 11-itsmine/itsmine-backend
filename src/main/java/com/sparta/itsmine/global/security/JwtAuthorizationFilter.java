@@ -1,14 +1,10 @@
 package com.sparta.itsmine.global.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.itsmine.domain.user.utils.UserRole;
-import com.sparta.itsmine.global.common.response.HttpResponseDto;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
+
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Arrays;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,22 +14,35 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.response.HttpResponseDto;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final UserDetailsServiceImpl userDetailsService;
 
-    public JwtAuthorizationFilter(JwtProvider jwtProvider,
-            UserDetailsServiceImpl userDetailsService) {
+    public JwtAuthorizationFilter(JwtProvider jwtProvider, UserDetailsServiceImpl userDetailsService) {
         this.jwtProvider = jwtProvider;
         this.userDetailsService = userDetailsService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res,
-            FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = jwtProvider.getAccessTokenFromHeader(req);
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
+        if (req.getCookies() != null) {
+            Arrays.stream(req.getCookies())
+                .forEach(cookie -> System.out.println(cookie.getName() + ": " + cookie.getValue()));
+        }
+        String accessToken = resolveTokenFromCookies(req);
         String refreshToken = jwtProvider.getRefreshTokenFromRequest(req);
 
         if (StringUtils.hasText(accessToken)) {
@@ -64,38 +73,41 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(req, res);
     }
 
-    /**
-     * 인증 처리
-     */
-    public void setAuthentication(String username) {
+    private void setAuthentication(String username) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(createAuthentication(username));
         SecurityContextHolder.setContext(context);
     }
 
-    /**
-     * 인증 객체 생성
-     */
     private Authentication createAuthentication(String username) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null,
-                userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
-    /**
-     * JWT 예외 처리
-     */
-    public void jwtExceptionHandler(HttpServletResponse res, HttpStatus status, String msg) {
+    private void jwtExceptionHandler(HttpServletResponse res, HttpStatus status, String msg) {
         int statusCode = status.value();
         res.setStatus(statusCode);
         res.setContentType("application/json");
         try {
-            String json = new ObjectMapper().writeValueAsString(
-                    new HttpResponseDto(statusCode, msg));
+            String json = new ObjectMapper().writeValueAsString(new HttpResponseDto(statusCode, msg));
             res.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+    }
+
+    private String resolveTokenFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (AUTHORIZATION_HEADER.equals(cookie.getName())) {
+                    String token = cookie.getValue();
+                    // %20을 공백으로 변환
+                    token = token.replace("%20", " ");
+                    return jwtProvider.substringToken(token);
+                }
+            }
+        }
+        return null;
     }
 
 }

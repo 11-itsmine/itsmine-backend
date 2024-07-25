@@ -33,4 +33,5 @@ public class ChatRoom extends Timestamp {
     public static ChatRoom createRoom() {
         return new ChatRoom();
     }
+
 }

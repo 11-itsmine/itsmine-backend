@@ -33,25 +33,23 @@ public class QnaService {
 
     @Transactional
     public void createQna(Long productId, QnaRequestDto requestDTO, User user) {
-        Product product = getProductEntity(productId);
+        Product product = getProduct(productId);
         Qna qna = Qna.of(requestDTO, user, product);
 
         qnaRepository.save(qna);
     }
 
     public Page<GetQnaResponseDto> getQnaList(Long productId, Pageable pageable, User user) {
-        Product product = getProductEntity(productId);
-        Page<Qna> qnaList;
-        Page<Qna> qnaListSecret;
+        Product product = getProduct(productId);
 
         //상품의 유저 정보와 인가된 유저 정보가 같을경우, 판매자 본인
         if (product.getUser().getId().equals(user.getId())) {
-            qnaList = qnaRepository.findAllByProduct(product, pageable);
-            return qnaList.map(GetQnaResponseDto::of);
+            return qnaRepository.findAllByProduct(product, pageable).map(GetQnaResponseDto::of);
             //인가된 유저랑 QnA 비밀글 작성자 본인일 경우
         } else {
-            qnaList = qnaRepository.findAllByProductAndSecretQna(product, false, pageable);
-            qnaListSecret = qnaRepository.findAllByProductAndUserAndSecretQna(product,
+            Page<Qna> qnaList = qnaRepository.findAllByProductAndSecretQna(product, false,
+                    pageable);
+            Page<Qna> qnaListSecret = qnaRepository.findAllByProductAndUserAndSecretQna(product,
                     user.getId()
                     , true, pageable);
 
@@ -66,12 +64,12 @@ public class QnaService {
 
     public GetQnaResponseDto getQna(Long productId, Long qnaId) {
         checkProduct(productId);
-        return GetQnaResponseDto.of(getQnaEntity(qnaId));
+        return GetQnaResponseDto.of(getQna(qnaId));
     }
 
     @Transactional
     public void updateQna(Long qnaId, QnaRequestDto requestDto, User user) {
-        Qna qna = getQnaEntity(qnaId);
+        Qna qna = getQna(qnaId);
         checkQnaUser(user, qna.getUser());
         qna.update(requestDto);
     }
@@ -79,7 +77,7 @@ public class QnaService {
     @Transactional
     public void deleteQna(Long productId, Long qnaId, User user) {
         checkProduct(productId);
-        Qna qna = getQnaEntity(qnaId);
+        Qna qna = getQna(qnaId);
         checkQnaUser(user, qna.getUser());
         qnaRepository.delete(qna);
     }
@@ -100,7 +98,7 @@ public class QnaService {
      *
      * @param productId 상품 고유 번호
      */
-    public Product getProductEntity(Long productId) {
+    public Product getProduct(Long productId) {
         return productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("상품 정보가 없습니다.")
         );
@@ -111,7 +109,7 @@ public class QnaService {
      *
      * @param qnaId Qna 고유 ID
      */
-    public Qna getQnaEntity(Long qnaId) {
+    public Qna getQna(Long qnaId) {
         return qnaRepository.findById(qnaId).orElseThrow(
                 () -> new QnaNotFoundException(ResponseExceptionEnum.QNA_NOT_FOUND)
         );
