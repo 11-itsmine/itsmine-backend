@@ -71,7 +71,7 @@ public class ProductAdapter {
                 .orElseThrow(() -> new DataNotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public void saveProduct(Product product) {
-        productRepository.save(product);
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
     }
 }

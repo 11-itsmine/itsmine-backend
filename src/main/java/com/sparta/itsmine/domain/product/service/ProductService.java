@@ -10,6 +10,8 @@ import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
+import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +31,10 @@ public class ProductService {
 
     private final ProductAdapter adapter;
     private final AuctionService auctionService;
+    private final ProductImagesService productImagesService;
 
     @Transactional
-    public ProductResponseDto createProduct(ProductCreateDto createDto, Long userId) {
+    public ProductResponseDto createProduct(ProductCreateDto createDto, ProductImagesRequestDto imagesRequestDto, Long userId) {
         User user = adapter.findByIdAndDeletedAtIsNull(userId);
         Category category = adapter.findCategoryByCategoryName(createDto.getCategoryName());
         adapter.existActiveProductByUserAndName(userId, createDto.getCategoryName());
@@ -41,8 +44,9 @@ public class ProductService {
         product.setDueDateBid(createDto.getDueDate());
         product.setCategory(category);
 
-        adapter.saveProduct(product);
-        return new ProductResponseDto(product);
+        Product newProduct = adapter.saveProduct(product);
+        productImagesService.createProductImages(imagesRequestDto,product,userId);
+        return new ProductResponseDto(newProduct);
     }
 
     @Transactional(readOnly = true)

@@ -9,6 +9,7 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.service.ProductService;
+import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.PageableResponse;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
@@ -37,9 +38,10 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<HttpResponseDto> createProduct(
             @RequestBody ProductCreateDto createDto,
+            @RequestBody ProductImagesRequestDto imagesRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        ProductResponseDto product = productService.createProduct(createDto,
+        ProductResponseDto product = productService.createProduct(createDto,imagesRequestDto,
                 userDetails.getUser().getId());
         return ResponseUtils.of(SUCCESS_SAVE_PRODUCT, product);
     }
