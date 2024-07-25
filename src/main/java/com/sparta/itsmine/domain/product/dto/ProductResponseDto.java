@@ -28,7 +28,7 @@ public class ProductResponseDto {
         this.currentPrice = product.getCurrentPrice();
         this.dueDate = product.getDueDate();
         this.category = product.getCategory();
-        this.imagesUrl = null;
+        this.imagesUrl = product.getImageUrls();
     }
 
     public ProductResponseDto(Product product, ProductImagesRequestDto productImagesRequestDto) {

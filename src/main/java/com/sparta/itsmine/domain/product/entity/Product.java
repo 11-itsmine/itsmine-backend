@@ -12,8 +12,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SAVED;
 
@@ -67,7 +69,7 @@ public class Product extends TimeStamp {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ProductImages> productImagesList;
+    private List<ProductImages> productImagesList = new ArrayList<>();
 
 
     /**
@@ -136,5 +138,11 @@ public class Product extends TimeStamp {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<String> getImageUrls() {
+        return productImagesList.stream()
+                .flatMap(productImage -> productImage.getImagesUrl().stream())
+                .collect(Collectors.toList());
     }
 }
