@@ -22,11 +22,4 @@ public class ResponseUtils {
                 .body(new HttpResponseDto(responseCodeEnum.getHttpStatus().value(),
                         responseCodeEnum.getMessage(), data));
     }
-
-    public static ResponseEntity<HttpResponseDto> of(ResponseCodeEnum responseCodeEnum,
-                                                     Object data, Object data2) {
-        return ResponseEntity.status(responseCodeEnum.getHttpStatus())
-                .body(new HttpResponseDto(responseCodeEnum.getHttpStatus().value(),
-                        responseCodeEnum.getMessage(), data, data2));
-    }
 }
