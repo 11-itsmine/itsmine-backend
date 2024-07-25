@@ -11,7 +11,7 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.common.ResponseCodeEnum;
+import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,7 +31,7 @@ public class ProductService {
     private final AuctionService auctionService;
 
     @Transactional
-    public ProductResponseDto createOrUpdateProduct(ProductCreateDto createDto, Long userId) {
+    public ProductResponseDto createProduct(ProductCreateDto createDto, Long userId) {
         User user = adapter.findByIdAndDeletedAtIsNull(userId);
         Category category = adapter.findCategoryByCategoryName(createDto.getCategoryName());
         adapter.existActiveProductByUserAndName(userId, createDto.getCategoryName());

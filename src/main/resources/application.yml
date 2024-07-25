@@ -10,9 +10,9 @@ spring:
   # 이런것을 다 실행할때 각각을 하드코딩하면 제대로 사용할 수 없다. 이렇게 되면 따로 브랜치를 생성하는 식으로 관리를 해야한다.
   # 이렇게 변경되는 것들에 대해서 따로 빼서 관리하는 것 입니다.
   datasource:
-    url: jdbc:mysql://${DB-URL}/itsmine
-    username: ${DB-USER}
-    password: ${DB-PASSWORD}
+    url: jdbc:mysql://localhost:3306/itsmine
+    username: root
+    password: nada5011
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
