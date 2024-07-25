@@ -1,7 +1,16 @@
-package com.sparta.itsmine.global.security;
+package com.sparta.itsmine.global.security.filters;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.response.HttpResponseDto;
+import com.sparta.itsmine.global.security.JwtProvider;
+import com.sparta.itsmine.global.security.UserDetailsServiceImpl;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,29 +20,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.itsmine.domain.user.utils.UserRole;
-import com.sparta.itsmine.global.common.response.HttpResponseDto;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final UserDetailsServiceImpl userDetailsService;
 
-    public JwtAuthorizationFilter(JwtProvider jwtProvider, UserDetailsServiceImpl userDetailsService) {
+    public JwtAuthorizationFilter(JwtProvider jwtProvider,
+            UserDetailsServiceImpl userDetailsService) {
         this.jwtProvider = jwtProvider;
         this.userDetailsService = userDetailsService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res,
+            FilterChain filterChain) throws ServletException, IOException {
         String accessToken = jwtProvider.getAccessTokenFromHeader(req);
         String refreshToken = jwtProvider.getRefreshTokenFromRequest(req);
 
@@ -79,7 +80,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
      */
     private Authentication createAuthentication(String username) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, null,
+                userDetails.getAuthorities());
     }
 
     /**
@@ -90,7 +92,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         res.setStatus(statusCode);
         res.setContentType("application/json");
         try {
-            String json = new ObjectMapper().writeValueAsString(new HttpResponseDto(statusCode, msg));
+            String json = new ObjectMapper().writeValueAsString(
+                    new HttpResponseDto(statusCode, msg));
             res.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());

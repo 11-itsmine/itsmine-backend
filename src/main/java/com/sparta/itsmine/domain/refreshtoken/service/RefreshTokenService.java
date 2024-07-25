@@ -1,9 +1,11 @@
-package com.sparta.itsmine.domain.refreshtoken;
+package com.sparta.itsmine.domain.refreshtoken.service;
 
+import com.sparta.itsmine.domain.refreshtoken.entity.RefreshToken;
+import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
