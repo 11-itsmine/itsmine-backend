@@ -163,8 +163,17 @@ public class JwtProvider {
      * 토큰에서 username 가져오기
      */
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()
-                .getSubject();
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            // 토큰이 만료된 경우에도 가져옴
+            return e.getClaims().getSubject();
+        }
     }
 
     /**
