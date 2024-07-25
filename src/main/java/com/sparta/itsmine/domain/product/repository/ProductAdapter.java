@@ -32,7 +32,7 @@ public class ProductAdapter {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
-    public GetProductResponseDto createOrUpdateProduct(ProductCreateDto createDto, Long userId) {
+    public Product createOrUpdateProduct(ProductCreateDto createDto, Long userId) {
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
@@ -48,8 +48,7 @@ public class ProductAdapter {
         }
 
         Product newProduct = createProduct(createDto, user, category);
-        productRepository.save(newProduct);
-        return new GetProductResponseDto(newProduct);
+        return productRepository.save(newProduct);
     }
 
     private Product createProduct(ProductCreateDto createDto, User user, Category category) {

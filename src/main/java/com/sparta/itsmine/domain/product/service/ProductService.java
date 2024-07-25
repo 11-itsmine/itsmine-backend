@@ -9,6 +9,8 @@ import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
+import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
 import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +29,13 @@ public class ProductService {
 
     private final ProductAdapter adapter;
     private final AuctionService auctionService;
+    private final ProductImagesService productImagesService;
 
     @Transactional
-    public GetProductResponseDto createOrUpdateProduct(ProductCreateDto createDto, Long userId) {
-        return adapter.createOrUpdateProduct(createDto, userId);
+    public GetProductResponseDto createOrUpdateProduct(ProductCreateDto createDto, ProductImagesRequestDto imagesRequestDto, Long userId) {
+        Product product = adapter.createOrUpdateProduct(createDto, userId);
+        productImagesService.createProductImages(imagesRequestDto, product, userId);
+        return new GetProductResponseDto(product);
     }
 
     @Transactional(readOnly = true)

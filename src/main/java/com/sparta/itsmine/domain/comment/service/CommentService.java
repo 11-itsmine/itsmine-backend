@@ -44,7 +44,7 @@ public class CommentService {
     // 댓글 조회
     public CommentResponseDto getComment(Long qnaId) {
 
-        Comment comment = commentAdapter.findByQnaId(qnaId);
+        Comment comment = getCommentByQnaId(qnaId);
 
         return new CommentResponseDto(comment, qnaId);
     }
@@ -92,7 +92,7 @@ public class CommentService {
     }
 
     // 문의사항에 이미 댓글이 있는지 확인
-    void commentAlreadyExists(Long qnaId) {
+    public void commentAlreadyExists(Long qnaId) {
         commentAdapter.commentAlreadyExists(qnaId);
     }
 }
