@@ -46,7 +46,7 @@ public class ProductService {
 
         Product newProduct = adapter.saveProduct(product);
         productImagesService.createProductImages(imagesRequestDto,product,userId);
-        return new ProductResponseDto(newProduct);
+        return new ProductResponseDto(newProduct, imagesRequestDto);
     }
 
     @Transactional(readOnly = true)

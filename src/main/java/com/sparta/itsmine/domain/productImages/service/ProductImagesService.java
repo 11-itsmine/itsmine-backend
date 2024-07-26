@@ -71,6 +71,7 @@ public class ProductImagesService {
         List<String> imagesUrl = imagesRequestDto.getImagesUrl();
         User user = userRepository.findById(userId).orElseThrow( () -> new NotFoundException("사용자를 찾을 수 없습니다."));
         ProductImages productImages = new ProductImages(imagesUrl, product, user);
+        product.getProductImagesList().add(productImages);
         productImagesRepository.save(productImages);
     }
 
@@ -106,7 +107,7 @@ public class ProductImagesService {
 //        }
 //    }
 
-//    // 프로필 업로드 메소드
+    // 프로필 업로드 메소드
 //    @Transactional
 //    public String uploadProfile(MultipartFile file, UserDetailsImpl userDetails) {
 //        String originalFilename = file.getOriginalFilename();
