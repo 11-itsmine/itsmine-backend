@@ -11,6 +11,7 @@ public class ProductCreateDto {
     private String productName;
     private String description;
     private Integer auctionNowPrice;
+    private Integer startPrice;
     private Integer currentPrice;
     private Integer dueDate;
     private String categoryName;
@@ -20,6 +21,7 @@ public class ProductCreateDto {
                 .productName(productName)
                 .description(description)
                 .auctionNowPrice(auctionNowPrice)
+                .startPrice(startPrice)
                 .currentPrice(currentPrice)
                 .dueDate(LocalDateTime.now().plusHours(dueDate))
                 .category(category).build();

@@ -41,6 +41,8 @@ public class Product extends TimeStamp {
     private String description;
     // TODO : 시작 가격을 명시해주고 추적하자
     @Column(nullable = false)
+    private Integer startPrice;
+    @Column(nullable = false)
     private Integer currentPrice;
     @Column(nullable = false)
     private Integer auctionNowPrice;
@@ -71,19 +73,20 @@ public class Product extends TimeStamp {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ProductImages> productImagesList;
-    @OneToMany(mappedBy="product",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Auction> auction;
+    private List<ProductImages> productImagesList = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Auction> auction = new ArrayList<>();
 
 
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
     @Builder
-    public Product(String productName, String description, Integer currentPrice,
+    public Product(String productName, String description, Integer currentPrice, Integer startPrice,
             Integer auctionNowPrice, LocalDateTime dueDate, Category category) {
         this.productName = productName;
         this.description = description;
+        this.startPrice = startPrice;
         this.currentPrice = currentPrice;
         this.auctionNowPrice = auctionNowPrice;
         this.dueDate = dueDate;
