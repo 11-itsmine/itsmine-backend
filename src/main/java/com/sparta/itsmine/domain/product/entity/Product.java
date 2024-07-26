@@ -14,8 +14,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SAVED;
 
@@ -140,5 +142,11 @@ public class Product extends TimeStamp {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<String> getImageUrls() {
+        return productImagesList.stream()
+                .flatMap(productImage -> productImage.getImagesUrl().stream())
+                .collect(Collectors.toList());
     }
 }
