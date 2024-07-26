@@ -3,7 +3,7 @@ package com.sparta.itsmine.domain.user.service;
 
 import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
 
-import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenAdapter;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;

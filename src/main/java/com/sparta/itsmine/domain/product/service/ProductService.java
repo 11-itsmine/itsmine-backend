@@ -4,11 +4,15 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_REMOVE_LIKE;
 
 import com.sparta.itsmine.domain.auction.service.AuctionService;
-import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
+import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
+import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
+import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
+import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,25 +31,37 @@ public class ProductService {
 
     private final ProductAdapter adapter;
     private final AuctionService auctionService;
+    private final ProductImagesService productImagesService;
 
     @Transactional
-    public GetProductResponseDto createOrUpdateProduct(ProductCreateDto createDto, Long userId) {
-        return adapter.createOrUpdateProduct(createDto, userId);
+    public ProductResponseDto createProduct(ProductCreateDto createDto, ProductImagesRequestDto imagesRequestDto, Long userId) {
+        User user = adapter.findByIdAndDeletedAtIsNull(userId);
+        Category category = adapter.findCategoryByCategoryName(createDto.getCategoryName());
+        adapter.existActiveProductByUserAndName(userId, createDto.getCategoryName());
+
+        Product product = createDto.toEntity(category);
+        product.connectUser(user);
+        product.setDueDateBid(createDto.getDueDate());
+        product.setCategory(category);
+
+        Product newProduct = adapter.saveProduct(product);
+        productImagesService.createProductImages(imagesRequestDto,product,userId);
+        return new ProductResponseDto(newProduct);
     }
 
     @Transactional(readOnly = true)
-    public GetProductResponseDto getProduct(Long productId) {
+    public ProductResponseDto getProduct(Long productId) {
         return adapter.verifyProduct(productId);
     }
 
     @Transactional(readOnly = true)
-    public Page<GetProductResponseDto> getProductsWithPage(int page, int size, Long userId) {
+    public Page<ProductResponseDto> getProductsWithPage(int page, int size, Long userId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.ASC, "createdAt"));
         return adapter.findAllProducts(pageable, userId);
     }
 
     @Transactional(readOnly = true)
-    public Page<GetProductResponseDto> getLikeProductsWithPage(int page, int size, Long userId) {
+    public Page<ProductResponseDto> getLikeProductsWithPage(int page, int size, Long userId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.ASC, "createdAt"));
         return adapter.findAllLikeProduct(pageable, userId);
     }

@@ -7,15 +7,12 @@ import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.US
 
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.category.repository.CategoryRepository;
-import com.sparta.itsmine.domain.product.dto.GetProductResponseDto;
-import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
+import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
-import com.sparta.itsmine.global.exception.category.CategoryNotFoundException;
+import com.sparta.itsmine.global.exception.DataNotFoundException;
 import com.sparta.itsmine.global.exception.product.ProductInDateException;
-import com.sparta.itsmine.global.exception.product.ProductNotFoundException;
-import com.sparta.itsmine.global.exception.user.UserNotFoundException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,56 +29,49 @@ public class ProductAdapter {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
-    public GetProductResponseDto createOrUpdateProduct(ProductCreateDto createDto, Long userId) {
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
-                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+    public User findByIdAndDeletedAtIsNull(Long userId) {
+        return userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND));
+    }
 
-        Category category = categoryRepository.findCategoryByCategoryName(
-                        createDto.getCategoryName())
-                .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
+    public Category findCategoryByCategoryName(String categoryName) {
+        return categoryRepository.findCategoryByCategoryName(
+                        categoryName)
+                .orElseThrow(() -> new DataNotFoundException(CATEGORY_NOT_FOUND));
+    }
 
-        Optional<Product> existingProduct = productRepository.findActiveProductByUserAndName(userId,
-                createDto.getProductName());
+    public void existActiveProductByUserAndName(Long userId, String categoryName) {
+        Optional<Product> existingProduct = productRepository.existActiveProductByUserAndName(
+                userId, categoryName);
 
         if (existingProduct.isPresent()) {
             throw new ProductInDateException(PRODUCT_IN_DATE);
         }
-
-        Product newProduct = createProduct(createDto, user, category);
-        productRepository.save(newProduct);
-        return new GetProductResponseDto(newProduct);
     }
 
-    private Product createProduct(ProductCreateDto createDto, User user, Category category) {
-        Product newProduct = createDto.toEntity(category);
-        newProduct.connectUser(user);
-        newProduct.setDueDateBid(createDto.getDueDate());
-        newProduct.setCategory(category);
-        return newProduct;
-    }
 
-    public GetProductResponseDto verifyProduct(Long productId) {
+    public ProductResponseDto verifyProduct(Long productId) {
         Product product = productRepository.findActiveProductById(productId)
-                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
-        return new GetProductResponseDto(product);
+                .orElseThrow(() -> new DataNotFoundException(PRODUCT_NOT_FOUND));
+        return new ProductResponseDto(product);
     }
 
-    public Page<GetProductResponseDto> findAllProducts(Pageable pageable, Long userId) {
+    public Page<ProductResponseDto> findAllProducts(Pageable pageable, Long userId) {
         return productRepository.findAllByUserIdAndDeletedAtIsNull(userId, pageable)
-                .map(GetProductResponseDto::new);
+                .map(ProductResponseDto::new);
     }
 
-    public Page<GetProductResponseDto> findAllLikeProduct(Pageable pageable, Long userId) {
+    public Page<ProductResponseDto> findAllLikeProduct(Pageable pageable, Long userId) {
         return productRepository.findAllByUserIdAndLikeTrueAndDeletedAtIsNull(userId, pageable)
-                .map(GetProductResponseDto::new);
+                .map(ProductResponseDto::new);
     }
 
     public Product getProduct(Long productId) {
         return productRepository.findActiveProductById(productId)
-                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new DataNotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public void saveProduct(Product product) {
-        productRepository.save(product);
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
     }
 }

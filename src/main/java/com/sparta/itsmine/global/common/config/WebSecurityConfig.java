@@ -1,9 +1,9 @@
 package com.sparta.itsmine.global.common.config;
 
-import com.sparta.itsmine.global.security.JwtAuthenticationFilter;
-import com.sparta.itsmine.global.security.JwtAuthorizationFilter;
 import com.sparta.itsmine.global.security.JwtProvider;
 import com.sparta.itsmine.global.security.UserDetailsServiceImpl;
+import com.sparta.itsmine.global.security.filters.JwtAuthenticationFilter;
+import com.sparta.itsmine.global.security.filters.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -54,33 +54,21 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // CSRF 설정
         http.csrf(AbstractHttpConfigurer::disable);
 
+        // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
         http.sessionManagement((sessionManagement) ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/users/resign/*").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/users/login-page", "/users/login")
-                        .permitAll()
-                        .requestMatchers("/ws/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/users/login-page") // 커스텀 로그인 페이지 URL
-                        .loginProcessingUrl("/users/login")
-                        .defaultSuccessUrl("/chat", true) // 로그인 성공 후 리디렉션 URL
-                        .failureUrl("/users/login-page?error=true") // 로그인 실패 후 리디렉션 URL
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/users/login-page?logout=true")
-                        .permitAll()
-                );
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/users/resign/*").permitAll()
+                .requestMatchers("/**").permitAll()
+                .anyRequest().authenticated()
+        );
 
         // 필터 관리
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);

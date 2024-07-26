@@ -1,27 +1,21 @@
 package com.sparta.itsmine.domain.product.entity;
 
-import static com.sparta.itsmine.domain.product.utils.ProductStatus.SAVED;
-
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
+import com.sparta.itsmine.domain.productImages.entity.ProductImages;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.SAVED;
 
 
 @Entity
@@ -41,6 +35,7 @@ public class Product extends TimeStamp {
     private String productName;
     @Column(nullable = false)
     private String description;
+    // TODO : 시작 가격을 명시해주고 추적하자
     @Column(nullable = false)
     private Integer currentPrice;
     @Column(nullable = false)
@@ -71,6 +66,9 @@ public class Product extends TimeStamp {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ProductImages> productImagesList;
+
 
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
