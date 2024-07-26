@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.product.entity;
 
+import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
@@ -7,6 +8,7 @@ import com.sparta.itsmine.domain.productImages.entity.ProductImages;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,6 +70,8 @@ public class Product extends TimeStamp {
     private User user;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductImages> productImagesList;
+    @OneToMany(mappedBy="product",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Auction> auction;
 
 
     /**
