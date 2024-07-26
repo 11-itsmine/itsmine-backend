@@ -71,7 +71,7 @@ public class Auction extends TimeStamp {
 
     public void checkBidPrice(Integer bidPrice){
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
-        if (bidPrice < product.getCurrentPrice()
+        if (bidPrice <= product.getCurrentPrice()
                 || bidPrice > product.getAuctionNowPrice()) {
             throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
         }
