@@ -3,14 +3,14 @@ package com.sparta.itsmine.domain.auction.contoller;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_CREATE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_GET;
 
+import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
-import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
-import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +44,7 @@ public class AuctionController {
     @GetMapping("/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
             @AuthenticationPrincipal UserDetailsImpl userDetails, Pageable pageable) {
-        Page<GetAuctionByUserResponseDto> responseDto = auctionService.getAuctionByUser(
+        Page<AuctionProductResponseDto> responseDto = auctionService.getAuctionByUser(
                 userDetails.getUser(),pageable);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
@@ -53,7 +53,7 @@ public class AuctionController {
     @GetMapping("/product/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByProduct(
             @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long productId) {
-        GetAuctionByProductResponseDto responseDto = auctionService.getAuctionByProduct(
+        AuctionProductResponseDto responseDto = auctionService.getAuctionByProduct(
                 userDetails.getUser(), productId);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
