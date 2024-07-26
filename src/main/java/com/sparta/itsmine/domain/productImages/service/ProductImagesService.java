@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.productImages.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import java.io.IOException;
@@ -7,6 +8,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.productImages.entity.ProductImages;
+import com.sparta.itsmine.domain.productImages.respository.ProductImagesRepository;
+import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,19 +30,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductImagesService {
 
     private final AmazonS3 amazonS3;
+    private final UserRepository userRepository;
+    private final ProductImagesRepository productImagesRepository;
 
     @Value("${CLOUD_AWS_S3_BUCKET}")
     private String bucket;
-
-    // 여러 파일 업로드 메소드
-    public List<String> saveFiles(List<MultipartFile> multipartFiles) throws IOException {
-        List<String> fileUrls = new ArrayList<>();
-        for (MultipartFile file : multipartFiles) {
-            String fileUrl = saveFile(file);
-            fileUrls.add(fileUrl);
-        }
-        return fileUrls;
-    }
 
     // 파일 저장하고 뽑아오기
     public String saveFile(MultipartFile multipartFile) throws IOException {
@@ -66,18 +66,37 @@ public class ProductImagesService {
         }
     }
 
-    // 파일 다운로드 메소드
-    public ResponseEntity<UrlResource> downloadFile(String originalFilename) {
-        UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucket, originalFilename));
-
-        String contentDisposition = "attachment; filename=\"" + originalFilename + "\"";
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-                .body(urlResource);
+    // ProductImages 엔티티 생성 및 저장
+    public void createProductImages(ProductImagesRequestDto imagesRequestDto, Product product, Long userId) {
+        List<String> imagesUrl = imagesRequestDto.getImagesUrl();
+        User user = userRepository.findById(userId).orElseThrow( () -> new NotFoundException("사용자를 찾을 수 없습니다."));
+        ProductImages productImages = new ProductImages(imagesUrl, product, user);
+        product.getProductImagesList().add(productImages);
+        productImagesRepository.save(productImages);
     }
 
-    // 이미지 주소에서 파일 키 추출 메소드
+//    // 여러 파일 업로드 메소드
+//    public List<String> saveFiles(List<MultipartFile> multipartFiles) throws IOException {
+//        List<String> fileUrls = new ArrayList<>();
+//        for (MultipartFile file : multipartFiles) {
+//            String fileUrl = saveFile(file);
+//            fileUrls.add(fileUrl);
+//        }
+//        return fileUrls;
+//    }
+//
+//    // 파일 다운로드 메소드
+//    public ResponseEntity<UrlResource> downloadFile(String originalFilename) {
+//        UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucket, originalFilename));
+//
+//        String contentDisposition = "attachment; filename=\"" + originalFilename + "\"";
+//
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+//                .body(urlResource);
+//    }
+
+//    // 이미지 주소에서 파일 키 추출 메소드
 //    private String extractKeyFromImageAddress(String imageAddress) {
 //        try {
 //            URL url = new URL(imageAddress);

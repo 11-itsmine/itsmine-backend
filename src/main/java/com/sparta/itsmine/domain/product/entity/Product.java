@@ -1,27 +1,23 @@
 package com.sparta.itsmine.domain.product.entity;
 
-import static com.sparta.itsmine.domain.product.utils.ProductStatus.SAVED;
-
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
+import com.sparta.itsmine.domain.productImages.entity.ProductImages;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.SAVED;
 
 
 @Entity
@@ -72,6 +68,9 @@ public class Product extends TimeStamp {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ProductImages> productImagesList = new ArrayList<>();
+
 
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
@@ -139,5 +138,11 @@ public class Product extends TimeStamp {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<String> getImageUrls() {
+        return productImagesList.stream()
+                .flatMap(productImage -> productImage.getImagesUrl().stream())
+                .collect(Collectors.toList());
     }
 }

@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.productImages.controller;
 
+import com.sparta.itsmine.domain.productImages.dto.ProductImagesResponseDto;
 import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,23 +19,24 @@ public class ProductImagesController {
 
     // 파일 업로드 엔드포인트
     @PostMapping("/upload")
-    public ResponseEntity<List<String>> uploadFiles(@RequestParam("file") List<MultipartFile> files) {
+    public ResponseEntity<ProductImagesResponseDto> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-            List<String> fileUrls = productImagesService.saveFiles(files);
-            return ResponseEntity.ok(fileUrls); // S3에 저장된 파일 URL 리스트 반환
+            String fileUrl = productImagesService.saveFile(file);
+            return ResponseEntity.ok(new ProductImagesResponseDto(Collections.singletonList(fileUrl)));
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(Collections.singletonList("파일 업로드 중 오류가 발생했습니다."));
+            return ResponseEntity.status(500).body(new ProductImagesResponseDto(
+                    Collections.singletonList("파일 업로드 중 오류가 발생했습니다.")));
         }
     }
 
     // 파일 업로드 엔드포인트
 //    @PostMapping("/upload")
-//    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+//    public ResponseEntity<List<String>> uploadFiles(@RequestParam("file") List<MultipartFile> files) {
 //        try {
-//            String fileUrl = s3Service.saveFile(file);
-//            return ResponseEntity.ok(fileUrl); // S3에 저장된 파일 URL 반환
+//            List<String> fileUrls = productImagesService.saveFiles(files);
+//            return ResponseEntity.ok(fileUrls); // S3에 저장된 파일 URL 리스트 반환
 //        } catch (IOException e) {
-//            return ResponseEntity.status(500).body("파일 업로드 중 오류가 발생했습니다.");
+//            return ResponseEntity.status(500).body(Collections.singletonList("파일 업로드 중 오류가 발생했습니다."));
 //        }
 //    }
 
