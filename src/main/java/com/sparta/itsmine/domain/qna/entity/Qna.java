@@ -5,19 +5,13 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import com.sparta.itsmine.global.exception.comment.CommentEqualSellerException;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.COMMENT_EQUAL_SELLER;
 
 @Entity
 @Getter
@@ -62,5 +56,12 @@ public class Qna extends TimeStamp {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
         this.secretQna = requestDto.isSecretQna();
+    }
+
+    // 판매자 확인
+    public void equalsSeller(Long userId) {
+        if (!this.product.getUser().getId().equals(userId)) {
+            throw new CommentEqualSellerException(COMMENT_EQUAL_SELLER);
+        }
     }
 }
