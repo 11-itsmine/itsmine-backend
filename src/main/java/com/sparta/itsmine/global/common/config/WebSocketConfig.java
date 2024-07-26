@@ -1,9 +1,10 @@
 package com.sparta.itsmine.global.common.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -15,11 +16,30 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final ChatPreHandler chatPreHandler;
 
+    @Value("{spring.rabbitmq.username}")
+    private String rabbitUser;
+    @Value("{spring.rabbitmq.password}")
+    private String rabbitPwd;
+    @Value("{spring.rabbitmq.host}")
+    private String rabbitHost;
+    @Value("{spring.rabbitmq.port}")
+    private int rabbitPort;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes("/pub");       //클라이언트에서 보낸 메세지를 받을 prefix
-        registry.enableSimpleBroker("/sub");    //해당 주소를 구독하고 있는 클라이언트들에게 메세지 전달
+//        registry.setApplicationDestinationPrefixes("/pub");       //클라이언트에서 보낸 메세지를 받을 prefix
+//        registry.enableSimpleBroker("/sub");    //해당 주소를 구독하고 있는 클라이언트들에게 메세지 전달
+        registry.enableStompBrokerRelay("/exchage")
+                .setClientLogin(rabbitUser)
+                .setClientPasscode(rabbitPwd)
+                .setSystemLogin(rabbitHost)
+                .setSystemPasscode(rabbitPwd)
+                .setRelayHost(rabbitHost)
+                .setRelayPort(rabbitPort)
+                .setVirtualHost(rabbitHost);
+
+        registry.setPathMatcher(new AntPathMatcher("."));
+        registry.setApplicationDestinationPrefixes("/pub");
     }
 
     @Override
@@ -31,8 +51,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // 주소 : ws://localhost:8080/ws
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(chatPreHandler);
-    }
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(chatPreHandler);
+//    }
+
+
 }

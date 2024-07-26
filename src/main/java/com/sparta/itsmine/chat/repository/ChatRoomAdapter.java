@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ChatRoomAdapter {
 
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomsRepository chatRoomRepository;
 
     public ChatRoom findById(Long roomId) {
         return chatRoomRepository.findById(roomId)

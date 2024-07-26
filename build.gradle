@@ -82,9 +82,8 @@ dependencies {
     implementation 'org.webjars:bootstrap:5.2.3'
     implementation 'org.webjars:jquery:3.6.4'
 
-
-    implementation 'it.ozimov:embedded-redis:0.7.2'
-
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 tasks.named('test') {

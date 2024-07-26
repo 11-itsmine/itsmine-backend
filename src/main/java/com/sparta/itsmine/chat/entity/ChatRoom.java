@@ -1,37 +1,23 @@
 package com.sparta.itsmine.chat.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.List;
-import lombok.Getter;
+import java.util.HashMap;
+import java.util.UUID;
+import lombok.Data;
 
-@Getter
-@Entity
-public class ChatRoom extends Timestamp {
+@Data
+public class ChatRoom {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String roomId;
+    private String roomName;
+    private long userCount;
+    private HashMap<String, String> userList = new HashMap<>();
 
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private ChatStatus chatStatus = ChatStatus.ACTIVE;
+    public ChatRoom create(String roomName) {
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.roomId = UUID.randomUUID().toString();
+        chatRoom.roomName = roomName;
 
-    @OneToMany(mappedBy = "chatRoom")
-    private List<JoinChat> chatRoomList;
-
-    public ChatRoom() {
-
-    }
-
-    public static ChatRoom createRoom() {
-        return new ChatRoom();
+        return chatRoom;
     }
 
 }
