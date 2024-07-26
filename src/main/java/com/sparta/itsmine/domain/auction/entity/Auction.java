@@ -43,6 +43,10 @@ public class Auction extends TimeStamp {
     @Column(nullable = false)
     private Integer bidPrice;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -51,9 +55,6 @@ public class Auction extends TimeStamp {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ProductStatus status;
 
 
     @Builder

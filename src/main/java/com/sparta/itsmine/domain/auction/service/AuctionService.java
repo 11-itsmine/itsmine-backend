@@ -20,7 +20,6 @@ import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
 import com.sparta.itsmine.global.exception.product.ProductNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,13 +83,9 @@ public class AuctionService {
 
     //상품 입찰 조회(자신이 입찰한 상품의 자신의 최대입찰가만 나오게끔)
     public AuctionProductResponseDto getAuctionByProduct(User user, Long productId) {
-        AuctionProductResponseDto productAuctions = auctionRepository.findByUserIdAndProductId(
-                user.getId(), productId);
-        if (productAuctions == null) {
-            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
-        }
 
-        return productAuctions;
+        return auctionRepository.findByUserIdAndProductId(
+                user.getId(), productId).orElseThrow(()->new AuctionNotFoundException(AUCTION_NOT_FOUND));
     }
 
 //    낙찰 or 유찰은 상품 상태 확인하고 상품 관련된 입찰정보 삭제

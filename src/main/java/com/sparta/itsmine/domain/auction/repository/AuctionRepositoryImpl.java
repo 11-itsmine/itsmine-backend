@@ -13,6 +13,7 @@ import com.sparta.itsmine.domain.auction.dto.QAuctionMaxedBidPriceResponseDto;
 import com.sparta.itsmine.domain.auction.dto.QAuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -74,15 +75,15 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 //        from auctions
 //        where user_id=user_id and product_id=product_id;
     //자신이 고른 상품 조회
-    public AuctionProductResponseDto findByUserIdAndProductId(Long UserId, Long productId) {
-        return jpaQueryFactory
+    public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId, Long productId) {
+        return Optional.ofNullable(jpaQueryFactory
                 .select(new QAuctionProductResponseDto(product.id, auction.bidPrice.max(),
                         user.id))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
                 .where(user.id.eq(UserId).and(product.id.eq(productId)))
-                .fetchOne();
+                .fetchOne());
     }
 
 
