@@ -40,14 +40,18 @@ public class AuctionService {
         Integer bidPrice = requestDto.getBidPrice();
         ProductStatus status = product.getStatus();
         Auction auction = new Auction(user, product, bidPrice, status);
-        //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
-        auction.checkBidPrice(bidPrice);
-        //현 최대 입찰가보다 낮으면 예외처리
-        auction.checkCurrentPrice(bidPrice, product.getCurrentPrice());
-        product.currentPriceUpdate(bidPrice);
-        productRepository.save(product);
         //현재 상품 상태가 입찰 중이 아니면 예외처리
         auction.checkStatus(status);
+
+        //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
+        auction.checkBidPrice(bidPrice);
+
+        //현 최대 입찰가보다 낮으면 예외처리
+        auction.checkCurrentPrice(bidPrice, product.getCurrentPrice());
+
+        //현재 구매가 갱신
+        currentPriceUpdate(bidPrice,product);
+
         //입찰가를 즉시구매가 만큼 썼으면 즉시 낙찰
         if (bidPrice.equals(product.getAuctionNowPrice())) {
             successfulAuction(auction, productId);
@@ -106,8 +110,13 @@ public class AuctionService {
         productRepository.save(product);
     }
 
-    public void allDeleteBid(Long productId){
+    public void allDeleteBid(Long productId) {
         auctionRepository.deleteAllByProductId(productId);
+    }
+
+    public void currentPriceUpdate(Integer bidPrice,Product product){
+        product.currentPriceUpdate(bidPrice);
+        productRepository.save(product);
     }
 
 }
