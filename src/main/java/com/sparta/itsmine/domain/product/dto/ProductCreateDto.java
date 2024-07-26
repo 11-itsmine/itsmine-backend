@@ -12,7 +12,7 @@ public class ProductCreateDto {
     private String description;
     private Integer auctionNowPrice;
     private Integer startPrice;
-    private Integer currentPrice;
+    //시작가를 현재 가격이랑 같게 만들었습니다
     private Integer dueDate;
     private String categoryName;
 
@@ -22,7 +22,6 @@ public class ProductCreateDto {
                 .description(description)
                 .auctionNowPrice(auctionNowPrice)
                 .startPrice(startPrice)
-                .currentPrice(currentPrice)
                 .dueDate(LocalDateTime.now().plusHours(dueDate))
                 .category(category).build();
     }

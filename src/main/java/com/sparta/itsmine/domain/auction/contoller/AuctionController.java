@@ -29,7 +29,7 @@ public class AuctionController {
     private final AuctionService auctionService;
 
     //구매자 입찰 생성
-    @PostMapping("/product/{productId}/auctions")
+    @PostMapping("/products/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> createAuction(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long productId,
@@ -50,7 +50,7 @@ public class AuctionController {
     }
 
     //유저(구매자(본인)) 상품 입찰 조회
-    @GetMapping("/product/{productId}/auctions")
+    @GetMapping("/products/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByProduct(
             @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long productId) {
         AuctionProductResponseDto responseDto = auctionService.getAuctionByProduct(

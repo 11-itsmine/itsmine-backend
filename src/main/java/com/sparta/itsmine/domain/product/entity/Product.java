@@ -42,8 +42,8 @@ public class Product extends TimeStamp {
     // TODO : 시작 가격을 명시해주고 추적하자
     @Column(nullable = false)
     private Integer startPrice;
-    @Column(nullable = false)
-    private Integer currentPrice;
+    @Column
+    private Integer currentPrice;//요청시 시작가만 받게 하기위해 요청 안해도 되게끔 만들었습니다
     @Column(nullable = false)
     private Integer auctionNowPrice;
     // 입찰, 낙찰, 유찰
@@ -82,12 +82,13 @@ public class Product extends TimeStamp {
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
     @Builder
-    public Product(String productName, String description, Integer currentPrice, Integer startPrice,
+    public Product(String productName, String description, Integer startPrice,
+//따로 currentPrice를 받지 않습니다
             Integer auctionNowPrice, LocalDateTime dueDate, Category category) {
         this.productName = productName;
         this.description = description;
         this.startPrice = startPrice;
-        this.currentPrice = currentPrice;
+        this.currentPrice = startPrice;
         this.auctionNowPrice = auctionNowPrice;
         this.dueDate = dueDate;
         this.category = category;
@@ -117,13 +118,17 @@ public class Product extends TimeStamp {
                 .orElse(product.getDescription());
         this.auctionNowPrice = Optional.ofNullable(createDto.getAuctionNowPrice())
                 .orElse(product.getAuctionNowPrice());
-        this.currentPrice = Optional.ofNullable(createDto.getCurrentPrice())
+        this.currentPrice = Optional.ofNullable(createDto.getStartPrice())//시작가 때문에 수정한 부분입니다
                 .orElse(product.getCurrentPrice());
         if (hour != null) {
             this.dueDate = product.getDueDate().plusSeconds(hour);
         } else {
             this.dueDate = product.getDueDate();
         }
+    }
+
+    public void currentPriceUpdate(Integer bidPrice) {
+        this.currentPrice = bidPrice;
     }
 
     public void setDeletedAt() {

@@ -60,7 +60,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 //        from auctions
 //        where product_id=product_id
     //해당 상품 최고가 찾기
-    public AuctionMaxedBidPriceResponseDto findByProductBidPrice(Long productId) {
+/*    public AuctionMaxedBidPriceResponseDto findByProductBidPrice(Long productId) {
         return jpaQueryFactory
                 .select(new QAuctionMaxedBidPriceResponseDto(product.id,
                         auction.bidPrice.max()))
@@ -68,7 +68,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .innerJoin(auction.product, product)
                 .where(product.id.eq(productId))
                 .fetchOne();
-    }
+    }*/
 
 
 //        select product_id,max(bid_price) as bid_price,user_id
@@ -91,7 +91,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 //        from auctions
 //        where product_id=2 and bid_price != (select max(bid_price) from auctions where product_id=2);
     //해당 상품에 대한 모든 입찰가를 찾기(최댓값 빼고)
-    public List<Auction> findAllByProductIdWithOutMaxPrice(Long productId) {
+/*    public List<Auction> findAllByProductIdWithOutMaxPrice(Long productId) {
 
         SubQueryExpression<Integer> maxBidPriceSubQuery = JPAExpressions
                 .select(auction.bidPrice.max())
@@ -106,5 +106,6 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .where(product.id.eq(productId)
                         .and(auction.bidPrice.ne(maxBidPriceSubQuery)))
                 .fetch();
-    }
+    }*/
+
 }

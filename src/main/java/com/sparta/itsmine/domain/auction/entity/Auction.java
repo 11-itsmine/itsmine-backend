@@ -65,9 +65,8 @@ public class Auction extends TimeStamp {
         this.status=status;
     }
 
-    public ProductStatus turnStatus(ProductStatus status) {
+    public void turnStatus(ProductStatus status) {
         this.status=status;
-        return this.getStatus();
     }
 
     public void checkBidPrice(Integer bidPrice){
@@ -81,6 +80,12 @@ public class Auction extends TimeStamp {
     public void checkStatus(ProductStatus status){
         if (!status.equals(ProductStatus.BID)) {
             throw new AuctionImpossibleBidCauseStatus(AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS);
+        }
+    }
+
+    public void checkCurrentPrice(Integer bidPrice,Integer currentPrice){
+        if (bidPrice <= currentPrice) {
+            throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
         }
     }
 }

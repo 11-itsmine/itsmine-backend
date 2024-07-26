@@ -19,8 +19,8 @@ public interface CustomAuctionRepository {
     Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId, Long productId);
 
     //해당 상품에 대한 모든 입찰가를 찾기(최댓값 빼고)
-    List<Auction> findAllByProductIdWithOutMaxPrice(Long productId);
+//    List<Auction> findAllByProductIdWithOutMaxPrice(Long productId);
 
     //해당 상품 최고가 찾기
-    AuctionMaxedBidPriceResponseDto findByProductBidPrice(Long productId);
+//    AuctionMaxedBidPriceResponseDto findByProductBidPrice(Long productId);
 }
