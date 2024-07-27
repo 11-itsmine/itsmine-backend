@@ -15,6 +15,7 @@ import com.sparta.itsmine.domain.auction.entity.Auction;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 //        where user_id=user_id
 //        group by product_id;
     //자신이 고른 상품 전체 조회
+    @Cacheable("AuctionAllPage")
     public Page<AuctionProductResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
         List<AuctionProductResponseDto> content = jpaQueryFactory
                 .select(new QAuctionProductResponseDto(product.id, auction.bidPrice.max(), user.id))
@@ -75,6 +77,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 //        from auctions
 //        where user_id=user_id and product_id=product_id;
     //자신이 고른 상품 조회
+    @Cacheable("Auction")
     public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId, Long productId) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(new QAuctionProductResponseDto(product.id, auction.bidPrice.max(),
