@@ -1,5 +1,5 @@
 ### 로그인
-POST http://localhost:8080/users/login
+POST https://localhost:443/users/login
 Content-Type: application/json
 
 {
@@ -9,12 +9,12 @@ Content-Type: application/json
 > {%client.global.set("Authorization", response.headers.valueOf("Authorization"));%}
 
 ###로그 아웃
-GET http://localhost:8080/users/logout
+GET https://localhost:443/users/logout
 Authorization: {{Authorization}}
 
 
 ### 1번 문의사항 댓글 달기
-POST http://localhost:8080/qnas/1/comments
+POST https://localhost:443/qnas/1/comments
 Content-Type: application/json
 Authorization: {{Authorization}}
 
@@ -23,12 +23,12 @@ Authorization: {{Authorization}}
 }
 
 ### 1번 문의사항 댓글 조회
-GET http://localhost:8080/qnas/1/comments
+GET https://localhost:443/qnas/1/comments
 Content-Type: application/json
 Authorization: {{Authorization}}
 
 ### 1번 문의사항 댓글 수정
-PATCH http://localhost:8080/qnas/1/comments
+PATCH https://localhost:443/qnas/1/comments
 Content-Type: application/json
 Authorization: {{Authorization}}
 
@@ -37,12 +37,12 @@ Authorization: {{Authorization}}
 }
 
 ### 1번 문의사항 댓글 삭제
-DELETE http://localhost:8080/qnas/1/comments
+DELETE https://localhost:443/qnas/1/comments
 Content-Type: application/json
 Authorization: {{Authorization}}
 
 ### 카테고리 추가
-POST http://localhost:8080/category
+POST https://localhost:443/category
 Content-Type: application/json
 Authorization: {{Authorization}}
 
@@ -51,7 +51,7 @@ Authorization: {{Authorization}}
 }
 
 ### 상품 등록
-POST http://localhost:8080/products
+POST https://localhost:443/products
 Content-Type: application/json
 Authorization: {{Authorization}}
 
@@ -65,7 +65,7 @@ Authorization: {{Authorization}}
 }
 
 ###QnA 생성
-POST http://localhost:8080/products/1/qnas
+POST https://localhost:443/products/1/qnas
 Content-Type: application/json
 Authorization: {{Authorization}}
 

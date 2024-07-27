@@ -24,7 +24,7 @@ function Board({ onLogout }) {
             setFetching(true); // 데이터 가져오는 중으로 설정
 
             // API 호출하여 보드 데이터 가져오기
-            const response = await axios.get('http://localhost:8080/api/boards', {
+            const response = await axios.get('https://localhost:443/api/boards', {
                 headers: {
                     Authorization: token // 토큰을 헤더에 포함해서 보냄
                 },
@@ -53,7 +53,7 @@ function Board({ onLogout }) {
     const fetchUserRole = async () => {
         const token = localStorage.getItem('Authorization');
         try {
-            const response = await axios.get('http://localhost:8080/api/users', {
+            const response = await axios.get('https://localhost:443/api/users', {
                 headers: {
                     Authorization: token // 토큰을 헤더에 포함해서 보냄
                 }
@@ -102,7 +102,7 @@ function Board({ onLogout }) {
         if (confirmDelete) {
             const token = localStorage.getItem('Authorization');
             try {
-                await axios.delete(`http://localhost:8080/api/boards/${boardId}`, {
+                await axios.delete(`https://localhost:443/api/boards/${boardId}`, {
                     headers: {
                         Authorization: token
                     }

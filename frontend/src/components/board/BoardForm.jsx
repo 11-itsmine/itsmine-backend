@@ -26,8 +26,8 @@ function BoardForm({ onClose, board = {}, mode = 'add' }) {
 
         const token = localStorage.getItem('Authorization');
         const url = mode === 'add'
-            ? 'http://localhost:8080/api/boards'
-            : `http://localhost:8080/api/boards/${board.id}`;
+            ? 'https://localhost:443/api/boards'
+            : `https://localhost:443/api/boards/${board.id}`;
         const method = mode === 'add' ? 'post' : 'put';
 
         try {

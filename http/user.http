@@ -1,5 +1,5 @@
 ### 유저 회원 가입
-POST http://localhost:8080/users
+POST https://localhost:443/users
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### 로그인
-POST http://localhost:8080/users/login
+POST https://localhost:443/users/login
 Content-Type: application/json
 
 {
@@ -23,29 +23,29 @@ Content-Type: application/json
 
 
 ### 로그아웃
-GET http://localhost:8080/users/logout
+GET https://localhost:443/users/logout
 Content-Type: application/json
 Authorization: {{Authorization}}
 
 
 ### 유저 조회
-GET http://localhost:8080/users/5
+GET https://localhost:443/users/1
 Content-Type: application/json
 Authorization: {{Authorization}}
 
 
 ### 회원 탈퇴
-DELETE http://localhost:8080/users/withdraw
+DELETE https://localhost:443/users/withdraw
 Content-Type: application/json
 Authorization: {{Authorization}}
 
 ### 회원 복구
-PUT http://localhost:8080/users/resign/5
+PUT https://localhost:443/users/resign/5
 Content-Type: application/json
 Authorization: {{Authorization}}
 
 ### 회원 정보 수정
-PUT http://localhost:8080/users/update
+PUT https://localhost:443/users/update
 Content-Type: application/json
 Authorization: {{Authorization}}
 
