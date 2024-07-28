@@ -11,40 +11,39 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class ChatController {
 
     private static final String CHAT_QUEUE_NAME = "chat.queue";
     private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
-    private final SimpMessageSendingOperations template;
     private final ChatService chatService;
-    private final RabbitMessagingTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @MessageMapping("chat.enter.{chatRoomId}")
     public void enterUser(@Payload ChatDto chatDto, @DestinationVariable String chatRoomId) {
         chatDto.setTime(LocalDateTime.now());
         chatDto.setMessage(chatDto.getSenderId() + "님 입장했습니다");
-        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatDto.getRoomId(), chatDto);
+        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatRoomId, chatDto);
     }
 
     @MessageMapping("chat.message.{chatRoomId}")
     public void sendMessage(@Payload ChatDto chatDto) {
         log.info("Chat : {}", chatDto);
         chatDto.setMessage(chatDto.getMessage());
-        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatDto.getRoomId(), chatDto);
+        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatDto.getRoomId(),
+                chatDto);
     }
 
     @RabbitListener(queues = CHAT_QUEUE_NAME)

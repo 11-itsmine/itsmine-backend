@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -20,22 +21,30 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableRabbit
+@RequiredArgsConstructor
 public class RabbitConfig {
 
     private static final String CHAT_QUEUE_NAME = "chat.queue";
     private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
-    private static final String ROUTING_KEY = "room.*";
+    private static final String ROUTING_KEY = "*.room.*";
 
-    @Value("{spring.rabbitmq.username}")
-    private String rabbitUser;
-    @Value("{spring.rabbitmq.password}")
-    private String rabbitPwd;
-    @Value("{spring.rabbitmq.host}")
+    @Value("${spring.rabbitmq.host}")
     private String rabbitHost;
-    @Value("{spring.rabbitmq.virtual-host}")
-    private String rabbitVh;
-    @Value("{RABBITMQ_PORT}")
+
+    @Value("${spring.rabbitmq.port}")
     private int rabbitPort;
+
+    @Value("${spring.rabbitmq.username}")
+    private String rabbitUser;
+
+    @Value("${spring.rabbitmq.password}")
+    private String rabbitPwd;
+
+    @Value("${spring.rabbitmq.virtual-host}")
+    private String rabbitVh;
+//    @Value("${spring.rabbitmq.port}")
+//    private int rabbitPort;
+
 
     @Bean
     public Queue queue() {
@@ -62,21 +71,22 @@ public class RabbitConfig {
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate() {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate();
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
         rabbitTemplate.setRoutingKey(ROUTING_KEY);
         return rabbitTemplate;
     }
 
+
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
-        factory.setHost(rabbitHost);
-        factory.setVirtualHost(rabbitVh);
-        factory.setUsername(rabbitUser);
-        factory.setPassword(rabbitPwd);
-        factory.setPort(5672);
+        factory.setHost("localhost");
+        factory.setVirtualHost("/");
+        factory.setUsername("guest");
+        factory.setPassword("guest");
+        factory.setPort(rabbitPort);
         return factory;
     }
 
@@ -93,4 +103,5 @@ public class RabbitConfig {
     public Module dateTimeModule() {
         return new JavaTimeModule();
     }
+
 }
