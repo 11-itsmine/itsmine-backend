@@ -89,6 +89,10 @@ dependencies {
 
     //외부 브로커를 사용하기 위해
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty', version: '3.0.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+
 }
 
 tasks.named('test') {

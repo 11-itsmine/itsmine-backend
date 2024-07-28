@@ -82,7 +82,7 @@ public class RabbitConfig {
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost(rabbitHost);
         factory.setVirtualHost("/");
         factory.setUsername("guest");
         factory.setPassword("guest");

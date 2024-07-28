@@ -23,6 +23,12 @@ spring:
     virtual-host: ${RABBIT-MQ-VH}
     #port: 61613
 
+
+    mongodb:
+      uri: mongodb://localhost:27017/itsmine
+
+
+
     profiles:
       active: local
 
