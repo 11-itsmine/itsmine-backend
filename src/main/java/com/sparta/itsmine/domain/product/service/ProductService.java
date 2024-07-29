@@ -10,10 +10,13 @@ import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
+import com.sparta.itsmine.domain.product.utils.rabbitmq.MessageSenderService;
 import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,9 +35,11 @@ public class ProductService {
     private final ProductAdapter adapter;
     private final AuctionService auctionService;
     private final ProductImagesService productImagesService;
+    private final MessageSenderService messageSenderService;
 
     @Transactional
-    public ProductResponseDto createProduct(ProductCreateDto createDto, ProductImagesRequestDto imagesRequestDto, Long userId) {
+    public ProductResponseDto createProduct(ProductCreateDto createDto,
+            ProductImagesRequestDto imagesRequestDto, Long userId) {
         User user = adapter.findByIdAndDeletedAtIsNull(userId);
         Category category = adapter.findCategoryByCategoryName(createDto.getCategoryName());
         adapter.existActiveProductByUserAndName(userId, createDto.getCategoryName());
@@ -45,7 +50,8 @@ public class ProductService {
         product.setCategory(category);
 
         Product newProduct = adapter.saveProduct(product);
-        productImagesService.createProductImages(imagesRequestDto,product,userId);
+        productImagesService.createProductImages(imagesRequestDto, product, userId);
+        scheduleProductUpdate(newProduct);
         return new ProductResponseDto(newProduct, imagesRequestDto);
     }
 
@@ -89,5 +95,30 @@ public class ProductService {
         boolean like = product.toggleLike();
         adapter.saveProduct(product);
         return like ? SUCCESS_TO_LIKE : SUCCESS_TO_REMOVE_LIKE;
+    }
+
+    private void scheduleProductUpdate(Product product) {
+        // 현재 시간
+        LocalDateTime now = LocalDateTime.now();
+
+        // 시작 시간과 종료 시간
+        LocalDateTime startDate = product.getStartDate();
+        LocalDateTime dueDate = product.getDueDate();
+
+        // 시작 시간부터 종료 시간까지의 차이를 계산
+        Duration durationBetween = Duration.between(startDate, dueDate);
+
+        // 현재 시간과 시작 시간 사이의 차이를 계산
+        Duration timeUntilStart = Duration.between(now, startDate);
+
+        // 딜레이 계산
+        long delayMillis = durationBetween.toMillis() - timeUntilStart.toMillis();
+
+        // delayMillis가 0 이하일 경우 바로 처리
+        if (delayMillis <= 0) {
+            delayMillis = 1000; // 최소 1초 후에 상태를 처리하도록 설정
+        }
+
+        messageSenderService.sendMessage(product.getId(), delayMillis);
     }
 }
