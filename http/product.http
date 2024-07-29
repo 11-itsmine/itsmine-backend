@@ -33,7 +33,7 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "categoryName": "Nㄹㅁㅇㄴㄹㅁㄴㅇㅁㄴㅇㅁ"
+  "categoryName": "중고"
 }
 
 
@@ -43,13 +43,27 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "productName": "Jakee13",
-  "description": "This is almost like a brandnew",
-  "auctionNowPrice": 150000,
-  "currentPrice": 80000,
-  "dueDate": 3,
-  "categoryName": "New Posts"
+  "productCreateDto": {
+    "productName": "상품6",
+    "description": "상품 설명입니다",
+    "auctionNowPrice": 1000,
+    "currentPrice": 1200,
+    "dueDate": 1,
+    "categoryName": "중고"
+  },
+  "productImagesRequestDto": {
+    "imagesUrl": [
+      "https://itsminebucket.s3.ap-northeast-2.amazonaws.com/Irelia_1.jpg",
+      "https://itsminebucket.s3.ap-northeast-2.amazonaws.com/Akali_2.jpg",
+      "https://itsminebucket.s3.ap-northeast-2.amazonaws.com/Irelia_3.jpg"
+    ]
+  }
 }
+
+
+
+
+
 
 ### 특정 상품 조회하기
 GET http://localhost:8080/products/3
