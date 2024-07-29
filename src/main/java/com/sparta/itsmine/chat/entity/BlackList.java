@@ -9,9 +9,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class BlackList extends Timestamp {
 
     @Id
@@ -25,4 +27,9 @@ public class BlackList extends Timestamp {
     @OneToOne
     @JoinColumn(name = "to_user_id")
     private User toUser;
+
+    public BlackList(User fromUser, User toUser) {
+        this.fromUser = fromUser;
+        this.toUser = toUser;
+    }
 }

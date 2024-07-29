@@ -1,5 +1,7 @@
 package com.sparta.itsmine.chat.controller;
 
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_BLACKLIST_USER_ADD;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_BLACKLIST_USER_CANCEL;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_GET_MESSAGE_LIST;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_GET_ROOM_LIST;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_SUCCESS_ROOM_LEAVE;
@@ -21,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -93,4 +96,13 @@ public class ChatRoomController {
         return ResponseUtils.of(CHAT_SUCCESS_ROOM_LEAVE);
     }
 
+    @PatchMapping("/blacklist")
+    public ResponseEntity<HttpResponseDto> isBlackList(@RequestBody UserRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+        boolean blackList = chatService.isBlackList(user, requestDto.getUserId());
+
+        return blackList ? ResponseUtils.of(CHAT_BLACKLIST_USER_ADD)
+                : ResponseUtils.of(CHAT_BLACKLIST_USER_CANCEL);
+    }
 }

@@ -52,7 +52,9 @@ public enum ResponseCodeEnum {
     CHAT_SUCCESS_CREATE(HttpStatus.CREATED, "방 생성 완료"),
     CHAT_GET_MESSAGE_LIST(HttpStatus.OK, "채팅방에 들어왔습니다. 이전 채팅 내역 불러옵니다."),
     CHAT_GET_ROOM_LIST(HttpStatus.OK, "채팅방 리스트 입니다."),
-    CHAT_SUCCESS_ROOM_LEAVE(HttpStatus.OK, "채팅방에서 나갔습니다");
+    CHAT_SUCCESS_ROOM_LEAVE(HttpStatus.OK, "채팅방에서 나갔습니다"),
+    CHAT_BLACKLIST_USER_ADD(HttpStatus.CREATED, "블랙 리스트 추가 했습니다."),
+    CHAT_BLACKLIST_USER_CANCEL(HttpStatus.CREATED, "블랙 리스트 취소 했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

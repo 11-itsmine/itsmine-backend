@@ -7,9 +7,11 @@ import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.US
 
 import com.sparta.itsmine.chat.dto.MessageRequestDto;
 import com.sparta.itsmine.chat.dto.RoomInfoResponseDto;
+import com.sparta.itsmine.chat.entity.BlackList;
 import com.sparta.itsmine.chat.entity.ChatRoom;
 import com.sparta.itsmine.chat.entity.JoinChat;
 import com.sparta.itsmine.chat.entity.Message;
+import com.sparta.itsmine.chat.repository.BlackListRepository;
 import com.sparta.itsmine.chat.repository.ChatRoomRepository;
 import com.sparta.itsmine.chat.repository.JoinChatRepository;
 import com.sparta.itsmine.chat.repository.MessageRepository;
@@ -18,10 +20,12 @@ import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.global.exception.DataNotFoundException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -32,6 +36,7 @@ public class ChatService {
     private final JoinChatRepository joinChatRepository;
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
+    private final BlackListRepository blackListRepository;
 
     /**
      * 내가 지금 참여하고 있는 채팅방 리스트를 불러 옵니다.
@@ -49,15 +54,13 @@ public class ChatService {
      * <p>
      * 판매자에게 채팅 요청 -> 채팅 수락 후 채팅방을 만듬 -> 만들때 유저 정보도 같이 들어감
      *
-     * @param user   본인 유저 정보
-     * @param userId 다른 사람의 유저 Id
+     * @param fromUser 본인 유저 정보
+     * @param userId   다른 사람의 유저 Id
      */
-    public RoomInfoResponseDto createChatRoom(User user, Long userId) {
-        User productUser = userRepository.findById(userId).orElseThrow(
-                () -> new DataNotFoundException(USER_NOT_FOUND)
-        );
+    public RoomInfoResponseDto createChatRoom(User fromUser, Long userId) {
+        User toUser = getUser(userId);
 
-        ChatRoom chatRoom = new ChatRoom(user, productUser);
+        ChatRoom chatRoom = new ChatRoom(fromUser, toUser);
 
         log.info("chatRoom : {} ", chatRoom.getFromUser());
 
@@ -106,6 +109,30 @@ public class ChatService {
         messageRepository.save(message);
     }
 
+    @Transactional
+    public boolean isBlackList(User fromuser, Long userId) {
+
+        Optional<BlackList> CheckBlackList = blackListRepository.findByFromUserIdAndToUserId(
+                fromuser.getId(),
+                userId);
+
+        if (CheckBlackList.isEmpty()) {
+            User toUser = getUser(userId);
+            BlackList blackList = new BlackList(fromuser, toUser);
+            blackListRepository.save(blackList);
+            return true;
+        } else {
+            blackListRepository.delete(CheckBlackList.get());
+            return false;
+        }
+    }
+
+    public User getUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new DataNotFoundException(USER_NOT_FOUND)
+        );
+    }
+
     /**
      * 채팅방 정보 있는지 확인
      * <p>
@@ -118,10 +145,18 @@ public class ChatService {
         );
     }
 
+    /**
+     * 채팅방 유저가 2명 이하면 채팅 이용 불가 예외 처리
+     * <p>
+     *
+     * @param roomId 채팅방 ID
+     */
     public void getUserCount(String roomId) {
         long userCount = joinChatRepository.countByChatRoomId(roomId);
         if (userCount < 2) {
             throw new DataNotFoundException(CHAT_NOT_ONE_TO_ONE);
         }
     }
+
+
 }
