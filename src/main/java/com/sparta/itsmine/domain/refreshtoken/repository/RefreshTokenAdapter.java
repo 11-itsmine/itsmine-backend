@@ -1,9 +1,9 @@
-package com.sparta.itsmine.domain.refreshtoken;
-
-import java.util.Optional;
+package com.sparta.itsmine.domain.refreshtoken.repository;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import com.sparta.itsmine.domain.refreshtoken.entity.RefreshToken;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.itsmine.domain.refreshtoken.RefreshTokenService;
+import com.sparta.itsmine.domain.refreshtoken.service.RefreshTokenService;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.utils.UserRole;

@@ -1,7 +1,7 @@
 package com.sparta.itsmine.global.security;
 
-import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
-import com.sparta.itsmine.domain.refreshtoken.RefreshTokenRepository;
+import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

@@ -3,7 +3,7 @@ package com.sparta.itsmine.domain.user.service;
 
 import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
 
-import com.sparta.itsmine.domain.refreshtoken.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenAdapter;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
@@ -58,8 +58,7 @@ public class UserService {
         return requestDto.getName();
     }
 
-    public void logout(String username, HttpServletResponse response) {
-        response.setHeader(AUTHORIZATION_HEADER, "");
+    public void logout(String username) {
         refreshTokenAdapter.deleteByUsername(username);
     }
 

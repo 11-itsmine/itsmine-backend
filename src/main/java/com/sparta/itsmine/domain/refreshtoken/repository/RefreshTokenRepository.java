@@ -1,8 +1,10 @@
-package com.sparta.itsmine.domain.refreshtoken;
+package com.sparta.itsmine.domain.refreshtoken.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.sparta.itsmine.domain.refreshtoken.entity.RefreshToken;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
