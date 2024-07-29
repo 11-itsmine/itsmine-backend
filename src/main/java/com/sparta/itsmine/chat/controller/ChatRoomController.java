@@ -1,13 +1,16 @@
 package com.sparta.itsmine.chat.controller;
 
-import com.sparta.itsmine.chat.dto.ChatRoomRequestDto;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_GET_MESSAGE_LIST;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_GET_ROOM_LIST;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_SUCCESS_ROOM_LEAVE;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.COMMENT_SUCCESS_CREATE;
+
 import com.sparta.itsmine.chat.dto.RoomInfoResponseDto;
 import com.sparta.itsmine.chat.dto.UserRequestDto;
 import com.sparta.itsmine.chat.entity.Message;
 import com.sparta.itsmine.chat.service.ChatService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
-import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import java.util.List;
@@ -31,6 +34,11 @@ public class ChatRoomController {
 
     private final ChatService chatService;
 
+    /**
+     * 내가 지금 참여하고 있는 채팅방 리스트를 불러 옵니다.
+     *
+     * @param userDetails 인가된 본인 유저 정보
+     */
     @GetMapping
     public ResponseEntity<HttpResponseDto> getChatRoom(
             @AuthenticationPrincipal UserDetailsImpl userDetails
@@ -38,24 +46,43 @@ public class ChatRoomController {
         Long userId = userDetails.getUser().getId();
         List<RoomInfoResponseDto> responseDtos = chatService.findAllRoom(userId);
 
-        return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_CREATE, responseDtos);
+        return ResponseUtils.of(CHAT_GET_ROOM_LIST, responseDtos);
     }
 
+
+    /**
+     * 채팅방을 만듭니다..(상품의 대한 질문이나 실시간으로 확인 하고 싶을떄 1:1 방식으로 진행)
+     * <p>
+     * 판매자에게 채팅 요청 -> 채팅 수락 후 채팅방을 만듬 -> 만들때 유저 정보도 같이 들어감
+     *
+     * @param requestDto  다른 사람의 유저 정보
+     * @param userDetails 인가된 본인 유저 정보
+     */
     @PostMapping
     public ResponseEntity<HttpResponseDto> createRoom(@RequestBody UserRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         RoomInfoResponseDto responseDto = chatService.createChatRoom(user, requestDto.getUserId());
-        return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_CREATE, responseDto);
+        return ResponseUtils.of(COMMENT_SUCCESS_CREATE, responseDto);
     }
 
-    @GetMapping("/chat")
-    public ResponseEntity<HttpResponseDto> getChat(@RequestBody ChatRoomRequestDto requestDto) {
-        String roomId = requestDto.getRoomId();
+    /**
+     * 내가 선택한 채팅방에 들어 갑니다. 들어갈때 이전 채팅 메시지 내역을 불러옵니다.
+     *
+     * @param roomId 채팅방 정보
+     */
+    @GetMapping("/{roomId}")
+    public ResponseEntity<HttpResponseDto> getChat(@PathVariable String roomId) {
         List<Message> messageList = chatService.getMessageList(roomId);
-        return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_CREATE, messageList);
+        return ResponseUtils.of(CHAT_GET_MESSAGE_LIST, messageList);
     }
 
+    /**
+     * 채팅방에서 나갑니다. 채팅방에 나가면은 남아있는 사람을 채팅을 못합니다.
+     *
+     * @param userDetails 인가된 본인 유저 정보
+     * @param roomId      채팅방 정보
+     */
     @DeleteMapping("/{roomId}")
     public ResponseEntity<HttpResponseDto> leaveUser(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -63,7 +90,7 @@ public class ChatRoomController {
     ) {
         User user = userDetails.getUser();
         chatService.leaveUser(user, roomId);
-        return ResponseUtils.of(ResponseCodeEnum.COMMENT_SUCCESS_CREATE);
+        return ResponseUtils.of(CHAT_SUCCESS_ROOM_LEAVE);
     }
 
 }

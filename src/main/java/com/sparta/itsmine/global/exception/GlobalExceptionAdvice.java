@@ -47,4 +47,16 @@ public class GlobalExceptionAdvice {
         log.error("에러 메세지: ", e);
         return of(e.getResponseExceptionEnum());
     }
+
+    @ExceptionHandler(DataNotFoundException.class)
+    public ResponseEntity<HttpResponseDto> handleUserException(DataNotFoundException e) {
+        log.error("에러 메세지: ", e);
+        return of(e.getResponseExceptionEnum());
+    }
+
+    @ExceptionHandler(DateDuplicatedException.class)
+    public ResponseEntity<HttpResponseDto> handleUserException(DateDuplicatedException e) {
+        log.error("에러 메세지: ", e);
+        return of(e.getResponseExceptionEnum());
+    }
 }

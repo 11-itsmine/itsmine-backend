@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class ChatRoomRequestDto {
 
     private String roomId; // 방 번호
-    private String senderId; // 채팅을 보낸 사람
+    private String fromUserId; // 채팅을 보낸 사람
 
 }

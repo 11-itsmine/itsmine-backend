@@ -1,5 +1,9 @@
 package com.sparta.itsmine.domain.qna.service;
 
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.QNA_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.QNA_USER_NOT_VALID;
+
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.qna.dto.GetQnaResponseDto;
@@ -7,27 +11,25 @@ import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
-import com.sparta.itsmine.global.exception.qna.QnaCheckUserException;
-import com.sparta.itsmine.global.exception.qna.QnaNotFoundException;
+import com.sparta.itsmine.global.exception.DataNotFoundException;
+import com.sparta.itsmine.global.exception.DateDuplicatedException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class QnaService {
-
-    private static final Logger log = LoggerFactory.getLogger(QnaService.class);
+    
     private final QnaRepository qnaRepository;
     private final ProductRepository productRepository;
 
@@ -89,7 +91,7 @@ public class QnaService {
      */
     public void checkProduct(Long productId) {
         productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("상품 정보가 없습니다.")
+                () -> new DataNotFoundException(PRODUCT_NOT_FOUND)
         );
     }
 
@@ -100,7 +102,7 @@ public class QnaService {
      */
     public Product getProduct(Long productId) {
         return productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("상품 정보가 없습니다.")
+                () -> new DataNotFoundException(PRODUCT_NOT_FOUND)
         );
     }
 
@@ -111,7 +113,7 @@ public class QnaService {
      */
     public Qna getQna(Long qnaId) {
         return qnaRepository.findById(qnaId).orElseThrow(
-                () -> new QnaNotFoundException(ResponseExceptionEnum.QNA_NOT_FOUND)
+                () -> new DataNotFoundException(QNA_NOT_FOUND)
         );
     }
 
@@ -123,7 +125,7 @@ public class QnaService {
      */
     public void checkQnaUser(User detailUser, User qnaUser) {
         if (!detailUser.getId().equals(qnaUser.getId())) {
-            throw new QnaCheckUserException(ResponseExceptionEnum.QNA_USER_NOT_VALID);
+            throw new DateDuplicatedException(QNA_USER_NOT_VALID);
         }
     }
 
