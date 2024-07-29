@@ -1,5 +1,6 @@
 package com.sparta.itsmine.chat.service;
 
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_NOT_ONE_TO_ONE;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_USER_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
@@ -72,6 +73,7 @@ public class ChatService {
      * @param roomId 채팅방 정보
      */
     public List<Message> getMessageList(String roomId) {
+
         chatRoomRepository.findByRoomId(roomId).orElseThrow(
                 () -> new DataNotFoundException(CHAT_ROOM_NOT_FOUND)
         );
@@ -116,7 +118,10 @@ public class ChatService {
         );
     }
 
-//    public long getUserCount(String roomId) {
-//        return joinChatRepository.
-//    }
+    public void getUserCount(String roomId) {
+        long userCount = joinChatRepository.countByChatRoomId(roomId);
+        if (userCount < 2) {
+            throw new DataNotFoundException(CHAT_NOT_ONE_TO_ONE);
+        }
+    }
 }
