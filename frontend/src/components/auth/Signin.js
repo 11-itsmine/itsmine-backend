@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import axiosInstance from '../../api/axiosInstance'; // 경로 수정
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -13,13 +13,14 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {createTheme, ThemeProvider} from '@mui/material/styles';
 
 const defaultTheme = createTheme();
 
 function Copyright(props) {
   return (
-      <Typography variant="body2" color="text.secondary" align="center" {...props}>
+      <Typography variant="body2" color="text.secondary"
+                  align="center" {...props}>
         {'Copyright © '}
         <Link color="inherit" href="https://mui.com/">
           Yours?
@@ -30,7 +31,7 @@ function Copyright(props) {
   );
 }
 
-export default function SignIn({ onLogin }) {
+export default function SignIn({onLogin}) {
   const [loginRequest, setLoginRequest] = useState({
     username: '',
     password: ''
@@ -44,26 +45,16 @@ export default function SignIn({ onLogin }) {
     event.preventDefault();
 
     try {
-      axiosInstance.post('/users/login', loginRequest)
-      .then((res) => {
-        if (res.status === 200) {
-          let accessToken = res.body; // 응답헤더에서 토큰 받기
-          console.log('access 토큰 :', res.headers['authorization']);
-          console.log(res);
-        }
-      })
-      .catch((error) => console.log(error));
+      const response = await axiosInstance.post('/users/login', loginRequest);
 
-      // console.log('Login successful!', response.headers);
-      // console.log('Login successful!', response.headers.getAuthorization());
-      // console.log('Login successful!', response.headers.authorization);
-      // console.log('Login successful!', response.headers[`authorization`]);
+      // 응답 바디에서 토큰 추출
+      const token = response.data.data;
+      // const token = response.headers.getAuthorization(); // 응답에서 토큰 추출 // 응답에서 토큰 추출 (예: { "status": 200, "message": "로그인 성공", "data": "토큰" })
+      console.log('Login successful!', token);
+      console.log(response);
 
       // 토큰을 localStorage에 저장
-      // let token = response.headers[`authorization`];
-      // localStorage.setItem('Authorization', token);
-      //
-      // console.log('Login successful!', response.headers[`authorization`]);
+      localStorage.setItem('Authorization', token);
       // 부모 컴포넌트에 로그인 상태 변경 알리기
       onLogin();
 
@@ -81,8 +72,8 @@ export default function SignIn({ onLogin }) {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLoginRequest({ ...loginRequest, [name]: value });
+    const {name, value} = e.target;
+    setLoginRequest({...loginRequest, [name]: value});
   };
 
   const goToSignup = () => {
@@ -92,7 +83,7 @@ export default function SignIn({ onLogin }) {
   return (
       <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">
-          <CssBaseline />
+          <CssBaseline/>
           <Box
               sx={{
                 marginTop: 8,
@@ -101,13 +92,14 @@ export default function SignIn({ onLogin }) {
                 alignItems: 'center',
               }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
+            <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
+              <LockOutlinedIcon/>
             </Avatar>
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <Box component="form" onSubmit={handleSubmit} noValidate
+                 sx={{mt: 1}}>
               <TextField
                   margin="normal"
                   required
@@ -133,15 +125,16 @@ export default function SignIn({ onLogin }) {
                   onChange={handleChange}
               />
               <FormControlLabel
-                  control={<Checkbox value="remember" color="primary" />}
+                  control={<Checkbox value="remember" color="primary"/>}
                   label="Remember me"
               />
-              {errorMessage && <Typography color="error">{errorMessage}</Typography>}
+              {errorMessage && <Typography
+                  color="error">{errorMessage}</Typography>}
               <Button
                   type="submit"
                   fullWidth
                   variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
+                  sx={{mt: 3, mb: 2}}
               >
                 Sign In
               </Button>
@@ -159,7 +152,7 @@ export default function SignIn({ onLogin }) {
               </Grid>
             </Box>
           </Box>
-          <Copyright sx={{ mt: 8, mb: 4 }} />
+          <Copyright sx={{mt: 8, mb: 4}}/>
         </Container>
       </ThemeProvider>
   );

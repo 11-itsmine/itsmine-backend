@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import './App.css';
 import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
-import SignIn from "./components/js/Signin";
-import SignUp from "./components/js/Signup";
-import Board from "./components/board/board";
+import SignIn from "./components/auth/Signin";
+import SignUp from "./components/auth/Signup";
+import Hotdeal from "./components/hotDeal/Hotdeal";
 
 function App() {
 
@@ -26,7 +26,7 @@ function App() {
                      onLogin={handleLogin}/>}/>
           <Route path="/" element={<SignIn/>}/>
           <Route path="/signup" element={<SignUp/>}/>
-          <Route path="/board" element={<Board onLogout={handleLogout}/>}/>
+          <Route path="/itsmine" element={<Hotdeal onLogout={handleLogout}/>}/>
         </Routes>
       </BrowserRouter>
   );

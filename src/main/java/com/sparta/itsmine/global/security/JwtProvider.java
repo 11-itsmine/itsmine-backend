@@ -58,7 +58,7 @@ public class JwtProvider {
         Date date = new Date();
 
         // Access 토큰 만료기간
-        long accessTokenTime = 1000 * 1000L; // 1000초
+        long accessTokenTime = 1 * 1000L; // 1초
 
         return BEARER_PREFIX + Jwts.builder()
                 .setSubject(username)
@@ -101,8 +101,9 @@ public class JwtProvider {
     }
 
     /**
-     * Header에서 Access 토큰 가져오기
+     * 요청 바디에서 액세스 토큰 추출
      */
+
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
@@ -141,7 +142,6 @@ public class JwtProvider {
             log.error("유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
             log.error("만료된 JWT token 입니다.");
-            return true;
         } catch (UnsupportedJwtException e) {
             log.error("지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {

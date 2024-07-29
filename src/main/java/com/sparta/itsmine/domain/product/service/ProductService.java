@@ -40,8 +40,8 @@ public class ProductService {
         adapter.existActiveProductByUserAndName(userId, createDto.getCategoryName());
 
         Product product = createDto.toEntity(category);
-        product.connectUser(user);
-        product.setDueDateBid(createDto.getDueDate());
+        product.assignUser(user);
+        product.extendDueDateByHours(createDto.getDueDate());
         product.setCategory(category);
 
         Product newProduct = adapter.saveProduct(product);
@@ -77,8 +77,8 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long productId) {
         Product product = adapter.getProduct(productId);
-        product.setDeletedAt();
-        product.turnStatus(ProductStatus.FAIL_BID);
+        product.markAsDeleted();
+        product.updateStatus(ProductStatus.FAIL_BID);
         adapter.saveProduct(product);
         auctionService.avoidedAuction(productId);
     }

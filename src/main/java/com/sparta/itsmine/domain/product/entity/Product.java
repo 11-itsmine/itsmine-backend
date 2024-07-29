@@ -31,7 +31,7 @@ public class Product extends TimeStamp {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Long id;
     @Column(nullable = false, unique = true)
     private String productName;
@@ -95,7 +95,7 @@ public class Product extends TimeStamp {
      * 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
      */
 
-    public void connectUser(User user) {
+    public void assignUser(User user) {
         this.user = user;
     }
 
@@ -119,11 +119,11 @@ public class Product extends TimeStamp {
         }
     }
 
-    public void setDeletedAt() {
+    public void markAsDeleted() {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void turnStatus(ProductStatus status) {
+    public void updateStatus(ProductStatus status) {
         this.status = status;
     }
 
@@ -132,7 +132,7 @@ public class Product extends TimeStamp {
         return this.like;
     }
 
-    public void setDueDateBid(Integer hours) {
+    public void extendDueDateByHours(Integer hours) {
         this.dueDate = this.getDueDate().plusSeconds(hours);
     }
 

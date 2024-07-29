@@ -123,7 +123,7 @@ public class AuctionService {
         auctionRepository.save(auction);
 
         Product product = product(productId);
-        product.turnStatus(ProductStatus.SUCCESS_BID);
+        product.updateStatus(ProductStatus.SUCCESS_BID);
         productRepository.save(product);
 
     }

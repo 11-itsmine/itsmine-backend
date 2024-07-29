@@ -8,7 +8,7 @@ Content-Type: application/json
   "name":"{{name}}",
   "email":"{{email}}",
   "address": "화성시",
-  "nickname": "Jake3"
+  "nickname": "Jak213r543"
 }
 
 ### 로그인
@@ -20,20 +20,20 @@ Content-Type: application/json
   "password":"{{password}}"
 }
 > {%
-  client.log(response.headers.valueOf("Authorization"));
+  client.log(response.body.data);
   client.log(response.headers.valueOf("RefreshToken"));
-  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("Authorization", response.body.data);
   client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
 
 
 ### 카테고리 추가하기
-POST http://localhost:8080/category
+POST http://localhost:8080/categories
 Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "categoryName": "New Posts"
+  "categoryName": "Nㄹㅁㅇㄴㄹㅁㄴㅇㅁㄴㅇㅁ"
 }
 
 
@@ -43,7 +43,7 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "productName": "Jake",
+  "productName": "Jakee13",
   "description": "This is almost like a brandnew",
   "auctionNowPrice": 150000,
   "currentPrice": 80000,
@@ -52,9 +52,17 @@ Content-Type: application/json
 }
 
 ### 특정 상품 조회하기
-GET http://localhost:8080/products/2
+GET http://localhost:8080/products/3
 Authorization: {{Authorization}}
 Content-Type: application/json
+
+
+
+### 상품 좋아요 누르기
+POST http://localhost:8080/users/products/3/likes
+Authorization: {{Authorization}}
+Content-Type: application/json
+
 
 
 ### 상품 조회 페이지네이션
@@ -71,7 +79,7 @@ Content-Type: application/json
 
 
 ### 상품 수정
-PATCH http://localhost:8080/products/1
+PATCH http://localhost:8080/products/3
 Authorization: {{Authorization}}
 Content-Type: application/json
 
