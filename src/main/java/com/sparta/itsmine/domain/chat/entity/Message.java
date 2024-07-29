@@ -1,6 +1,6 @@
-package com.sparta.itsmine.chat.entity;
+package com.sparta.itsmine.domain.chat.entity;
 
-import com.sparta.itsmine.chat.dto.MessageRequestDto;
+import com.sparta.itsmine.domain.chat.dto.MessageRequestDto;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.sparta.itsmine.global.common.config;
 
-import com.sparta.itsmine.chat.service.ChatService;
+import com.sparta.itsmine.domain.chat.service.ChatService;
 import com.sparta.itsmine.global.security.JwtProvider;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

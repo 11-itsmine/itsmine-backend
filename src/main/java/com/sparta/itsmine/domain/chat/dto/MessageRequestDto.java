@@ -1,4 +1,4 @@
-package com.sparta.itsmine.chat.dto;
+package com.sparta.itsmine.domain.chat.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
-package com.sparta.itsmine.chat.controller;
+package com.sparta.itsmine.domain.chat.controller;
 
-import com.sparta.itsmine.chat.dto.MessageRequestDto;
-import com.sparta.itsmine.chat.service.ChatService;
+import com.sparta.itsmine.domain.chat.dto.MessageRequestDto;
+import com.sparta.itsmine.domain.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

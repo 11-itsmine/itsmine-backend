@@ -1,23 +1,25 @@
-package com.sparta.itsmine.chat.service;
+package com.sparta.itsmine.domain.chat.service;
 
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_BLACKLIST_USER;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_NOT_ONE_TO_ONE;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_USER_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
 
-import com.sparta.itsmine.chat.dto.MessageRequestDto;
-import com.sparta.itsmine.chat.dto.RoomInfoResponseDto;
-import com.sparta.itsmine.chat.entity.BlackList;
-import com.sparta.itsmine.chat.entity.ChatRoom;
-import com.sparta.itsmine.chat.entity.JoinChat;
-import com.sparta.itsmine.chat.entity.Message;
-import com.sparta.itsmine.chat.repository.BlackListRepository;
-import com.sparta.itsmine.chat.repository.ChatRoomRepository;
-import com.sparta.itsmine.chat.repository.JoinChatRepository;
-import com.sparta.itsmine.chat.repository.MessageRepository;
+import com.sparta.itsmine.domain.chat.dto.MessageRequestDto;
+import com.sparta.itsmine.domain.chat.dto.RoomInfoResponseDto;
+import com.sparta.itsmine.domain.chat.entity.BlackList;
+import com.sparta.itsmine.domain.chat.entity.ChatRoom;
+import com.sparta.itsmine.domain.chat.entity.JoinChat;
+import com.sparta.itsmine.domain.chat.entity.Message;
+import com.sparta.itsmine.domain.chat.repository.BlackListRepository;
+import com.sparta.itsmine.domain.chat.repository.ChatRoomRepository;
+import com.sparta.itsmine.domain.chat.repository.JoinChatRepository;
+import com.sparta.itsmine.domain.chat.repository.MessageRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.global.exception.DataNotFoundException;
+import com.sparta.itsmine.global.exception.DateDuplicatedException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +60,13 @@ public class ChatService {
      * @param userId   다른 사람의 유저 Id
      */
     public RoomInfoResponseDto createChatRoom(User fromUser, Long userId) {
+        Optional<BlackList> blackList = blackListRepository.findByFromUserIdAndToUserId(
+                fromUser.getId(),
+                userId);
         User toUser = getUser(userId);
+        if (blackList.isPresent()) {
+            throw new DateDuplicatedException(CHAT_BLACKLIST_USER);
+        }
 
         ChatRoom chatRoom = new ChatRoom(fromUser, toUser);
 
@@ -109,6 +117,13 @@ public class ChatService {
         messageRepository.save(message);
     }
 
+    /**
+     * 블랙리스트를 추가 합니다
+     * <p>
+     * (채팅을 하다가 블랙 리스트를 추가하여 마음에 들지 않는 유저의 채팅을 받지 못하게 한다)
+     *
+     * @param userId 유저 ID
+     */
     @Transactional
     public boolean isBlackList(User fromuser, Long userId) {
 
@@ -127,6 +142,12 @@ public class ChatService {
         }
     }
 
+    /**
+     * 유저 정보 있는지 확인
+     * <p>
+     *
+     * @param userId 유저 ID
+     */
     public User getUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new DataNotFoundException(USER_NOT_FOUND)

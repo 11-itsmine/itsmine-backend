@@ -1,4 +1,4 @@
-package com.sparta.itsmine.chat.entity;
+package com.sparta.itsmine.domain.chat.entity;
 
 
 public enum ChatStatus {

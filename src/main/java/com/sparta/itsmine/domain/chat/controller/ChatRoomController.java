@@ -1,4 +1,4 @@
-package com.sparta.itsmine.chat.controller;
+package com.sparta.itsmine.domain.chat.controller;
 
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_BLACKLIST_USER_ADD;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_BLACKLIST_USER_CANCEL;
@@ -7,10 +7,10 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_GE
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_SUCCESS_ROOM_LEAVE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.COMMENT_SUCCESS_CREATE;
 
-import com.sparta.itsmine.chat.dto.RoomInfoResponseDto;
-import com.sparta.itsmine.chat.dto.UserRequestDto;
-import com.sparta.itsmine.chat.entity.Message;
-import com.sparta.itsmine.chat.service.ChatService;
+import com.sparta.itsmine.domain.chat.dto.RoomInfoResponseDto;
+import com.sparta.itsmine.domain.chat.dto.UserRequestDto;
+import com.sparta.itsmine.domain.chat.entity.Message;
+import com.sparta.itsmine.domain.chat.service.ChatService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
@@ -96,6 +96,12 @@ public class ChatRoomController {
         return ResponseUtils.of(CHAT_SUCCESS_ROOM_LEAVE);
     }
 
+    /**
+     * 블랙 리스트 등록 여부를 확인 합니다, 테이블에 데이터 있으면 삭제 없으면 등록
+     *
+     * @param userDetails 인가된 본인 유저 정보
+     * @param requestDto  유저 정보가 들어있는 Dto
+     */
     @PatchMapping("/blacklist")
     public ResponseEntity<HttpResponseDto> isBlackList(@RequestBody UserRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {

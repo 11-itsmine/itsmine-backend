@@ -1,6 +1,6 @@
-package com.sparta.itsmine.chat.dto;
+package com.sparta.itsmine.domain.chat.dto;
 
-import com.sparta.itsmine.chat.entity.ChatRoom;
+import com.sparta.itsmine.domain.chat.entity.ChatRoom;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Data;

@@ -1,6 +1,6 @@
-package com.sparta.itsmine.chat.repository;
+package com.sparta.itsmine.domain.chat.repository;
 
-import com.sparta.itsmine.chat.entity.JoinChat;
+import com.sparta.itsmine.domain.chat.entity.JoinChat;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

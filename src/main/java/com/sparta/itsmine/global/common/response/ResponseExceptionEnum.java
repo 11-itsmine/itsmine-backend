@@ -49,7 +49,8 @@ public enum ResponseExceptionEnum {
     //채팅
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방이 없습니다."),
     CHAT_ROOM_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 나간 유저 입니다."),
-    CHAT_NOT_ONE_TO_ONE(HttpStatus.NOT_FOUND, "나간 유저가 존재하여 채팅이 불가능 합니다.");
+    CHAT_NOT_ONE_TO_ONE(HttpStatus.NOT_FOUND, "나간 유저가 존재하여 채팅이 불가능 합니다."),
+    CHAT_BLACKLIST_USER(HttpStatus.OK, "블랙 리스트에 등록된 유저 입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

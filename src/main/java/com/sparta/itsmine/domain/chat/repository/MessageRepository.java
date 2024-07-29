@@ -1,6 +1,6 @@
-package com.sparta.itsmine.chat.repository;
+package com.sparta.itsmine.domain.chat.repository;
 
-import com.sparta.itsmine.chat.entity.Message;
+import com.sparta.itsmine.domain.chat.entity.Message;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
