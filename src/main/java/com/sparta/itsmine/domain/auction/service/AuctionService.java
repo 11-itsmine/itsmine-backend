@@ -7,17 +7,16 @@ import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PR
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
-import com.sparta.itsmine.domain.auction.dto.AuctionMaxedBidPriceResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
 import com.sparta.itsmine.global.exception.product.ProductNotFoundException;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +29,7 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
+    private final ProductAdapter productAdapter;
 
     //입찰 생성(현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리를 해줘야함,(조건은 나중에))
     //즉시구매가를 바로 입찰했을 때 바로 낙찰
@@ -100,9 +100,9 @@ public class AuctionService {
     }
 
     public Product getProduct(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+       return productAdapter.getProduct(productId);
     }
+
 
     public void turnToSuccessBidProduct(Long productId) {
         Product product = getProduct(productId);
