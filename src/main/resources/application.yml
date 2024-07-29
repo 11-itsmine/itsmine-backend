@@ -24,8 +24,8 @@ spring:
     #port: 61613
 
 
-    mongodb:
-      uri: mongodb://localhost:27017/itsmine
+  mongodb:
+    url: mongodb://localhost:27017/itsmine
 
 
 

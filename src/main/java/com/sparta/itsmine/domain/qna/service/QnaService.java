@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class QnaService {
-    
+
     private final QnaRepository qnaRepository;
     private final ProductRepository productRepository;
 
@@ -49,11 +49,10 @@ public class QnaService {
             return qnaRepository.findAllByProduct(product, pageable).map(GetQnaResponseDto::of);
             //인가된 유저랑 QnA 비밀글 작성자 본인일 경우
         } else {
-            Page<Qna> qnaList = qnaRepository.findAllByProductAndSecretQna(product, false,
+            Page<Qna> qnaList = qnaRepository.findAllByProductIdAndSecretQna(product.getId(), false,
                     pageable);
-            Page<Qna> qnaListSecret = qnaRepository.findAllByProductAndUserAndSecretQna(product,
-                    user.getId()
-                    , true, pageable);
+            Page<Qna> qnaListSecret = qnaRepository.findAllByProductIdAndUserAndSecretQna(
+                    product.getId(), user.getId(), true, pageable);
 
             List<GetQnaResponseDto> getQnaResponseDtoList = Stream.concat(
                             qnaList.stream().map(GetQnaResponseDto::of),

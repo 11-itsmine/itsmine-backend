@@ -115,4 +115,8 @@ public class ChatService {
                 () -> new DataNotFoundException(CHAT_ROOM_NOT_FOUND)
         );
     }
+
+//    public long getUserCount(String roomId) {
+//        return joinChatRepository.
+//    }
 }
