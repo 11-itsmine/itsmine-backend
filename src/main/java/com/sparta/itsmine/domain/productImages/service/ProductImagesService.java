@@ -3,26 +3,27 @@ package com.sparta.itsmine.domain.productImages.service;
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.domain.productImages.entity.ProductImages;
 import com.sparta.itsmine.domain.productImages.respository.ProductImagesRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
+import com.sparta.itsmine.global.exception.DataNotFoundException;
+import com.sparta.itsmine.global.exception.productimages.InvalidURLException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.INVALID_URL_EXCEPTION;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -62,14 +63,14 @@ public class ProductImagesService {
             return path.substring(1);
         } catch (MalformedURLException e) {
             log.error("Invalid URL: " + fileUrl, e);
-            throw new IllegalArgumentException("Invalid file URL", e);
+            throw new InvalidURLException(INVALID_URL_EXCEPTION);
         }
     }
 
     // ProductImages 엔티티 생성 및 저장
     public void createProductImages(ProductImagesRequestDto imagesRequestDto, Product product, Long userId) {
         List<String> imagesUrl = imagesRequestDto.getImagesUrl();
-        User user = userRepository.findById(userId).orElseThrow( () -> new NotFoundException("사용자를 찾을 수 없습니다."));
+        User user = userRepository.findById(userId).orElseThrow( () -> new DataNotFoundException(USER_NOT_FOUND));
         ProductImages productImages = new ProductImages(imagesUrl, product, user);
         product.getProductImagesList().add(productImages);
         productImagesRepository.save(productImages);
