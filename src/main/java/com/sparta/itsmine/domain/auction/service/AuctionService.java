@@ -34,7 +34,7 @@ public class AuctionService {
     @Transactional
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto) {
-        Product product = getProduct(productId);
+        Product product = productAdapter.getProduct(productId);
         Integer bidPrice = requestDto.getBidPrice();
         ProductStatus status = product.getStatus();
         Auction auction = new Auction(user, product, bidPrice, status);
@@ -97,13 +97,8 @@ public class AuctionService {
         allDeleteBid(productId);
     }
 
-    public Product getProduct(Long productId) {
-       return productAdapter.getProduct(productId);
-    }
-
-
     public void turnToSuccessBidProduct(Long productId) {
-        Product product = getProduct(productId);
+        Product product = productAdapter.getProduct(productId);
         product.turnStatus(ProductStatus.SUCCESS_BID);
         productRepository.save(product);
     }
