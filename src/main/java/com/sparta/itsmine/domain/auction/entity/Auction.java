@@ -8,7 +8,7 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
-import com.sparta.itsmine.global.exception.DateDuplicatedException;
+import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -51,36 +51,35 @@ public class Auction extends TimeStamp {
     private Product product;
 
 
-
     @Builder
-    public Auction(User user, Product product, Integer bidPrice ,ProductStatus status) {
+    public Auction(User user, Product product, Integer bidPrice, ProductStatus status) {
         this.user = user;
         this.product = product;
         this.bidPrice = bidPrice;
-        this.status=status;
+        this.status = status;
     }
 
-    public void turnStatus(ProductStatus status) {
-        this.status=status;
+    public void updateStatus(ProductStatus status) {
+        this.status = status;
     }
 
-    public void checkBidPrice(Integer bidPrice){
+    public void checkBidPrice(Integer bidPrice) {
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
         if (bidPrice <= product.getCurrentPrice()
                 || bidPrice > product.getAuctionNowPrice()) {
-            throw new DateDuplicatedException(AUCTION_IMPOSSIBLE_BID);
+            throw new DataDuplicatedException(AUCTION_IMPOSSIBLE_BID);
         }
     }
 
-    public void checkStatus(ProductStatus status){
+    public void checkStatus(ProductStatus status) {
         if (!status.equals(ProductStatus.BID)) {
-            throw new DateDuplicatedException(AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS);
+            throw new DataDuplicatedException(AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS);
         }
     }
 
-    public void checkCurrentPrice(Integer bidPrice,Integer currentPrice){
+    public void checkCurrentPrice(Integer bidPrice, Integer currentPrice) {
         if (bidPrice <= currentPrice) {
-            throw new DateDuplicatedException(AUCTION_IMPOSSIBLE_BID);
+            throw new DataDuplicatedException(AUCTION_IMPOSSIBLE_BID);
         }
     }
 }

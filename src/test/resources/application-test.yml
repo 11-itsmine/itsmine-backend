@@ -2,6 +2,11 @@ server:
   port: ${SERVER-PORT:8080}
 
 spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
   data:
     redis:
       host: localhost
@@ -25,6 +30,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
     properties:
       hibernate:
         #show_sql: true
@@ -47,3 +53,4 @@ spring:
 jwt-secret-key: ${JWT-KEY}
 
 admin-token: ${ADMIN-TOKEN}
+

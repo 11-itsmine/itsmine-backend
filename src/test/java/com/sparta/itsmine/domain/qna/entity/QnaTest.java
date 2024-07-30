@@ -32,7 +32,7 @@ class QnaTest {
                 .build();
         Category.builder().categoryName("전자").build();
         product = new Product("마우스", "마우스ㅍㅍ", 5000
-                , 50000, LocalDateTime.parse("2024-07-23 02:21:48.628888")
+                , 50000, LocalDateTime.now()
                 , category);
     }
 

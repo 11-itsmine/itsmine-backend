@@ -83,24 +83,25 @@ public class JwtProvider {
     }
 
     /**
-     * Cookie에 Access 토큰 저장
+     * Cookie에 Refresh 토큰 저장
      */
     public void addJwtToCookie(String token, HttpServletResponse response) {
         String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8)
                 .replaceAll("\\+", "%20");
 
-        Cookie cookie = new Cookie(AUTHORIZATION_HEADER, encodedToken);
+        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, encodedToken);
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         cookie.setPath("/");
-        cookie.setMaxAge(Math.toIntExact(ACCESS_TOKEN_TIME));
+        cookie.setMaxAge(Math.toIntExact(REFRESH_TOKEN_TIME));
 
         response.addCookie(cookie);
     }
 
     /**
-     * Header에서 Access 토큰 가져오기
+     * 요청 바디에서 액세스 토큰 추출
      */
+
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 

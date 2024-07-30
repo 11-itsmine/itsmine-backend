@@ -27,7 +27,7 @@ public class User extends TimeStamp {
      * 컬럼 - 연관관계 컬럼을 제외한 컬럼을 정의합니다.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, unique = true)
     private Long id;
 

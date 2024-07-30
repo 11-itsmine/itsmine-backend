@@ -1,4 +1,6 @@
-import * as React from 'react';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import axiosInstance from '../../api/axiosInstance'; // Ensure this is correctly set up
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,6 +14,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
+
+const defaultTheme = createTheme();
 
 function Copyright(props) {
   return (
@@ -27,22 +31,41 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
-const defaultTheme = createTheme();
-
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const [signupRequest, setSignupRequest] = useState({
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+    address: '',
+    nickname: '',
+  });
+
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      username: data.get('username'),
-      email: data.get('email'),
-      password: data.get('password'),
-      address: data.get('address'),
-      nickname: data.get('nickname'),
-    });
+
+    try {
+      await axiosInstance.post('/users', signupRequest);
+
+      console.log('Signup successful!');
+      navigate('/');
+    } catch (error) {
+      console.error('Signup failed:', error);
+      if (error.response && error.response.data) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage('회원가입에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
+  const handleChange = (e) => {
+    const {name, value} = e.target;
+    setSignupRequest({...signupRequest, [name]: value});
   };
 
   return (
@@ -70,11 +93,12 @@ export default function SignUp() {
                   <TextField
                       required
                       fullWidth
-                      name="name"
-                      label="Name"
-                      type="name"
                       id="name"
+                      label="Name"
+                      name="name"
                       autoComplete="name"
+                      value={signupRequest.name}
+                      onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -85,6 +109,8 @@ export default function SignUp() {
                       label="Username"
                       name="username"
                       autoComplete="username"
+                      value={signupRequest.username}
+                      onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -95,6 +121,8 @@ export default function SignUp() {
                       label="Email Address"
                       name="email"
                       autoComplete="email"
+                      value={signupRequest.email}
+                      onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -106,6 +134,8 @@ export default function SignUp() {
                       type="password"
                       id="password"
                       autoComplete="new-password"
+                      value={signupRequest.password}
+                      onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -114,9 +144,10 @@ export default function SignUp() {
                       fullWidth
                       name="address"
                       label="Address"
-                      type="address"
                       id="address"
-                      autoComplete="new-Address"
+                      autoComplete="address"
+                      value={signupRequest.address}
+                      onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -125,9 +156,10 @@ export default function SignUp() {
                       fullWidth
                       name="nickname"
                       label="Nickname"
-                      type="nickname"
                       id="nickname"
-                      autoComplete="new-nickname"
+                      autoComplete="nickname"
+                      value={signupRequest.nickname}
+                      onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -138,6 +170,8 @@ export default function SignUp() {
                   />
                 </Grid>
               </Grid>
+              {errorMessage && <Typography
+                  color="error">{errorMessage}</Typography>}
               <Button
                   type="submit"
                   fullWidth
@@ -148,7 +182,7 @@ export default function SignUp() {
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link href="/" variant="body2">
+                  <Link href="/frontend/public" variant="body2">
                     Already have an account? Sign in
                   </Link>
                 </Grid>

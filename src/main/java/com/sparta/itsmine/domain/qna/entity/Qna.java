@@ -8,7 +8,7 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
-import com.sparta.itsmine.global.exception.DateDuplicatedException;
+import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import com.sparta.itsmine.global.exception.comment.CommentEqualSellerException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -84,7 +84,7 @@ public class Qna extends TimeStamp {
      */
     public void checkQnaUser(User detailUser, User qnaUser) {
         if (!detailUser.getId().equals(qnaUser.getId())) {
-            throw new DateDuplicatedException(QNA_USER_NOT_VALID);
+            throw new DataDuplicatedException(QNA_USER_NOT_VALID);
         }
     }
 }

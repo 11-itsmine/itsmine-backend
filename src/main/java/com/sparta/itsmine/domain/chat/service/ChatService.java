@@ -18,8 +18,8 @@ import com.sparta.itsmine.domain.chat.repository.JoinChatRepository;
 import com.sparta.itsmine.domain.chat.repository.MessageRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
+import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import com.sparta.itsmine.global.exception.DataNotFoundException;
-import com.sparta.itsmine.global.exception.DateDuplicatedException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +65,7 @@ public class ChatService {
                 userId);
         User toUser = getUser(userId);
         if (blackList.isPresent()) {
-            throw new DateDuplicatedException(CHAT_BLACKLIST_USER);
+            throw new DataDuplicatedException(CHAT_BLACKLIST_USER);
         }
 
         ChatRoom chatRoom = new ChatRoom(fromUser, toUser);

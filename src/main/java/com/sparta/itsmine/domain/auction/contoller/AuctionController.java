@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.auction.contoller;
 
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESSFUL_BID;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_CREATE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_GET;
@@ -8,11 +9,9 @@ import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
-import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +39,7 @@ public class AuctionController {
                 productId,
                 requestDto);
         return ResponseUtils.of(
-                responseDto.getStatus().equals(ProductStatus.SUCCESS_BID) ? AUCTION_SUCCESSFUL_BID
+                responseDto.getStatus().equals(SUCCESS_BID) ? AUCTION_SUCCESSFUL_BID
                         : AUCTION_SUCCESS_CREATE, responseDto);
 
     }

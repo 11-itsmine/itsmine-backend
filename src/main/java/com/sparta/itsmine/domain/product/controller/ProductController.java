@@ -38,15 +38,15 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> getProduct(
-            @PathVariable Long productId
+            @PathVariable("productId") Long productId
     ) {
         return ResponseUtils.of(SUCCESS_TO_SEARCH_PRODUCTS, productService.getProduct(productId));
     }
 
     @GetMapping
     public ResponseEntity<HttpResponseDto> getAllProductsWithPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Page<ProductResponseDto> responseDto = productService.getProductsWithPage(page, size,
@@ -58,8 +58,8 @@ public class ProductController {
 
     @GetMapping("/likes")
     public ResponseEntity<HttpResponseDto> getAllLikeProductsWithPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Page<ProductResponseDto> responseDto = productService.getLikeProductsWithPage(page, size,
@@ -72,7 +72,7 @@ public class ProductController {
     @PatchMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> updateProduct(
             @RequestBody ProductCreateDto createDto,
-            @PathVariable Long productId
+            @PathVariable("productId") Long productId
     ) {
         productService.updateProduct(createDto, productId);
         return ResponseUtils.of(SUCCESS_TO_UPDATE);
@@ -80,16 +80,9 @@ public class ProductController {
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> deleteProduct(
-            @PathVariable Long productId
+            @PathVariable("productId") Long productId
     ) {
         productService.deleteProduct(productId);
         return ResponseUtils.of(SUCCESS_DELETE_PRODUCT);
-    }
-
-    @PostMapping("/{productId}/likes")
-    public ResponseEntity<HttpResponseDto> addLikes(
-            @PathVariable Long productId
-    ) {
-        return ResponseUtils.of(productService.toggleProductLike(productId));
     }
 }
