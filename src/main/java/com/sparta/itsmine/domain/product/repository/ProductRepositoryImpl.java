@@ -7,8 +7,12 @@ import static com.sparta.itsmine.domain.product.utils.ProductStatus.FAIL_BID;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.itsmine.domain.product.entity.Product;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +57,44 @@ public class ProductRepositoryImpl implements CustomProductRepository {
                         .and(product.deletedAt.isNull()))
                 .fetchOne();
         return Optional.ofNullable(foundProduct);
+    }
+
+    @Cacheable("productsByUser")
+    @Override
+    public Page<Product> findAllByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable) {
+        List<Product> products = queryFactory.selectFrom(product)
+                .where(product.user.id.eq(userId)
+                        .and(product.deletedAt.isNull()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = queryFactory.selectFrom(product)
+                .where(product.user.id.eq(userId)
+                        .and(product.deletedAt.isNull()))
+                .fetch().size();
+
+        return new PageImpl<>(products, pageable, total);
+    }
+
+    @Override
+    public Page<Product> findAllByUserIdAndLikeTrueAndDeletedAtIsNull(Long userId,
+            Pageable pageable) {
+        List<Product> products = queryFactory.selectFrom(product)
+                .where(product.user.id.eq(userId)
+                        .and(product.like.isTrue())
+                        .and(product.deletedAt.isNull()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = queryFactory.selectFrom(product)
+                .where(product.user.id.eq(userId)
+                        .and(product.like.isTrue())
+                        .and(product.deletedAt.isNull()))
+                .fetch().size();
+
+        return new PageImpl<>(products, pageable, total);
     }
 
     private long fetchCount(JPAQueryFactory queryFactory, Long userId) {
