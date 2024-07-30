@@ -29,17 +29,6 @@ public class ProductImagesController {
         }
     }
 
-    // 파일 업로드 엔드포인트
-//    @PostMapping("/upload")
-//    public ResponseEntity<List<String>> uploadFiles(@RequestParam("file") List<MultipartFile> files) {
-//        try {
-//            List<String> fileUrls = productImagesService.saveFiles(files);
-//            return ResponseEntity.ok(fileUrls); // S3에 저장된 파일 URL 리스트 반환
-//        } catch (IOException e) {
-//            return ResponseEntity.status(500).body(Collections.singletonList("파일 업로드 중 오류가 발생했습니다."));
-//        }
-//    }
-
     // 파일 삭제 엔드포인트
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteFile(@RequestParam("fileUrl") String fileUrl) {
@@ -50,6 +39,17 @@ public class ProductImagesController {
             return ResponseEntity.status(500).body("파일 삭제 중 오류가 발생했습니다.");
         }
     }
+
+    // 파일 업로드 엔드포인트
+//    @PostMapping("/upload")
+//    public ResponseEntity<List<String>> uploadFiles(@RequestParam("file") List<MultipartFile> files) {
+//        try {
+//            List<String> fileUrls = productImagesService.saveFiles(files);
+//            return ResponseEntity.ok(fileUrls); // S3에 저장된 파일 URL 리스트 반환
+//        } catch (IOException e) {
+//            return ResponseEntity.status(500).body(Collections.singletonList("파일 업로드 중 오류가 발생했습니다."));
+//        }
+//    }
 
     // 파일 다운로드 엔드포인트
 //    @GetMapping("/download")
