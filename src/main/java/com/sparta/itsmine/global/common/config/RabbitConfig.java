@@ -15,6 +15,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,6 +57,7 @@ public class RabbitConfig {
      * CHAT_QUEUE_NAME이라는 이름의 큐를 생성합니다. true 매개변수는 큐가 지속되도록 설정합니다.
      */
     @Bean
+    @Qualifier("chatQueue")
     public Queue queue() {
         return new Queue(CHAT_QUEUE_NAME, true);
     }
@@ -78,7 +80,7 @@ public class RabbitConfig {
      * 큐와 교환기를 라우팅 키(ROUTING_KEY)를 사용하여 바인딩합니다.
      */
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
+    public Binding binding(@Qualifier("chatQueue") Queue queue, TopicExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
     }
 
@@ -120,9 +122,9 @@ public class RabbitConfig {
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         factory.setHost(rabbitHost);
-        factory.setVirtualHost("/");
-        factory.setUsername("guest");
-        factory.setPassword("guest");
+        factory.setVirtualHost(rabbitVh);
+        factory.setUsername(rabbitUser);
+        factory.setPassword(rabbitPwd);
         factory.setPort(rabbitPort);
         return factory;
     }
@@ -152,5 +154,4 @@ public class RabbitConfig {
     public Module dateTimeModule() {
         return new JavaTimeModule();
     }
-
 }

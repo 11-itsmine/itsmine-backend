@@ -16,13 +16,14 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableRabbit
-public class RabbitConfig {
+public class RabbitScheduleConfig {
 
     protected static final String ROUTING_KEY = "product.routing.key";
     protected static final String DELAYED_QUEUE_NAME = "delayed.queue";
@@ -45,11 +46,13 @@ public class RabbitConfig {
     private String rabbitVh;
 
     @Bean
+    @Qualifier("productQueue")
     public Queue productQueue() {
         return new Queue(PRODUCT_QUEUE_NAME, true);
     }
 
     @Bean
+    @Qualifier("delayedQueue")
     public Queue delayedQueue() {
         return QueueBuilder.durable(DELAYED_QUEUE_NAME).build();
     }
@@ -62,13 +65,15 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Binding productBinding() {
-        return BindingBuilder.bind(productQueue()).to(delayedExchange()).with(ROUTING_KEY).noargs();
+    public Binding productBinding(@Qualifier("productQueue") Queue productQueue,
+            CustomExchange delayedExchange) {
+        return BindingBuilder.bind(productQueue).to(delayedExchange).with(ROUTING_KEY).noargs();
     }
 
     @Bean
-    public Binding delayedBinding() {
-        return BindingBuilder.bind(delayedQueue()).to(delayedExchange()).with(ROUTING_KEY).noargs();
+    public Binding delayedBinding(@Qualifier("delayedQueue") Queue delayedQueue,
+            CustomExchange delayedExchange) {
+        return BindingBuilder.bind(delayedQueue).to(delayedExchange).with(ROUTING_KEY).noargs();
     }
 
     @Bean

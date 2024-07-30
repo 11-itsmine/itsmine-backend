@@ -16,7 +16,7 @@ public class MessageListener {
         this.productRepository = productRepository;
     }
 
-    @RabbitListener(queues = RabbitConfig.PRODUCT_QUEUE_NAME)
+    @RabbitListener(queues = RabbitScheduleConfig.PRODUCT_QUEUE_NAME)
     public void receiveMessage(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));

@@ -19,6 +19,7 @@ public class MessageSenderService {
         messageProperties.setHeader("x-delay", delayMillis);
 
         Message message = new Message(productId.toString().getBytes(), messageProperties);
-        amqpTemplate.send(RabbitConfig.DELAYED_EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, message);
+        amqpTemplate.send(RabbitScheduleConfig.DELAYED_EXCHANGE_NAME,
+                RabbitScheduleConfig.ROUTING_KEY, message);
     }
 }

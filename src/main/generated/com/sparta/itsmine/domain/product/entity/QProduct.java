@@ -24,6 +24,8 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final com.sparta.itsmine.global.common.QTimeStamp _super = new com.sparta.itsmine.global.common.QTimeStamp(this);
 
+    public final ListPath<com.sparta.itsmine.domain.auction.entity.Auction, com.sparta.itsmine.domain.auction.entity.QAuction> auction = this.<com.sparta.itsmine.domain.auction.entity.Auction, com.sparta.itsmine.domain.auction.entity.QAuction>createList("auction", com.sparta.itsmine.domain.auction.entity.Auction.class, com.sparta.itsmine.domain.auction.entity.QAuction.class, PathInits.DIRECT2);
+
     public final NumberPath<Integer> auctionNowPrice = createNumber("auctionNowPrice", Integer.class);
 
     public final com.sparta.itsmine.domain.category.entity.QCategory category;
@@ -48,6 +50,8 @@ public class QProduct extends EntityPathBase<Product> {
     public final StringPath productName = createString("productName");
 
     public final DateTimePath<java.time.LocalDateTime> startDate = createDateTime("startDate", java.time.LocalDateTime.class);
+
+    public final NumberPath<Integer> startPrice = createNumber("startPrice", Integer.class);
 
     public final EnumPath<com.sparta.itsmine.domain.product.utils.ProductStatus> status = createEnum("status", com.sparta.itsmine.domain.product.utils.ProductStatus.class);
 

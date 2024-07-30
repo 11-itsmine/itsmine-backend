@@ -1,5 +1,7 @@
 package com.sparta.itsmine.domain.product.entity;
 
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
+
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
@@ -7,19 +9,27 @@ import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.productImages.entity.ProductImages;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
-import jakarta.persistence.*;
-import java.util.ArrayList;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.sparta.itsmine.domain.product.utils.ProductStatus.SAVED;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
@@ -72,8 +82,10 @@ public class Product extends TimeStamp {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductImages> productImagesList = new ArrayList<>();
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Auction> auction = new ArrayList<>();
 
@@ -94,7 +106,7 @@ public class Product extends TimeStamp {
         this.category = category;
 
         // set up initialized values
-        this.status = SAVED;
+        this.status = BID;
         this.startDate = LocalDateTime.now();
         this.like = false;
     }
