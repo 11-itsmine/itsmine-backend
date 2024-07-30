@@ -56,6 +56,7 @@ public enum ResponseCodeEnum {
     CHAT_BLACKLIST_USER_ADD(HttpStatus.CREATED, "블랙 리스트 추가 했습니다."),
     CHAT_BLACKLIST_USER_CANCEL(HttpStatus.OK, "블랙 리스트 취소 했습니다.");
 
+
     private final HttpStatus httpStatus;
     private final String message;
 }

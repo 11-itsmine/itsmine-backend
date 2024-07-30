@@ -2,18 +2,18 @@ server:
   port: ${SERVER-PORT:8080}
 
 spring:
-  data:
-    redis:
-      host: localhost
-      port: 6379
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
   # 배포 환경이라는 것은 각각 다양한 환경이 존재한다. 이때 각각의 주소가 다르다.
   # 이런것을 다 실행할때 각각을 하드코딩하면 제대로 사용할 수 없다. 이렇게 되면 따로 브랜치를 생성하는 식으로 관리를 해야한다.
   # 이렇게 변경되는 것들에 대해서 따로 빼서 관리하는 것 입니다.
   datasource:
-    url: jdbc:mysql://${DB-URL}/itsmine
+    url: jdbc:mariadb://itsmine.cjuymau828zh.ap-northeast-2.rds.amazonaws.com:3306/itsmine
     username: ${DB-USER}
     password: ${DB-PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.mariadb.jdbc.Driver
 
   rabbitmq:
     host: ${RABBIT-MQ-HOST}
@@ -44,7 +44,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        #show_sql: true
+        show_sql: true
         format_sql: true
         connection:
           CharSet: utf-8

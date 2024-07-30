@@ -7,15 +7,15 @@ import static com.sparta.itsmine.domain.user.entity.QUser.user;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.itsmine.domain.auction.dto.GetAuctionByMaxedBidPriceResponseDto;
-import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
-import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
-import com.sparta.itsmine.domain.auction.dto.QGetAuctionByMaxedBidPriceResponseDto;
-import com.sparta.itsmine.domain.auction.dto.QGetAuctionByProductResponseDto;
-import com.sparta.itsmine.domain.auction.dto.QGetAuctionByUserResponseDto;
+import com.sparta.itsmine.domain.auction.dto.AuctionMaxedBidPriceResponseDto;
+import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
+import com.sparta.itsmine.domain.auction.dto.QAuctionMaxedBidPriceResponseDto;
+import com.sparta.itsmine.domain.auction.dto.QAuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,9 +33,10 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 //        where user_id=user_id
 //        group by product_id;
     //자신이 고른 상품 전체 조회
-    public Page<GetAuctionByUserResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
-        List<GetAuctionByUserResponseDto> content = jpaQueryFactory
-                .select(new QGetAuctionByUserResponseDto(product.id, auction.bidPrice.max(), user.id))
+    @Cacheable("AuctionAllPage")
+    public Page<AuctionProductResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
+        List<AuctionProductResponseDto> content = jpaQueryFactory
+                .select(new QAuctionProductResponseDto(product.id, auction.bidPrice.max(), user.id))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
@@ -61,30 +62,31 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 //        from auctions
 //        where product_id=product_id
     //해당 상품 최고가 찾기
-    public GetAuctionByMaxedBidPriceResponseDto findByProductBidPrice(Long productId) {
+/*    public AuctionMaxedBidPriceResponseDto findByProductBidPrice(Long productId) {
         return jpaQueryFactory
-                .select(new QGetAuctionByMaxedBidPriceResponseDto(product.id,
+                .select(new QAuctionMaxedBidPriceResponseDto(product.id,
                         auction.bidPrice.max()))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .where(product.id.eq(productId))
                 .fetchOne();
-    }
+    }*/
 
 
 //        select product_id,max(bid_price) as bid_price,user_id
 //        from auctions
 //        where user_id=user_id and product_id=product_id;
     //자신이 고른 상품 조회
-    public GetAuctionByProductResponseDto findByUserIdAndProductId(Long UserId, Long productId) {
-        return jpaQueryFactory
-                .select(new QGetAuctionByProductResponseDto(product.id, auction.bidPrice.max(),
+    @Cacheable("Auction")
+    public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId, Long productId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(new QAuctionProductResponseDto(product.id, auction.bidPrice.max(),
                         user.id))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
                 .where(user.id.eq(UserId).and(product.id.eq(productId)))
-                .fetchOne();
+                .fetchOne());
     }
 
 
@@ -92,7 +94,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 //        from auctions
 //        where product_id=2 and bid_price != (select max(bid_price) from auctions where product_id=2);
     //해당 상품에 대한 모든 입찰가를 찾기(최댓값 빼고)
-    public List<Auction> findAllByProductIdWithOutMaxPrice(Long productId) {
+/*    public List<Auction> findAllByProductIdWithOutMaxPrice(Long productId) {
 
         SubQueryExpression<Integer> maxBidPriceSubQuery = JPAExpressions
                 .select(auction.bidPrice.max())
@@ -107,5 +109,6 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .where(product.id.eq(productId)
                         .and(auction.bidPrice.ne(maxBidPriceSubQuery)))
                 .fetch();
-    }
+    }*/
+
 }
