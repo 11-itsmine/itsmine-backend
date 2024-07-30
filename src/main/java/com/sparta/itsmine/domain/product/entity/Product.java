@@ -121,7 +121,7 @@ public class Product extends TimeStamp {
         this.currentPrice = Optional.ofNullable(createDto.getStartPrice())//시작가 때문에 수정한 부분입니다
                 .orElse(product.getCurrentPrice());
         if (hour != null) {
-            this.dueDate = product.getDueDate().plusSeconds(hour);
+            this.dueDate = product.getDueDate().plusHours(hour);
         } else {
             this.dueDate = product.getDueDate();
         }

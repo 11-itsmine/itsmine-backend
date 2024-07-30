@@ -2,7 +2,6 @@ package com.sparta.itsmine.domain.auction.service;
 
 
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_NOT_FOUND;
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
@@ -14,8 +13,7 @@ import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
-import com.sparta.itsmine.global.exception.product.ProductNotFoundException;
+import com.sparta.itsmine.global.exception.DataNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -65,7 +63,7 @@ public class AuctionService {
         Page<AuctionProductResponseDto> auctions = auctionRepository.findAuctionAllByUserid(
                 user.getId(), pageable);
         if (auctions.isEmpty()) {
-            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
+            throw new DataNotFoundException(AUCTION_NOT_FOUND);
         }
 
         return auctions;
@@ -75,7 +73,7 @@ public class AuctionService {
     public AuctionProductResponseDto getAuctionByProduct(User user, Long productId) {
         return auctionRepository.findByUserIdAndProductId(
                         user.getId(), productId)
-                .orElseThrow(() -> new AuctionNotFoundException(AUCTION_NOT_FOUND));
+                .orElseThrow(() -> new DataNotFoundException(AUCTION_NOT_FOUND));
     }
 
 //    낙찰 or 유찰은 상품 상태 확인하고 상품 관련된 입찰정보 삭제
