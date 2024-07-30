@@ -2,7 +2,6 @@ package com.sparta.itsmine.domain.qna.service;
 
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.QNA_NOT_FOUND;
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.QNA_USER_NOT_VALID;
 
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
@@ -12,7 +11,6 @@ import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.exception.DataNotFoundException;
-import com.sparta.itsmine.global.exception.DateDuplicatedException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +30,7 @@ public class QnaService {
 
     private final QnaRepository qnaRepository;
     private final ProductRepository productRepository;
+
 
     @Transactional
     public void createQna(Long productId, QnaRequestDto requestDTO, User user) {
@@ -71,7 +70,7 @@ public class QnaService {
     @Transactional
     public void updateQna(Long qnaId, QnaRequestDto requestDto, User user) {
         Qna qna = getQna(qnaId);
-        checkQnaUser(user, qna.getUser());
+        qna.checkQnaUser(user, qna.getUser());
         qna.update(requestDto);
     }
 
@@ -79,7 +78,7 @@ public class QnaService {
     public void deleteQna(Long productId, Long qnaId, User user) {
         checkProduct(productId);
         Qna qna = getQna(qnaId);
-        checkQnaUser(user, qna.getUser());
+        qna.checkQnaUser(user, qna.getUser());
         qnaRepository.delete(qna);
     }
 
@@ -115,17 +114,4 @@ public class QnaService {
                 () -> new DataNotFoundException(QNA_NOT_FOUND)
         );
     }
-
-    /**
-     * Qna내의 유저 정보와 인가된 유저 정보를 확인 후 일치 하지 않으면 Exception
-     *
-     * @param detailUser 인가된 유저 정보
-     * @param qnaUser    qnaEntity 유저 정보
-     */
-    public void checkQnaUser(User detailUser, User qnaUser) {
-        if (!detailUser.getId().equals(qnaUser.getId())) {
-            throw new DateDuplicatedException(QNA_USER_NOT_VALID);
-        }
-    }
-
 }
