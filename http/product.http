@@ -72,21 +72,20 @@ Content-Type: application/json
 
 
 
-### 상품 좋아요 누르기
-POST http://localhost:8080/users/products/3/likes
-Authorization: {{Authorization}}
-Content-Type: application/json
-
-
-
 ### 상품 조회 페이지네이션
 GET http://localhost:8080/products?page=0&size=5
 Authorization: {{Authorization}}
 Content-Type: application/json
 
 
+### 좋아요 누르기
+POST http://localhost:8080/users/products/1/likes
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
 ### 좋아요 게시물 조회
-GET https://localhost:8080/products/likes?page=0&size=5
+GET http://localhost:8080/products/likes?page=0&size=5
 Authorization: {{Authorization}}
 Content-Type: application/json
 

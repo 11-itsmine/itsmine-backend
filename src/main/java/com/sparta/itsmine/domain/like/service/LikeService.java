@@ -25,12 +25,11 @@ public class LikeService {
     @Transactional
     public ResponseCodeEnum createLike(Long productId, User user) {
         // 자기 물건에 좋아요 가능하게 만든다.
+        Product product = productAdapter.getProduct(productId); // 좋아요할 상품을 찾는다.
+        boolean likeExists = likeAdapter.existsLike(product.getId(),
+                user.getId()); // 해당 상품에 내가 좋아요를 했는지 찾는다. Empty, true
 
-        Product product = productAdapter.getProduct(productId);
-
-        boolean likeExists = likeAdapter.existsLike(product.getId(), user.getId());
-
-        if (!product.getLike()) {
+        if (!product.getLike() && likeExists) {
             product.toggleLike(); // Set like to true
             likeRepository.save(new Like(product, user));
             return SUCCESS_TO_LIKE;
