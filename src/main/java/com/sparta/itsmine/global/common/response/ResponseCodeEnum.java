@@ -43,9 +43,9 @@ public enum ResponseCodeEnum {
     COMMENT_SUCCESS_DELETE(HttpStatus.OK, "댓글 삭제가 완료 되었습니다."),
 
     //경매
-    AUCTION_SUCCESS_CREATE(HttpStatus.CREATED, "경매 생성이 완료 되었습니다."),
-    AUCTION_SUCCESS_GET(HttpStatus.OK, "경매 조회가 완료 되었습니다."),
-    AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION(HttpStatus.OK, "낙찰 되었습니다."),
+    AUCTION_SUCCESS_CREATE(HttpStatus.CREATED, "입찰 생성이 완료 되었습니다."),
+    AUCTION_SUCCESS_GET(HttpStatus.OK, "입찰 조회가 완료 되었습니다."),
+    AUCTION_SUCCESSFUL_BID(HttpStatus.OK, "낙찰 되었습니다."),
     AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION(HttpStatus.OK, "유찰 되었습니다.");
 
     private final HttpStatus httpStatus;

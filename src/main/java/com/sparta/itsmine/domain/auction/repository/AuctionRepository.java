@@ -9,8 +9,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomAuctionRepository {
 
     void deleteAllByProductId(Long productId);
-
-    boolean existsByProductId(Long productId);
-
-    Auction findByProductId(Long productId);
 }

@@ -1,28 +1,20 @@
 package com.sparta.itsmine.domain.auction.service;
 
 
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID;
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_NOT_FOUND;
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
 
+import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
-import com.sparta.itsmine.domain.auction.dto.GetAuctionByMaxedBidPriceResponseDto;
-import com.sparta.itsmine.domain.auction.dto.GetAuctionByProductResponseDto;
-import com.sparta.itsmine.domain.auction.dto.GetAuctionByUserResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.exception.Auction.AuctionImpossibleBid;
-import com.sparta.itsmine.global.exception.Auction.AuctionImpossibleBidCauseStatus;
-import com.sparta.itsmine.global.exception.Auction.AuctionNotFoundException;
-import com.sparta.itsmine.global.exception.product.ProductNotFoundException;
+import com.sparta.itsmine.global.exception.DataNotFoundException;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,70 +27,53 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
+    private final ProductAdapter productAdapter;
 
     //입찰 생성(현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리를 해줘야함,(조건은 나중에))
     //즉시구매가를 바로 입찰했을 때 바로 낙찰
     @Transactional
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto) {
-        Product product = product(productId);
+        Product product = productAdapter.getProduct(productId);
+        Integer bidPrice = requestDto.getBidPrice();
         ProductStatus status = product.getStatus();
-        Integer auctionPrice = requestDto.getBidPrice();
-
-        GetAuctionByMaxedBidPriceResponseDto maxedBidPrice = auctionRepository.findByProductBidPrice(
-                productId);
+        Auction auction = new Auction(user, product, bidPrice, status);
+        //현재 상품 상태가 입찰 중이 아니면 예외처리
+        auction.checkStatus(status);
 
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
-        if (auctionPrice < product.getCurrentPrice()
-                || auctionPrice > product.getAuctionNowPrice()) {
-            throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
-        }
+        auction.checkBidPrice(bidPrice);
 
         //현 최대 입찰가보다 낮으면 예외처리
-        if (auctionRepository.existsByProductId(productId)) {
-            if (auctionPrice <= maxedBidPrice.getBidPrice()) {
-                throw new AuctionImpossibleBid(AUCTION_IMPOSSIBLE_BID);
-            }
-        }
+        auction.checkCurrentPrice(bidPrice, product.getCurrentPrice());
 
-        //현재 상품 상태가 입찰 중이 아니면 예외처리
-        if (!product.getStatus().equals(ProductStatus.BID)) {
-            throw new AuctionImpossibleBidCauseStatus(AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS);
-        }
-
-        Auction auction = new Auction(user, product, auctionPrice, status);
-
-        auctionRepository.save(auction);
+        //현재 구매가 갱신
+        currentPriceUpdate(bidPrice,product);
 
         //입찰가를 즉시구매가 만큼 썼으면 즉시 낙찰
-        if (auctionPrice.equals(product.getAuctionNowPrice())) {
-            successfulAuction(productId);
+        if (bidPrice.equals(product.getAuctionNowPrice())) {
+            successfulAuction(auction, productId);
         }
-
+        auctionRepository.save(auction);
         return new AuctionResponseDto(auction);
-
     }
 
     //유저 입찰 조회(queryDSL 조회)(각각 입찰한 상품 당 자신의 최대입찰가만 나오게끔)(유지보수 할때 더 좋음)
-    public Page<GetAuctionByUserResponseDto> getAuctionByUser(User user, Pageable pageable) {
-        Page<GetAuctionByUserResponseDto> auctions = auctionRepository.findAuctionAllByUserid(
+    public Page<AuctionProductResponseDto> getAuctionByUser(User user, Pageable pageable) {
+        Page<AuctionProductResponseDto> auctions = auctionRepository.findAuctionAllByUserid(
                 user.getId(), pageable);
-        if (auctions == null) {
-            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
+        if (auctions.isEmpty()) {
+            throw new DataNotFoundException(AUCTION_NOT_FOUND);
         }
 
         return auctions;
     }
 
     //상품 입찰 조회(자신이 입찰한 상품의 자신의 최대입찰가만 나오게끔)
-    public GetAuctionByProductResponseDto getAuctionByProduct(User user, Long productId) {
-        GetAuctionByProductResponseDto productAuctions = auctionRepository.findByUserIdAndProductId(
-                user.getId(), productId);
-        if (productAuctions == null) {
-            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
-        }
-
-        return productAuctions;
+    public AuctionProductResponseDto getAuctionByProduct(User user, Long productId) {
+        return auctionRepository.findByUserIdAndProductId(
+                        user.getId(), productId)
+                .orElseThrow(() -> new DataNotFoundException(AUCTION_NOT_FOUND));
     }
 
 //    낙찰 or 유찰은 상품 상태 확인하고 상품 관련된 입찰정보 삭제
@@ -110,33 +85,31 @@ public class AuctionService {
     //조건: 즉시구매가를 바로 입찰했을 때(입찰 생성에서 해결해야함)
     //낙찰 시 상품 상태 SUCCESS_BID로 변경해야함
     @Transactional
-    public void successfulAuction(Long productId) {
-        List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
-        if (auctions == null) {
-            throw new AuctionNotFoundException(AUCTION_NOT_FOUND);
-        }
-
-        auctionRepository.deleteAll(auctions);
-
-        Auction auction = auctionRepository.findByProductId(productId);
+    public void successfulAuction(Auction auction, Long productId) {
+        allDeleteBid(productId);
         auction.turnStatus(ProductStatus.SUCCESS_BID);
-        auctionRepository.save(auction);
-
-        Product product = product(productId);
-        product.turnStatus(ProductStatus.SUCCESS_BID);
-        productRepository.save(product);
-
+        turnToSuccessBidProduct(productId);
     }
 
-    //유찰(상품ID로 조회해서 다 삭제(조건은 나중에))
+    //유찰(상품ID로 조회해서 다 삭제)
     @Transactional
     public void avoidedAuction(Long productId) {
+        allDeleteBid(productId);
+    }
+
+    public void turnToSuccessBidProduct(Long productId) {
+        Product product = productAdapter.getProduct(productId);
+        product.turnStatus(ProductStatus.SUCCESS_BID);
+        productRepository.save(product);
+    }
+
+    public void allDeleteBid(Long productId) {
         auctionRepository.deleteAllByProductId(productId);
     }
 
-    public Product product(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+    public void currentPriceUpdate(Integer bidPrice,Product product){
+        product.currentPriceUpdate(bidPrice);
+        productRepository.save(product);
     }
 
 }

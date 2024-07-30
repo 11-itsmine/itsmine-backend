@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.product.entity;
 
+import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
@@ -7,6 +8,7 @@ import com.sparta.itsmine.domain.productImages.entity.ProductImages;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +41,9 @@ public class Product extends TimeStamp {
     private String description;
     // TODO : 시작 가격을 명시해주고 추적하자
     @Column(nullable = false)
-    private Integer currentPrice;
+    private Integer startPrice;
+    @Column
+    private Integer currentPrice;//요청시 시작가만 받게 하기위해 요청 안해도 되게끔 만들었습니다
     @Column(nullable = false)
     private Integer auctionNowPrice;
     // 입찰, 낙찰, 유찰
@@ -70,17 +74,21 @@ public class Product extends TimeStamp {
     private User user;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductImages> productImagesList = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Auction> auction = new ArrayList<>();
 
 
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
     @Builder
-    public Product(String productName, String description, Integer currentPrice,
+    public Product(String productName, String description, Integer startPrice,
+//따로 currentPrice를 받지 않습니다
             Integer auctionNowPrice, LocalDateTime dueDate, Category category) {
         this.productName = productName;
         this.description = description;
-        this.currentPrice = currentPrice;
+        this.startPrice = startPrice;
+        this.currentPrice = startPrice;
         this.auctionNowPrice = auctionNowPrice;
         this.dueDate = dueDate;
         this.category = category;
@@ -110,13 +118,17 @@ public class Product extends TimeStamp {
                 .orElse(product.getDescription());
         this.auctionNowPrice = Optional.ofNullable(createDto.getAuctionNowPrice())
                 .orElse(product.getAuctionNowPrice());
-        this.currentPrice = Optional.ofNullable(createDto.getCurrentPrice())
+        this.currentPrice = Optional.ofNullable(createDto.getStartPrice())//시작가 때문에 수정한 부분입니다
                 .orElse(product.getCurrentPrice());
         if (hour != null) {
-            this.dueDate = product.getDueDate().plusSeconds(hour);
+            this.dueDate = product.getDueDate().plusHours(hour);
         } else {
             this.dueDate = product.getDueDate();
         }
+    }
+
+    public void currentPriceUpdate(Integer bidPrice) {
+        this.currentPrice = bidPrice;
     }
 
     public void setDeletedAt() {
