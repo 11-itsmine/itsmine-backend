@@ -20,6 +20,8 @@ spring:
     username: ${DB-USER}
     password: ${DB-PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  mongodb:
+    url: mongodb://localhost:27017/itsmine
 
     #  rabbitmq:
     #    host: ${RABBIT-MQ-HOST}
