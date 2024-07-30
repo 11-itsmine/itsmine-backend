@@ -1,7 +1,5 @@
 package com.sparta.itsmine.domain.user.entity;
 
-import java.time.LocalDateTime;
-
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.TimeStamp;
@@ -12,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,11 +55,15 @@ public class User extends TimeStamp {
 
     private LocalDateTime deletedAt;
 
+//    @OneToMany(mappedBy = "user")
+//    private List<JoinChat> joinChatList;
+
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
     @Builder
-    public User(String username, String encodedPassword, String name, String nickname, String email, UserRole role, String address) {
+    public User(String username, String encodedPassword, String name, String nickname, String email,
+            UserRole role, String address) {
         this.username = username;
         this.password = encodedPassword;
         this.name = name;

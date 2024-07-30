@@ -1,16 +1,13 @@
-package com.sparta.itsmine.global.exception.qna;
+package com.sparta.itsmine.global.exception.Chat;
 
 import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
-import lombok.Getter;
 
-@Getter
-public class QnaException extends RuntimeException {
+public class ChatException extends RuntimeException {
 
     private final ResponseExceptionEnum responseExceptionEnum;
 
-    public QnaException(ResponseExceptionEnum responseExceptionEnum) {
+    public ChatException(ResponseExceptionEnum responseExceptionEnum) {
         super(responseExceptionEnum.getMessage());
         this.responseExceptionEnum = responseExceptionEnum;
     }
-
 }

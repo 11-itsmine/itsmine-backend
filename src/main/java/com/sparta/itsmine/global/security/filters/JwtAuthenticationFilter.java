@@ -3,6 +3,14 @@ package com.sparta.itsmine.global.security.filters;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.itsmine.domain.refreshtoken.service.RefreshTokenService;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;

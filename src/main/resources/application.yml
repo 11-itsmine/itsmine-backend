@@ -15,6 +15,26 @@ spring:
     password: ${DB-PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
+  rabbitmq:
+    host: ${RABBIT-MQ-HOST}
+    port: ${RABBIT-MQ-PORT}
+    username: ${RABBIT-MQ-USER}
+    password: ${RABBIT-MQ-PWD}
+    virtual-host: ${RABBIT-MQ-VH}
+    #port: 61613
+
+
+  mongodb:
+    url: mongodb://localhost:27017/itsmine
+
+
+
+    profiles:
+      active: local
+
+    redis:
+      host: localhost
+      port: 6379
   sql:
     init:
       encoding: UTF-8
@@ -44,4 +64,6 @@ spring:
 jwt-secret-key: ${JWT-KEY}
 
 admin-token: ${ADMIN-TOKEN}
+
+
 
