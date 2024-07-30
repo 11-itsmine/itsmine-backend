@@ -15,6 +15,7 @@ public class ProductResponseDto {
     private final String productName;
     private final String description;
     private final Integer auctionNowPrice;
+    private final Integer startPrice;//수정부분
     private final Integer currentPrice;
     private final LocalDateTime dueDate;
     private final Category category;
@@ -25,6 +26,7 @@ public class ProductResponseDto {
         this.productName = product.getProductName();
         this.description = product.getDescription();
         this.auctionNowPrice = product.getAuctionNowPrice();
+        this.startPrice=product.getStartPrice();//수정부분
         this.currentPrice = product.getCurrentPrice();
         this.dueDate = product.getDueDate();
         this.category = product.getCategory();
@@ -36,6 +38,7 @@ public class ProductResponseDto {
         this.productName = product.getProductName();
         this.description = product.getDescription();
         this.auctionNowPrice = product.getAuctionNowPrice();
+        this.startPrice=product.getStartPrice();//수정부분
         this.currentPrice = product.getCurrentPrice();
         this.dueDate = product.getDueDate();
         this.category = product.getCategory();
