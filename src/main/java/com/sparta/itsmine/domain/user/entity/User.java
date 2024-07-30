@@ -55,6 +55,9 @@ public class User extends TimeStamp {
 
     private LocalDateTime deletedAt;
 
+//    @OneToMany(mappedBy = "user")
+//    private List<JoinChat> joinChatList;
+
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */

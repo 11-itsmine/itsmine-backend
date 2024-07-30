@@ -6,6 +6,7 @@ import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.exception.category.CategoryException;
 import com.sparta.itsmine.global.exception.product.ProductException;
 import com.sparta.itsmine.global.exception.qna.QnaException;
+import jdk.jshell.spi.ExecutionControl.UserException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,8 +35,14 @@ public class GlobalExceptionAdvice {
         return of(e.getResponseExceptionEnum());
     }
 
-    @ExceptionHandler(QnaException.class)
-    public ResponseEntity<HttpResponseDto> handleUserException(QnaException e) {
+    @ExceptionHandler(DataNotFoundException.class)
+    public ResponseEntity<HttpResponseDto> handleUserException(DataNotFoundException e) {
+        log.error("에러 메세지: ", e);
+        return of(e.getResponseExceptionEnum());
+    }
+
+    @ExceptionHandler(DateDuplicatedException.class)
+    public ResponseEntity<HttpResponseDto> handleUserException(DateDuplicatedException e) {
         log.error("에러 메세지: ", e);
         return of(e.getResponseExceptionEnum());
     }

@@ -46,7 +46,13 @@ public enum ResponseExceptionEnum {
     AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS(HttpStatus.BAD_REQUEST,
             "이미 낙찰됐거나 유찰된 상품입니다."),
     // 좋아요
-    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요 하고 있지 않는 상품입니다.");
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요 하고 있지 않는 상품입니다."),
+
+    //채팅
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방이 없습니다."),
+    CHAT_ROOM_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 나간 유저 입니다."),
+    CHAT_NOT_ONE_TO_ONE(HttpStatus.NOT_FOUND, "나간 유저가 존재하여 채팅이 불가능 합니다."),
+    CHAT_BLACKLIST_USER(HttpStatus.OK, "블랙 리스트에 등록된 유저 입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

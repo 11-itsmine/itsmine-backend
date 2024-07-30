@@ -81,8 +81,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
      */
     private Authentication createAuthentication(String username) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null,
-                userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
     /**
@@ -93,8 +92,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         res.setStatus(statusCode);
         res.setContentType("application/json");
         try {
-            String json = new ObjectMapper().writeValueAsString(
-                    new HttpResponseDto(statusCode, msg));
+            String json = new ObjectMapper().writeValueAsString(new HttpResponseDto(statusCode, msg));
             res.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
