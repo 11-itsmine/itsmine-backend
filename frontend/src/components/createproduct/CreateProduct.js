@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, TextField, Typography, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const ProductCreatePage = () => {
   const [productName, setProductName] = useState('');
@@ -33,6 +34,12 @@ const ProductCreatePage = () => {
     } catch (error) {
       console.error('Error uploading image:', error);
     }
+  };
+
+  const handleImageDelete = (index) => {
+    const newImageUrls = [...imageUrls];
+    newImageUrls.splice(index, 1);
+    setImageUrls(newImageUrls);
   };
 
   const token = localStorage.getItem('Authorization');
@@ -82,7 +89,15 @@ const ProductCreatePage = () => {
             <Grid item xs={12}>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2 }}>
                 {imageUrls.map((url, index) => (
-                    <img key={index} src={url} alt={`이미지 ${index + 1}`} style={{ width: '18%', height: 'auto' }} />
+                    <Box key={index} sx={{ position: 'relative', width: '18%', height: 'auto' }}>
+                      <img src={url} alt={`이미지 ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <IconButton
+                          onClick={() => handleImageDelete(index)}
+                          sx={{ position: 'absolute', top: 0, right: 0 }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
                 ))}
               </Box>
             </Grid>
@@ -109,7 +124,7 @@ const ProductCreatePage = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                   fullWidth
-                  label="현재 가격"
+                  label="즉시 구매가"
                   type="number"
                   value={auctionNowPrice}
                   onChange={(e) => setAuctionNowPrice(e.target.value)}
