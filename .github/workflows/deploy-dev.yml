@@ -2,9 +2,11 @@ name: Deploy to Dev
 
 on:
   workflow_dispatch:
+  # JangHyun0247-patch-1 브랜치에서 푸시할 때 워크플로우 실행
   push:
     branches:
-      - dev
+      - JangHyun0247-patch-1
+  # JangHyun0247-patch-1 브랜치에서 dev 브랜치로 PR이 머지될 때 워크플로우 실행
   pull_request:
     branches:
       - dev
@@ -13,38 +15,65 @@ on:
 
 jobs:
   deploy:
+    # 최신 Ubuntu 환경에서 작업 실행
     runs-on: ubuntu-latest
     steps:
+      # 리포지토리를 체크아웃하여 코드베이스를 가져옴
       - name: Checkout
         uses: actions/checkout@v3
+
+      # JDK 17을 설정하여 자바 환경을 구성
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
-          distribution: 'adopt'
+          java-version: '17'  # 자바 버전 17 사용
+          distribution: 'adopt'  # AdoptOpenJDK 사용
+
+      # Gradle 실행 파일에 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-      - name: gradlew bootJar
-        run: ./gradlew bootJar
+
+      # 유닛 테스트를 실행하여 코드의 품질을 확인
+      - name: Run unit tests
+        run: |
+          ./gradlew clean test  # Gradle clean 및 테스트 실행
+
+      # 테스트가 통과된 경우 Jar 파일을 빌드
+      - name: Build Jar
+        run: ./gradlew bootJar  # Spring Boot 프로젝트를 Jar 파일로 빌드
+
+      # Docker 이미지를 빌드하여 애플리케이션 컨테이너 이미지 생성
       - name: Build Docker image
-        run: docker build -t my-backend-app .
+        run: docker build -t my-backend-app .  # 현재 디렉토리에서 Dockerfile을 사용하여 이미지 빌드
+
+      # Amazon ECR에 로그인하여 Docker 이미지를 푸시할 수 있도록 설정
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+      # 빌드된 Docker 이미지에 태그를 설정하여 ECR에 푸시할 수 있도록 준비
       - name: Tag Docker image
         run: docker tag my-backend-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-backend-app:latest
+
+      # Docker 이미지를 Amazon ECR에 푸시
       - name: Push Docker image to ECR
         run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-backend-app:latest
+
+      # EC2 인스턴스에 SSH로 접속하여 Docker 컨테이너를 배포
       - name: SSH into EC2 and deploy Docker container
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ec2-user
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          script_stop: true
+          host: ${{ secrets.SSH_HOST }}  # EC2 인스턴스의 호스트명
+          username: ec2-user  # EC2 인스턴스의 사용자명
+          key: ${{ secrets.SSH_KEY }}  # SSH 키
+          port: 22  # SSH 포트
+          script_stop: true  # 스크립트 실행 중 오류 발생 시 중지
           script: |
-             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-backend-app:latest
-             docker stop my-backend-app || true
-             docker rm my-backend-app || true
-             docker run -d --name my-backend-app -p 8080:8080 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-backend-app:latest
+            # ECR에서 최신 Docker 이미지 가져오기
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-backend-app:latest
+            # 기존 컨테이너 중지 (존재하지 않으면 무시)
+            docker stop my-backend-app || true
+            # 기존 컨테이너 제거 (존재하지 않으면 무시)
+            docker rm my-backend-app || true
+            # 새로운 컨테이너를 백그라운드에서 실행
+            docker run -d --name my-backend-app -p 8080:8080 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-backend-app:latest
