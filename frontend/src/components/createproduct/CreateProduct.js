@@ -10,15 +10,17 @@ const ProductCreatePage = () => {
   const [startPrice, setStartPrice] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [categoryName, setCategoryName] = useState('');
-  const [imageUrls, setImageUrls] = useState(['', '', '']);
+  const [imageUrls, setImageUrls] = useState([]);
   const navigate = useNavigate();
 
-  const handleImageChange = async (index, event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  const handleImageChange = async (event) => {
+    const files = event.target.files;
+    if (!files.length) return;
 
     const formData = new FormData();
-    formData.append('file', file);
+    Array.from(files).forEach((file, index) => {
+      formData.append('file', file);
+    });
 
     try {
       const response = await axios.post('http://localhost:8080/s3/upload', formData, {
@@ -26,9 +28,8 @@ const ProductCreatePage = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      const newImageUrls = [...imageUrls];
-      newImageUrls[index] = response.data.imagesUrl[0];
-      setImageUrls(newImageUrls);
+      const newImageUrls = [...imageUrls, ...response.data.imagesUrl];
+      setImageUrls(newImageUrls.slice(0, 5)); // 최대 5개 이미지 저장
     } catch (error) {
       console.error('Error uploading image:', error);
     }
@@ -49,7 +50,7 @@ const ProductCreatePage = () => {
           categoryName
         },
         productImagesRequestDto: {
-          imagesUrl: imageUrls.filter(url => url !== '')
+          imagesUrl: imageUrls
         }
       };
 
@@ -74,27 +75,15 @@ const ProductCreatePage = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Button variant="contained" component="label">
-                이미지 업로드 1
-                <input type="file" hidden onChange={(e) => handleImageChange(0, e)} />
+                이미지 업로드
+                <input type="file" hidden onChange={handleImageChange} multiple />
               </Button>
             </Grid>
             <Grid item xs={12}>
-              <Button variant="contained" component="label">
-                이미지 업로드 2
-                <input type="file" hidden onChange={(e) => handleImageChange(1, e)} />
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" component="label">
-                이미지 업로드 3
-                <input type="file" hidden onChange={(e) => handleImageChange(2, e)} />
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                {imageUrls[0] && <img src={imageUrls[0]} alt="이미지 1" style={{ width: '30%', height: 'auto' }} />}
-                {imageUrls[1] && <img src={imageUrls[1]} alt="이미지 2" style={{ width: '30%', height: 'auto' }} />}
-                {imageUrls[2] && <img src={imageUrls[2]} alt="이미지 3" style={{ width: '30%', height: 'auto' }} />}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2 }}>
+                {imageUrls.map((url, index) => (
+                    <img key={index} src={url} alt={`이미지 ${index + 1}`} style={{ width: '18%', height: 'auto' }} />
+                ))}
               </Box>
             </Grid>
             <Grid item xs={12}>
