@@ -88,7 +88,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }} # SSH 키
           port: 22 # SSH 포트
           script_stop: true # 스크립트 실패 시 작업 중지
-          script: |
+          script: \
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ github.sha }}
             docker stop itsmine || true
             docker rm itsmine || true
