@@ -10,11 +10,28 @@ const ProductCreatePage = () => {
   const [startPrice, setStartPrice] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [categoryName, setCategoryName] = useState('');
-  const [images, setImages] = useState([]);
+  const [imageUrls, setImageUrls] = useState(['', '', '']);
   const navigate = useNavigate();
 
-  const handleImageChange = (e) => {
-    setImages(e.target.files);
+  const handleImageChange = async (index, event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post('http://localhost:8080/s3/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      const newImageUrls = [...imageUrls];
+      newImageUrls[index] = response.data.imagesUrl[0];
+      setImageUrls(newImageUrls);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
   };
 
   const token = localStorage.getItem('Authorization');
@@ -22,21 +39,6 @@ const ProductCreatePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      for (let i = 0; i < images.length; i++) {
-        formData.append('file', images[i]);
-      }
-
-      // 이미지 업로드
-      const imageResponse = await axios.post('http://localhost:8080/s3/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      const imageUrls = imageResponse.data.imagesUrl;
-
-      // 상품 등록 데이터
       const productData = {
         productCreateDto: {
           productName,
@@ -47,11 +49,9 @@ const ProductCreatePage = () => {
           categoryName
         },
         productImagesRequestDto: {
-          imagesUrl: imageUrls
+          imagesUrl: imageUrls.filter(url => url !== '')
         }
       };
-
-      // 상품 등록 요청
 
       await axios.post('http://localhost:8080/products', productData, {
         headers: {
@@ -59,7 +59,7 @@ const ProductCreatePage = () => {
         }
       });
 
-      // navigate('/'); // 상품 등록 후 홈 페이지로 이동
+      navigate('/'); // 상품 등록 후 홈 페이지로 이동
     } catch (error) {
       console.error('Error creating product:', error);
     }
@@ -72,6 +72,27 @@ const ProductCreatePage = () => {
             상품 등록
           </Typography>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Button variant="contained" component="label">
+                이미지 업로드 1
+                <input type="file" hidden onChange={(e) => handleImageChange(0, e)} />
+              </Button>
+              {imageUrls[0] && <Typography>{imageUrls[0]}</Typography>}
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" component="label">
+                이미지 업로드 2
+                <input type="file" hidden onChange={(e) => handleImageChange(1, e)} />
+              </Button>
+              {imageUrls[1] && <Typography>{imageUrls[1]}</Typography>}
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" component="label">
+                이미지 업로드 3
+                <input type="file" hidden onChange={(e) => handleImageChange(2, e)} />
+              </Button>
+              {imageUrls[2] && <Typography>{imageUrls[2]}</Typography>}
+            </Grid>
             <Grid item xs={12}>
               <TextField
                   fullWidth
@@ -130,12 +151,6 @@ const ProductCreatePage = () => {
                   onChange={(e) => setCategoryName(e.target.value)}
                   required
               />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" component="label">
-                이미지 업로드
-                <input type="file" multiple hidden onChange={handleImageChange} />
-              </Button>
             </Grid>
             <Grid item xs={12}>
               <Button type="submit" variant="contained" color="primary" fullWidth>
