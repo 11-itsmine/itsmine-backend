@@ -59,16 +59,6 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
           # AWS ECR에 Docker 로그인
 
-      # ECR 리포지토리가 존재하지 않을 경우 생성
-      - name: Create ECR Repository if not exists
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # AWS 액세스 키 ID
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # AWS 시크릿 액세스 키
-        run: |
-          aws ecr describe-repositories --repository-names itsmine-repository --region ${{ secrets.AWS_REGION }} || \
-          aws ecr create-repository --repository-name itsmine-repository --region ${{ secrets.AWS_REGION }}
-          # 리포지토리가 존재하지 않으면 새 ECR 리포지토리를 생성
-
       # 빌드된 Docker 이미지에 고유 태그를 설정하여 ECR에 푸시할 수 있도록 준비
       - name: Tag Docker image
         run: docker tag itsmine:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ github.sha }}
