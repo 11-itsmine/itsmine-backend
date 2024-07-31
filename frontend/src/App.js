@@ -1,11 +1,20 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
-import SignIn from "./components/auth/Signin";
-import SignUp from "./components/auth/Signup";
-import Hotdeal from "./components/hotDeal/Hotdeal";
+import SignIn from "./Components/auth/Signin";
+import SignUp from "./Components/auth/Signup";
+import Main from "./main/Main";
+import Footer from "./Components/footer/Footer";
+import Nav from "./Components/nav/Nav";
 
 function App() {
+
+  useEffect(() => {
+    const token = localStorage.getItem('Authorization');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -20,14 +29,16 @@ function App() {
 
   return (
       <BrowserRouter>
+        <Nav/>
         <Routes>
           <Route path="/"
-                 element={isLoggedIn ? <Navigate to="/board"/> : <SignIn
+                 element={isLoggedIn ? <Navigate to="/itsmine "/> : <SignIn
                      onLogin={handleLogin}/>}/>
           <Route path="/" element={<SignIn/>}/>
           <Route path="/signup" element={<SignUp/>}/>
-          <Route path="/itsmine" element={<Hotdeal onLogout={handleLogout}/>}/>
+          <Route path="/itsmine" element={<Main/>}/>
         </Routes>
+        <Footer/>
       </BrowserRouter>
   );
 }
