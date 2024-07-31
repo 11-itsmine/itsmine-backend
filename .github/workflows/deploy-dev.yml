@@ -56,11 +56,11 @@ jobs:
 
       # 빌드된 Docker 이미지에 태그를 설정하여 ECR에 푸시할 수 있도록 준비
       - name: Tag Docker image
-        run: docker tag itsmine:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine:latest
+        run: docker tag itsmine:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:latest
 
       # Docker 이미지를 Amazon ECR에 푸시
       - name: Push Docker image to ECR
-        run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine:latest
+        run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:latest
 
       # EC2 인스턴스에 SSH로 접속하여 Docker 컨테이너를 배포
       - name: SSH into EC2 and deploy Docker container
