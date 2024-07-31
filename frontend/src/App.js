@@ -4,6 +4,7 @@ import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
 import SignIn from "./components/auth/Signin";
 import SignUp from "./components/auth/Signup";
 import Hotdeal from "./components/hotDeal/Hotdeal";
+import GoodsDetail from "./components/product/goodsDetail/GoodsDetail";
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<SignIn/>}/>
           <Route path="/signup" element={<SignUp/>}/>
           <Route path="/itsmine" element={<Hotdeal onLogout={handleLogout}/>}/>
+          <Route path="/GoodsDetail" element={<GoodsDetail/>}/>
         </Routes>
       </BrowserRouter>
   );

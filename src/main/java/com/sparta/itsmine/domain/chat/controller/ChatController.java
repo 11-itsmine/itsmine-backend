@@ -30,10 +30,6 @@ public class ChatController {
      */
     @MessageMapping("chat.message.{chatRoomId}")
     public void sendMessage(@Payload MessageRequestDto requestDto) {
-        log.info("Chat : {}", requestDto);
-        chatService.getUserCount(requestDto.getRoomId());
-        //long userCount = chatService.getUserCount(requestDto.getRoomId());
-
         rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + requestDto.getRoomId(),
                 requestDto);
     }
@@ -45,7 +41,6 @@ public class ChatController {
      */
     @RabbitListener(queues = CHAT_QUEUE_NAME)
     public void receive(MessageRequestDto requestDto) {
-        log.info("received : {}", requestDto.getMessage());
         chatService.saveMessage(requestDto);
     }
 }
