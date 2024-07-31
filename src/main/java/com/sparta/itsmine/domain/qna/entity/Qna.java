@@ -1,17 +1,28 @@
 package com.sparta.itsmine.domain.qna.entity;
 
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.COMMENT_EQUAL_SELLER;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.QNA_USER_NOT_VALID;
+
 import com.sparta.itsmine.domain.comment.entity.Comment;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
+import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import com.sparta.itsmine.global.exception.comment.CommentEqualSellerException;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.COMMENT_EQUAL_SELLER;
 
 @Entity
 @Getter
@@ -62,6 +73,18 @@ public class Qna extends TimeStamp {
     public void equalsSeller(Long userId) {
         if (!this.product.getUser().getId().equals(userId)) {
             throw new CommentEqualSellerException(COMMENT_EQUAL_SELLER);
+        }
+    }
+
+    /**
+     * Qna내의 유저 정보와 인가된 유저 정보를 확인 후 일치 하지 않으면 Exception
+     *
+     * @param detailUser 인가된 유저 정보
+     * @param qnaUser    qnaEntity 유저 정보
+     */
+    public void checkQnaUser(User detailUser, User qnaUser) {
+        if (!detailUser.getId().equals(qnaUser.getId())) {
+            throw new DataDuplicatedException(QNA_USER_NOT_VALID);
         }
     }
 }

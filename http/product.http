@@ -8,7 +8,7 @@ Content-Type: application/json
   "name":"{{name}}",
   "email":"{{email}}",
   "address": "화성시",
-  "nickname": "Jake3"
+  "nickname": "Jak213r543"
 }
 
 ### 로그인
@@ -20,20 +20,20 @@ Content-Type: application/json
   "password":"{{password}}"
 }
 > {%
-  client.log(response.headers.valueOf("Authorization"));
+  client.log(response.body.data);
   client.log(response.headers.valueOf("RefreshToken"));
-  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("Authorization", response.body.data);
   client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
 
 
 ### 카테고리 추가하기
-POST http://localhost:8080/category
+POST http://localhost:8080/categories
 Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "categoryName": "New Posts"
+  "categoryName": "중고"
 }
 
 
@@ -43,18 +43,33 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "productName": "Jake",
-  "description": "This is almost like a brandnew",
-  "auctionNowPrice": 150000,
-  "currentPrice": 80000,
-  "dueDate": 3,
-  "categoryName": "New Posts"
+  "productCreateDto": {
+    "productName": "상품6",
+    "description": "상품 설명입니다",
+    "auctionNowPrice": 1000,
+    "currentPrice": 1200,
+    "dueDate": 1,
+    "categoryName": "중고"
+  },
+  "productImagesRequestDto": {
+    "imagesUrl": [
+      "https://itsminebucket.s3.ap-northeast-2.amazonaws.com/Irelia_1.jpg",
+      "https://itsminebucket.s3.ap-northeast-2.amazonaws.com/Akali_2.jpg",
+      "https://itsminebucket.s3.ap-northeast-2.amazonaws.com/Irelia_3.jpg"
+    ]
+  }
 }
 
+
+
+
+
+
 ### 특정 상품 조회하기
-GET http://localhost:8080/products/2
+GET http://localhost:8080/products/3
 Authorization: {{Authorization}}
 Content-Type: application/json
+
 
 
 ### 상품 조회 페이지네이션
@@ -63,15 +78,21 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 
+### 좋아요 누르기
+POST http://localhost:8080/users/products/1/likes
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
 ### 좋아요 게시물 조회
-GET https://localhost:8080/products/likes?page=0&size=5
+GET http://localhost:8080/products/likes?page=0&size=5
 Authorization: {{Authorization}}
 Content-Type: application/json
 
 
 
 ### 상품 수정
-PATCH http://localhost:8080/products/1
+PATCH http://localhost:8080/products/3
 Authorization: {{Authorization}}
 Content-Type: application/json
 

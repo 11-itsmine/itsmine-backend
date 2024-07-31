@@ -12,13 +12,13 @@ public interface QnaRepository extends JpaRepository<Qna, Long> {
 
     Page<Qna> findAllByProduct(Product product, Pageable pageable);
 
-    @Query("SELECT q FROM Qna q WHERE q.product = :product AND q.user.id = :userId AND q.secretQna = :secretQna")
-    Page<Qna> findAllByProductAndUserAndSecretQna(@Param("product") Product product,
+    @Query("SELECT q FROM Qna q WHERE q.product.id = :productId AND q.user.id = :userId AND q.secretQna = :secretQna")
+    Page<Qna> findAllByProductIdAndUserAndSecretQna(@Param("productId") Long productId,
             @Param("userId") Long userId,
             @Param("secretQna") boolean secretQna,
             Pageable pageable);
 
-    @Query("SELECT q FROM Qna q WHERE q.product = :product AND q.secretQna = :secretQna")
-    Page<Qna> findAllByProductAndSecretQna(Product product, boolean secretQna,
+    @Query("SELECT q FROM Qna q WHERE q.product.id = :productId AND q.secretQna = :secretQna")
+    Page<Qna> findAllByProductIdAndSecretQna(Long productId, boolean secretQna,
             Pageable pageable);
 }

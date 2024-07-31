@@ -3,6 +3,14 @@ package com.sparta.itsmine.global.security.filters;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.itsmine.domain.refreshtoken.service.RefreshTokenService;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
@@ -76,7 +84,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtProvider.createRefreshToken(username, role);
 
         // 헤더에 액세스 토큰 추가
-        res.addHeader(JwtProvider.AUTHORIZATION_HEADER, accessToken);
+//        res.setHeader(AUTHORIZATION_HEADER, accessToken);
 
         // 쿠키에 액세스 토큰 추가
         jwtProvider.addJwtToCookie(refreshToken, res);
@@ -93,7 +101,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // JSON 응답 생성
         String jsonResponse = new ObjectMapper().writeValueAsString(
-                new HttpResponseDto(SC_OK, "로그인 성공")
+                new HttpResponseDto(SC_OK, "로그인 성공", accessToken)
         );
 
         res.getWriter().write(jsonResponse);

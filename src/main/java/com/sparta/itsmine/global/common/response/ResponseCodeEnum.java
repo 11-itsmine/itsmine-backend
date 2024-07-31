@@ -45,8 +45,17 @@ public enum ResponseCodeEnum {
     //경매
     AUCTION_SUCCESS_CREATE(HttpStatus.CREATED, "경매 생성이 완료 되었습니다."),
     AUCTION_SUCCESS_GET(HttpStatus.OK, "경매 조회가 완료 되었습니다."),
-    AUCTION_SUCCESS_DELETE_SUCCESSFULAUCTION(HttpStatus.OK, "낙찰 되었습니다."),
-    AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION(HttpStatus.OK, "유찰 되었습니다.");
+    AUCTION_SUCCESSFUL_BID(HttpStatus.OK, "낙찰 되었습니다."),
+    AUCTION_SUCCESS_DELETE_AVOIDEDAUCTION(HttpStatus.OK, "유찰 되었습니다."),
+
+    //채팅
+    CHAT_SUCCESS_CREATE(HttpStatus.CREATED, "방 생성 완료"),
+    CHAT_GET_MESSAGE_LIST(HttpStatus.OK, "채팅방에 들어왔습니다. 이전 채팅 내역 불러옵니다."),
+    CHAT_GET_ROOM_LIST(HttpStatus.OK, "채팅방 리스트 입니다."),
+    CHAT_SUCCESS_ROOM_LEAVE(HttpStatus.OK, "채팅방에서 나갔습니다"),
+    CHAT_BLACKLIST_USER_ADD(HttpStatus.CREATED, "블랙 리스트 추가 했습니다."),
+    CHAT_BLACKLIST_USER_CANCEL(HttpStatus.OK, "블랙 리스트 취소 했습니다.");
+
 
     private final HttpStatus httpStatus;
     private final String message;

@@ -29,7 +29,7 @@ public class QProductImages extends EntityPathBase<ProductImages> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath imageUrl = createString("imageUrl");
+    public final ListPath<String, StringPath> imagesUrl = this.<String, StringPath>createList("imagesUrl", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final com.sparta.itsmine.domain.product.entity.QProduct product;
 

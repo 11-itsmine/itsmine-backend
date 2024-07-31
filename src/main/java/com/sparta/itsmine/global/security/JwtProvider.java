@@ -37,6 +37,7 @@ public class JwtProvider {
     public static final String AUTHORIZATION_KEY = "auth";
 
     public static final Long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
+    public static final Long ACCESS_TOKEN_TIME = 60 * 60 * 1000L;
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenAdapter refreshTokenAdapter;
@@ -57,13 +58,10 @@ public class JwtProvider {
     public String createAccessToken(String username, UserRole role) {
         Date date = new Date();
 
-        // Access 토큰 만료기간
-        long accessTokenTime = 1000 * 1000L; // 1000초
-
         return BEARER_PREFIX + Jwts.builder()
                 .setSubject(username)
                 .claim(AUTHORIZATION_KEY, role)
-                .setExpiration(new Date(date.getTime() + accessTokenTime))
+                .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))
                 .setIssuedAt(date) // 발급일
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -101,8 +99,9 @@ public class JwtProvider {
     }
 
     /**
-     * Header에서 Access 토큰 가져오기
+     * 요청 바디에서 액세스 토큰 추출
      */
+
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
@@ -163,8 +162,17 @@ public class JwtProvider {
      * 토큰에서 username 가져오기
      */
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()
-                .getSubject();
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            // 토큰이 만료된 경우에도 가져옴
+            return e.getClaims().getSubject();
+        }
     }
 
     /**
@@ -184,4 +192,10 @@ public class JwtProvider {
         response.setHeader(AUTHORIZATION_HEADER, accessToken);
     }
 
+    public String substringToken(String tokenValue) {
+        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
+            return tokenValue.substring(BEARER_PREFIX.length());
+        }
+        throw new NullPointerException("토큰이 없습니다.");
+    }
 }

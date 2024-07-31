@@ -2,6 +2,12 @@ server:
   port: ${SERVER-PORT:8080}
 
 spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+    virtual-host: /
   data:
     redis:
       host: localhost
@@ -14,6 +20,18 @@ spring:
     username: ${DB-USER}
     password: ${DB-PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  mongodb:
+    url: mongodb://localhost:27017/itsmine
+
+    #  rabbitmq:
+    #    host: ${RABBIT-MQ-HOST}
+    #    port: ${RABBIT-MQ-PORT}
+    #    username: ${RABBIT-MQ-USER}
+    #    password: ${RABBIT-MQ-PWD}
+    #    virtual-host: ${RABBIT-MQ-VH}
+    #port: 61613
+
+
 
   sql:
     init:
@@ -22,9 +40,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
     properties:
       hibernate:
-        #show_sql: true
+        show_sql: true
         format_sql: true
         connection:
           CharSet: utf-8
@@ -40,8 +59,12 @@ spring:
   profiles:
     include:
       - aws
+  main:
+    allow-bean-definition-overriding: true
 
 jwt-secret-key: ${JWT-KEY}
 
 admin-token: ${ADMIN-TOKEN}
+
+
 

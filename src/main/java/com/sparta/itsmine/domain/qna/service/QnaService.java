@@ -1,5 +1,8 @@
 package com.sparta.itsmine.domain.qna.service;
 
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.QNA_NOT_FOUND;
+
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.qna.dto.GetQnaResponseDto;
@@ -7,53 +10,48 @@ import com.sparta.itsmine.domain.qna.dto.QnaRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.qna.repository.QnaRepository;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
-import com.sparta.itsmine.global.exception.qna.QnaCheckUserException;
-import com.sparta.itsmine.global.exception.qna.QnaNotFoundException;
+import com.sparta.itsmine.global.exception.DataNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class QnaService {
 
-    private static final Logger log = LoggerFactory.getLogger(QnaService.class);
     private final QnaRepository qnaRepository;
     private final ProductRepository productRepository;
 
+
     @Transactional
     public void createQna(Long productId, QnaRequestDto requestDTO, User user) {
-        Product product = getProductEntity(productId);
+        Product product = getProduct(productId);
         Qna qna = Qna.of(requestDTO, user, product);
 
         qnaRepository.save(qna);
     }
 
     public Page<GetQnaResponseDto> getQnaList(Long productId, Pageable pageable, User user) {
-        Product product = getProductEntity(productId);
-        Page<Qna> qnaList;
-        Page<Qna> qnaListSecret;
+        Product product = getProduct(productId);
 
         //상품의 유저 정보와 인가된 유저 정보가 같을경우, 판매자 본인
         if (product.getUser().getId().equals(user.getId())) {
-            qnaList = qnaRepository.findAllByProduct(product, pageable);
-            return qnaList.map(GetQnaResponseDto::of);
+            return qnaRepository.findAllByProduct(product, pageable).map(GetQnaResponseDto::of);
             //인가된 유저랑 QnA 비밀글 작성자 본인일 경우
         } else {
-            qnaList = qnaRepository.findAllByProductAndSecretQna(product, false, pageable);
-            qnaListSecret = qnaRepository.findAllByProductAndUserAndSecretQna(product,
-                    user.getId()
-                    , true, pageable);
+            Page<Qna> qnaList = qnaRepository.findAllByProductIdAndSecretQna(product.getId(), false,
+                    pageable);
+            Page<Qna> qnaListSecret = qnaRepository.findAllByProductIdAndUserAndSecretQna(
+                    product.getId(), user.getId(), true, pageable);
 
             List<GetQnaResponseDto> getQnaResponseDtoList = Stream.concat(
                             qnaList.stream().map(GetQnaResponseDto::of),
@@ -66,21 +64,21 @@ public class QnaService {
 
     public GetQnaResponseDto getQna(Long productId, Long qnaId) {
         checkProduct(productId);
-        return GetQnaResponseDto.of(getQnaEntity(qnaId));
+        return GetQnaResponseDto.of(getQna(qnaId));
     }
 
     @Transactional
     public void updateQna(Long qnaId, QnaRequestDto requestDto, User user) {
-        Qna qna = getQnaEntity(qnaId);
-        checkQnaUser(user, qna.getUser());
+        Qna qna = getQna(qnaId);
+        qna.checkQnaUser(user, qna.getUser());
         qna.update(requestDto);
     }
 
     @Transactional
     public void deleteQna(Long productId, Long qnaId, User user) {
         checkProduct(productId);
-        Qna qna = getQnaEntity(qnaId);
-        checkQnaUser(user, qna.getUser());
+        Qna qna = getQna(qnaId);
+        qna.checkQnaUser(user, qna.getUser());
         qnaRepository.delete(qna);
     }
 
@@ -91,7 +89,7 @@ public class QnaService {
      */
     public void checkProduct(Long productId) {
         productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("상품 정보가 없습니다.")
+                () -> new DataNotFoundException(PRODUCT_NOT_FOUND)
         );
     }
 
@@ -100,9 +98,9 @@ public class QnaService {
      *
      * @param productId 상품 고유 번호
      */
-    public Product getProductEntity(Long productId) {
+    public Product getProduct(Long productId) {
         return productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("상품 정보가 없습니다.")
+                () -> new DataNotFoundException(PRODUCT_NOT_FOUND)
         );
     }
 
@@ -111,22 +109,9 @@ public class QnaService {
      *
      * @param qnaId Qna 고유 ID
      */
-    public Qna getQnaEntity(Long qnaId) {
+    public Qna getQna(Long qnaId) {
         return qnaRepository.findById(qnaId).orElseThrow(
-                () -> new QnaNotFoundException(ResponseExceptionEnum.QNA_NOT_FOUND)
+                () -> new DataNotFoundException(QNA_NOT_FOUND)
         );
     }
-
-    /**
-     * Qna내의 유저 정보와 인가된 유저 정보를 확인 후 일치 하지 않으면 Exception
-     *
-     * @param detailUser 인가된 유저 정보
-     * @param qnaUser    qnaEntity 유저 정보
-     */
-    public void checkQnaUser(User detailUser, User qnaUser) {
-        if (!detailUser.getId().equals(qnaUser.getId())) {
-            throw new QnaCheckUserException(ResponseExceptionEnum.QNA_USER_NOT_VALID);
-        }
-    }
-
 }
