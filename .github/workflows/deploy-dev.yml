@@ -84,8 +84,11 @@ jobs:
           port: 22 # SSH 포트
           script_stop: true # 스크립트 실패 시 작업 중지
           script: |
+            sudo amazon-linux-extras install docker -y
+            sudo service docker start
+            sudo usermod -a -G docker ec2-user
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
             docker stop itsmine || true
             docker rm itsmine || true
             docker run -d --name itsmine -p 8080:8080 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}       
-            # EC2 인스턴스에 SSH로 접속하여 Docker 이미지를 풀하고, 기존 컨테이너를 중지 및 제거한 후 새로운 컨테이너를 실행
+            # EC2 인스턴스에 Docker를 설치하고, 이미지를 풀한 후 기존 컨테이너를 중지 및 제거한 후 새로운 컨테이너를 실행
