@@ -11,7 +11,7 @@ VOLUME /tmp
 EXPOSE 8080
 
 # 빌드 과정에서 사용할 JAR 파일 경로를 정의합니다. Gradle 빌드 디렉토리에서 생성된 JAR 파일을 사용합니다.
-ARG JAR_FILE=build/libs/my-application.jar
+ARG JAR_FILE=build/libs/itsmine-0.0.1-SNAPSHOT.jar
 
 # JAR 파일을 컨테이너 이미지의 루트 디렉토리에 app.jar 이름으로 추가합니다.
 ADD ${JAR_FILE} app.jar
