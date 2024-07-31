@@ -2,13 +2,13 @@ name: Deploy to Dev
 
 # 워크플로우 트리거 설정
 on:
-  workflow_dispatch: # 수동으로 워크플로우 실행
+  workflow_dispatch:
   push:
     branches:
-      - JangHyun0247-patch-1 # 특정 브랜치로 푸시될 때 워크플로우 실행
+      - feature/cicd # 푸시될 때 워크플로우 실행
   pull_request:
     branches:
-      - dev # dev 브랜치로 PR이 닫힐 때 워크플로우 실행
+      - feature/cicd # 해당 브랜치로 PR이 닫힐 때 워크플로우 실행
     types:
       - closed
 
