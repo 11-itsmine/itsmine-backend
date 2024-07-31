@@ -61,10 +61,11 @@ public class ChatService {
      */
     public RoomInfoResponseDto createChatRoom(User fromUser, Long userId) {
         Optional<BlackList> blackList = blackListRepository.findByFromUserIdAndToUserId(
-                fromUser.getId(),
-                userId);
+                fromUser.getId(), userId);
+        Optional<BlackList> toBlackList = blackListRepository.findByFromUserIdAndToUserId(
+                userId, fromUser.getId());
         User toUser = getUser(userId);
-        if (blackList.isPresent()) {
+        if (blackList.isPresent() || toBlackList.isPresent()) {
             throw new DataDuplicatedException(CHAT_BLACKLIST_USER);
         }
 
@@ -107,7 +108,7 @@ public class ChatService {
 
         if (chatRoom.getFromUserStatus().equals(ChatStatus.END)
                 && chatRoom.getToUserStatus().equals(ChatStatus.END)) {
-
+            //messageRepository.delete를 하면 삭제가 되지 않아 Query 클래스 활용
             Query query = new Query();
             query.addCriteria(Criteria.where("roomId").is(roomId));
 
