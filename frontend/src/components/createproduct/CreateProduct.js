@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Button, Container, Grid, TextField, Typography, IconButton } from '@mui/material';
+import { Box, Button, Container, Grid, TextField, Typography, IconButton, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -11,15 +11,29 @@ const ProductCreatePage = () => {
   const [startPrice, setStartPrice] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [categoryName, setCategoryName] = useState('');
+  const [categories, setCategories] = useState([]);
   const [imageUrls, setImageUrls] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/categories');
+        setCategories(response.data.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleImageChange = async (event) => {
     const files = event.target.files;
     if (!files.length) return;
 
     const formData = new FormData();
-    Array.from(files).forEach((file, index) => {
+    Array.from(files).forEach((file) => {
       formData.append('file', file);
     });
 
@@ -74,7 +88,7 @@ const ProductCreatePage = () => {
   };
 
   return (
-      <Container>
+      <Container sx={{ backgroundColor: '#f2f2f2', padding: 3, borderRadius: 2 }}>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Typography variant="h4" component="h1" gutterBottom>
             상품 등록
@@ -144,7 +158,7 @@ const ProductCreatePage = () => {
             <Grid item xs={12}>
               <TextField
                   fullWidth
-                  label="종료 시간 (시간 단위)"
+                  label="경매 진행 시간 (시간 단위)"
                   type="number"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
@@ -152,13 +166,21 @@ const ProductCreatePage = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                  fullWidth
-                  label="카테고리"
-                  value={categoryName}
-                  onChange={(e) => setCategoryName(e.target.value)}
-                  required
-              />
+              <FormControl fullWidth required>
+                <InputLabel id="category-label">카테고리</InputLabel>
+                <Select
+                    labelId="category-label"
+                    value={categoryName}
+                    onChange={(e) => setCategoryName(e.target.value)}
+                    label="카테고리"
+                >
+                  {categories.map((category, index) => (
+                      <MenuItem key={index} value={category.categoryName}>
+                        {category.categoryName}
+                      </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <Button type="submit" variant="contained" color="primary" fullWidth>
