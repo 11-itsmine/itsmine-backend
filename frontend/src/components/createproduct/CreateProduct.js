@@ -47,6 +47,7 @@ const ProductCreatePage = () => {
       setImageUrls(newImageUrls.slice(0, 5)); // 최대 5개 이미지 저장
     } catch (error) {
       console.error('Error uploading image:', error);
+      alert("이미지 업로드가 불가능합니다. 새로고침(F5) 뒤 다시 시도해주세요");
     }
   };
 
@@ -84,6 +85,7 @@ const ProductCreatePage = () => {
       navigate('/'); // 상품 등록 후 홈 페이지로 이동
     } catch (error) {
       console.error('Error creating product:', error);
+      alert("상품 등록이 불가능합니다 해당 상품의 이름과 정보를 다시 한번 확인해주세요.");
     }
   };
 
