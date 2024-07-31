@@ -58,7 +58,7 @@ public class ChatRoom {
 
 
     public void userStatusUpdate(User user) {
-        if (fromUser.equals(user)) {
+        if (user.getId().equals(fromUser.getId())) {
             this.fromUserStatus = ChatStatus.END;
         } else {
             this.toUserStatus = ChatStatus.END;

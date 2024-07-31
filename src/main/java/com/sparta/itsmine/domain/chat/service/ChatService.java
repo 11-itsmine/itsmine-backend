@@ -23,6 +23,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,7 @@ public class ChatService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final BlackListRepository blackListRepository;
+    private final MongoTemplate mongoTemplate;
 
     /**
      * 내가 지금 참여하고 있는 채팅방 리스트를 불러 옵니다.
@@ -103,9 +107,14 @@ public class ChatService {
 
         if (chatRoom.getFromUserStatus().equals(ChatStatus.END)
                 && chatRoom.getToUserStatus().equals(ChatStatus.END)) {
-            List<Message> messages = messageRepository.findAllByRoomId(roomId);
+
+            Query query = new Query();
+            query.addCriteria(Criteria.where("roomId").is(roomId));
+
             chatRoomRepository.delete(chatRoom);
-            messageRepository.deleteAll(messages);
+
+            mongoTemplate.remove(query, Message.class);
+
         }
 
     }
@@ -168,18 +177,5 @@ public class ChatService {
                 () -> new DataNotFoundException(CHAT_ROOM_NOT_FOUND)
         );
     }
-
-//    /**
-//     * 채팅방 유저가 2명 이하면 채팅 이용 불가 예외 처리
-//     * <p>
-//     *
-//     * @param roomId 채팅방 ID
-//     */
-//    public void getUserCount(String roomId) {
-//        long userCount = joinChatRepository.countByChatRoomId(roomId);
-//        if (userCount < 2) {
-//            throw new DataNotFoundException(CHAT_NOT_ONE_TO_ONE);
-//        }
-//    }
 
 }
