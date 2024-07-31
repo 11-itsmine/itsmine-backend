@@ -22,6 +22,7 @@ const ProductCreatePage = () => {
         setCategories(response.data.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
+        alert("카테고리를 가져오는 중 오류가 발생했습니다.");
       }
     };
 
