@@ -77,21 +77,25 @@ const ProductCreatePage = () => {
                 이미지 업로드 1
                 <input type="file" hidden onChange={(e) => handleImageChange(0, e)} />
               </Button>
-              {imageUrls[0] && <img src={imageUrls[0]} alt="이미지 1" style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }} />}
             </Grid>
             <Grid item xs={12}>
               <Button variant="contained" component="label">
                 이미지 업로드 2
                 <input type="file" hidden onChange={(e) => handleImageChange(1, e)} />
               </Button>
-              {imageUrls[1] && <img src={imageUrls[1]} alt="이미지 2" style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }} />}
             </Grid>
             <Grid item xs={12}>
               <Button variant="contained" component="label">
                 이미지 업로드 3
                 <input type="file" hidden onChange={(e) => handleImageChange(2, e)} />
               </Button>
-              {imageUrls[2] && <img src={imageUrls[2]} alt="이미지 3" style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }} />}
+            </Grid>
+            <Grid item xs={12}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                {imageUrls[0] && <img src={imageUrls[0]} alt="이미지 1" style={{ width: '30%', height: 'auto' }} />}
+                {imageUrls[1] && <img src={imageUrls[1]} alt="이미지 2" style={{ width: '30%', height: 'auto' }} />}
+                {imageUrls[2] && <img src={imageUrls[2]} alt="이미지 3" style={{ width: '30%', height: 'auto' }} />}
+              </Box>
             </Grid>
             <Grid item xs={12}>
               <TextField
