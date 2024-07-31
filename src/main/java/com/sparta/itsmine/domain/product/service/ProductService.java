@@ -50,7 +50,7 @@ public class ProductService {
         product.setCategory(category);
 
         Product newProduct = adapter.saveProduct(product);
-        productImagesService.createProductImages(imagesRequestDto, product, userId);
+        productImagesService.createProductImages(imagesRequestDto, product);
         scheduleProductUpdate(newProduct);
         return new ProductResponseDto(newProduct, imagesRequestDto);
     }

@@ -166,7 +166,7 @@ public class Product extends TimeStamp {
 
     public List<String> getImageUrls() {
         return productImagesList.stream()
-                .flatMap(productImage -> productImage.getImagesUrl().stream())
+                .map(ProductImages::getImagesUrl)
                 .collect(Collectors.toList());
     }
 }
