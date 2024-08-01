@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import axiosInstance from '../../api/axiosInstance'; // 경로 수정
+import axiosInstance from '../../api/axiosInstance'; // Ensure this path is correct
 import styled from 'styled-components';
 import Link from '@mui/material/Link';
 
@@ -25,7 +25,7 @@ const SignUp = () => {
       await axiosInstance.post('/users', signupRequest);
 
       console.log('Signup successful!');
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       console.error('Signup failed:', error);
       if (error.response && error.response.data) {
@@ -126,7 +126,7 @@ const SignUp = () => {
           <SignUpBtn type="submit">Sign Up</SignUpBtn>
           <GridContainer>
             <GridItem>
-              <Link href="/">Already have an account? Sign in</Link>
+              <Link href="/login">Already have an account? Sign in</Link>
             </GridItem>
           </GridContainer>
         </Form>

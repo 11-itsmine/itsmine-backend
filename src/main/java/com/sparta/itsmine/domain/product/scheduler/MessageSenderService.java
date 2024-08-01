@@ -1,6 +1,6 @@
 package com.sparta.itsmine.domain.product.scheduler;
 
-import static com.sparta.itsmine.global.common.config.RabbitConfig.DELAYED_EXCHANGE_NAME;
+import static com.sparta.itsmine.global.common.config.RabbitConfig.DELAYED_QUEUE_NAME;
 import static com.sparta.itsmine.global.common.config.RabbitConfig.PRODUCT_ROUTING_KEY;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class MessageSenderService {
         messageProperties.setHeader("x-delay", delayMillis);
 
         Message message = new Message(productId.toString().getBytes(), messageProperties);
-        amqpTemplate.send(DELAYED_EXCHANGE_NAME,
+        amqpTemplate.send(DELAYED_QUEUE_NAME,
                 PRODUCT_ROUTING_KEY, message);
     }
 }

@@ -3,11 +3,13 @@ server:
 
 spring:
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: admin
-    password: admin
-    virtual-host: /
+    host: b-85ae3372-6261-4fb6-80e1-805b463e9fc6.mq.ap-northeast-2.amazonaws.com
+    port: 5671
+    username: ${RABBITMQ_USERNAME:itsmine1010}
+    password: ${RABBITMQ_PASSWORD:itsmine101010}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:/}
+    ssl:
+      enabled: true
   data:
     redis:
       host: localhost
