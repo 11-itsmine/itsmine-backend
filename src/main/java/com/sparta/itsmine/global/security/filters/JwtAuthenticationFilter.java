@@ -87,7 +87,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 //        res.setHeader(AUTHORIZATION_HEADER, accessToken);
 
         // 쿠키에 액세스 토큰 추가
-        jwtProvider.addJwtToCookie(refreshToken, res);
+        jwtProvider.addJwtToCookie(accessToken, res);
 
         // DB에 리프레시 토큰이 이미 있으면 수정, 없으면 저장
         refreshTokenService.save(username, refreshToken);

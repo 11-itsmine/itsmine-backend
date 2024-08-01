@@ -1,12 +1,17 @@
 server:
   port: ${SERVER-PORT:8080}
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   rabbitmq:
     host: localhost
     port: 5672
-    username: admin
-    password: admin
+    username: guest
+    password: guest
     virtual-host: /
   data:
     redis:
@@ -53,7 +58,7 @@ spring:
 
 jwt-secret-key: ${JWT-KEY}
 
-admin-token: ${ADMIN-TOKEN}
+#admin-token: ${ADMIN-TOKEN}
 
 
 

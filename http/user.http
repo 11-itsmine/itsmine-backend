@@ -29,7 +29,7 @@ Authorization: {{Authorization}}
 
 
 ### 유저 조회
-GET http://localhost:8080/users/5
+GET http://localhost:8080/users/3
 Content-Type: application/json
 Authorization: {{Authorization}}
 
