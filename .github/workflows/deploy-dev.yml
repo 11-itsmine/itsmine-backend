@@ -87,5 +87,15 @@ jobs:
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
             docker stop itsmine || true
             docker rm itsmine || true
-            docker run -d --name itsmine -p 8080:8080 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}       
-            # EC2 인스턴스에 SSH로 접속하여 Docker 이미지를 풀하고, 기존 컨테이너를 중지 및 제거한 후 새로운 컨테이너를 실행
+            docker run -d --name itsmine -p 8080:8080 \
+              -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
+              -e DB_URL=${{ secrets.DB_URL }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e JWT_KEY=${{ secrets.JWT_KEY }} \
+              -e ADMIN_TOKEN=${{ secrets.ADMIN_TOKEN }} \
+              -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+              -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }} \
+              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
