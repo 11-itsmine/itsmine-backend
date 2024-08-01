@@ -44,10 +44,7 @@ public class ChatRoom {
 
     @Enumerated(EnumType.STRING)
     private ChatStatus toUserStatus;
-
-//    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<JoinChat> joinChats = new ArrayList<>();
-
+    
     public ChatRoom(User fromUser, User toUser) {
         this.roomId = UUID.randomUUID().toString();
         this.fromUser = fromUser;
