@@ -2,13 +2,17 @@ package com.sparta.itsmine.domain.productImages.controller;
 
 import com.sparta.itsmine.domain.productImages.dto.ProductImagesResponseDto;
 import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
+import com.sparta.itsmine.domain.user.repository.UserRepository;
 import java.io.IOException;
 import java.util.Collections;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,13 +20,16 @@ import java.util.Collections;
 public class ProductImagesController {
 
     private final ProductImagesService productImagesService;
+    private final UserRepository userRepository;
 
     // 파일 업로드 엔드포인트
     @PostMapping("/upload")
-    public ResponseEntity<ProductImagesResponseDto> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ProductImagesResponseDto> uploadFile(
+            @RequestParam("file") MultipartFile file) {
         try {
             String fileUrl = productImagesService.saveFile(file);
-            return ResponseEntity.ok(new ProductImagesResponseDto(Collections.singletonList(fileUrl)));
+            return ResponseEntity.ok(
+                    new ProductImagesResponseDto(Collections.singletonList(fileUrl)));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(new ProductImagesResponseDto(
                     Collections.singletonList("파일 업로드 중 오류가 발생했습니다.")));
@@ -40,33 +47,12 @@ public class ProductImagesController {
         }
     }
 
-    // 파일 업로드 엔드포인트
-//    @PostMapping("/upload")
-//    public ResponseEntity<List<String>> uploadFiles(@RequestParam("file") List<MultipartFile> files) {
-//        try {
-//            List<String> fileUrls = productImagesService.saveFiles(files);
-//            return ResponseEntity.ok(fileUrls); // S3에 저장된 파일 URL 리스트 반환
-//        } catch (IOException e) {
-//            return ResponseEntity.status(500).body(Collections.singletonList("파일 업로드 중 오류가 발생했습니다."));
-//        }
-//    }
-
-    // 파일 다운로드 엔드포인트
-//    @GetMapping("/download")
-//    public ResponseEntity<?> downloadFile(@RequestParam("filename") String filename) {
-//        try {
-//            return s3Service.downloadFile(filename); // 파일 다운로드
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body("파일 다운로드 중 오류가 발생했습니다.");
-//        }
-//    }
-
-    // 프로필 업로드 엔드포인트
+//     프로필 업로드 엔드포인트
 //    @PostMapping("/upload/profile")
 //    public ResponseEntity<String> uploadProfile(@RequestParam("file") MultipartFile file, @RequestParam("userId") Long userId) {
 //        try {
 //            UserDetailsImpl userDetails = new UserDetailsImpl(userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다.")));
-//            String responseMessage = s3Service.uploadProfile(file, userDetails);
+//            String responseMessage = productImagesService.uploadProfile(file, userDetails);
 //            return ResponseEntity.ok(responseMessage); // 프로필 업로드 완료 메시지 반환
 //        } catch (Exception e) {
 //            return ResponseEntity.status(500).body("프로필 업로드 중 오류가 발생했습니다.");

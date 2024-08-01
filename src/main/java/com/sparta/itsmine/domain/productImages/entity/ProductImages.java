@@ -1,7 +1,6 @@
 package com.sparta.itsmine.domain.productImages.entity;
 
 import com.sparta.itsmine.domain.product.entity.Product;
-import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,22 +18,15 @@ public class ProductImages extends TimeStamp {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @ElementCollection
-    @CollectionTable(name = "images_url", joinColumns = @JoinColumn(name = "product_images_id"))
-    @Column(name = "images_url", nullable = false)
-    private List<String> imagesUrl;
+    @Column(name = "imageUrl", nullable = false)
+    private String imagesUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    public ProductImages(List<String> imagesUrl, Product product, User user) {
+    public ProductImages(String imagesUrl, Product product) {
         this.imagesUrl = imagesUrl;
         this.product = product;
-        this.user = user;
     }
 }

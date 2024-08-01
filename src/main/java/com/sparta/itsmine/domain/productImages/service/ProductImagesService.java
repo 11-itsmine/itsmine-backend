@@ -1,6 +1,5 @@
 package com.sparta.itsmine.domain.productImages.service;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.sparta.itsmine.domain.product.entity.Product;
@@ -8,22 +7,23 @@ import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.domain.productImages.entity.ProductImages;
 import com.sparta.itsmine.domain.productImages.respository.ProductImagesRepository;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.domain.user.repository.UserRepository;
-import com.sparta.itsmine.global.exception.DataNotFoundException;
 import com.sparta.itsmine.global.exception.productimages.InvalidURLException;
+import com.sparta.itsmine.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.INVALID_URL_EXCEPTION;
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -31,7 +31,6 @@ import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.US
 public class ProductImagesService {
 
     private final AmazonS3 amazonS3;
-    private final UserRepository userRepository;
     private final ProductImagesRepository productImagesRepository;
 
     @Value("${CLOUD_AWS_S3_BUCKET}")
@@ -68,12 +67,13 @@ public class ProductImagesService {
     }
 
     // ProductImages 엔티티 생성 및 저장
-    public void createProductImages(ProductImagesRequestDto imagesRequestDto, Product product, Long userId) {
+    public void createProductImages(ProductImagesRequestDto imagesRequestDto, Product product) {
         List<String> imagesUrl = imagesRequestDto.getImagesUrl();
-        User user = userRepository.findById(userId).orElseThrow( () -> new DataNotFoundException(USER_NOT_FOUND));
-        ProductImages productImages = new ProductImages(imagesUrl, product, user);
-        product.getProductImagesList().add(productImages);
-        productImagesRepository.save(productImages);
+        for (String imageUrl : imagesUrl) {
+            ProductImages productImages = new ProductImages(imageUrl, product);
+            product.getProductImagesList().add(productImages);
+            productImagesRepository.save(productImages);
+        }
     }
 
 //    // 여러 파일 업로드 메소드
@@ -85,28 +85,7 @@ public class ProductImagesService {
 //        }
 //        return fileUrls;
 //    }
-//
-//    // 파일 다운로드 메소드
-//    public ResponseEntity<UrlResource> downloadFile(String originalFilename) {
-//        UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucket, originalFilename));
-//
-//        String contentDisposition = "attachment; filename=\"" + originalFilename + "\"";
-//
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-//                .body(urlResource);
-//    }
 
-//    // 이미지 주소에서 파일 키 추출 메소드
-//    private String extractKeyFromImageAddress(String imageAddress) {
-//        try {
-//            URL url = new URL(imageAddress);
-//            String decodingKey = URLDecoder.decode(url.getPath(), "UTF-8");
-//            return decodingKey.substring(1);
-//        } catch (MalformedURLException | UnsupportedEncodingException e) {
-//            throw new IllegalArgumentException("URL 변환 실패", e);
-//        }
-//    }
 
     // 프로필 업로드 메소드
 //    @Transactional

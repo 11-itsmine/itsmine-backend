@@ -22,17 +22,6 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   mongodb:
     url: mongodb://localhost:27017/itsmine
-
-    #  rabbitmq:
-    #    host: ${RABBIT-MQ-HOST}
-    #    port: ${RABBIT-MQ-PORT}
-    #    username: ${RABBIT-MQ-USER}
-    #    password: ${RABBIT-MQ-PWD}
-    #    virtual-host: ${RABBIT-MQ-VH}
-    #port: 61613
-
-
-
   sql:
     init:
       encoding: UTF-8
