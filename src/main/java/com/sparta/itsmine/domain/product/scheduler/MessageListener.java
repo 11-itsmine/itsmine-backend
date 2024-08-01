@@ -26,17 +26,14 @@ public class MessageListener {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // 입찰 기록 확인 - ProductId를 통해서 입찰 테이블에 기록된것을 찾습니다.
-        boolean existAutction = auctionRepository.findAllByProductId(productId).isEmpty();
-        // 상태가 만료 상태인지 확인
-        if (product.getDueDate().isBefore(LocalDateTime.now())) {
-            product.updateStatus(SUCCESS_BID);
+        boolean hasNoAuctions = auctionRepository.findAllByProductId(productId).isEmpty();
+        LocalDateTime now = LocalDateTime.now();
+
+        if (product.getDueDate().isBefore(now) || product.getAuctionNowPrice()
+                .equals(product.getCurrentPrice())) {
+            product.updateStatus(hasNoAuctions ? FAIL_BID : SUCCESS_BID);
             productRepository.save(product);
-            log.info("Product with ID {} has been succeed as {}.", productId, SUCCESS_BID);
-        } else if (product.getDueDate().isBefore(LocalDateTime.now()) && existAutction) {
-            product.updateStatus(FAIL_BID);
-            productRepository.save(product);
-            log.info("Product with ID {} has been marked as {}.", productId, FAIL_BID);
+            log.info("Product with ID {} has been marked as {}.", productId, product.getStatus());
         } else {
             log.info("Product with ID {} is still valid.", productId);
         }
