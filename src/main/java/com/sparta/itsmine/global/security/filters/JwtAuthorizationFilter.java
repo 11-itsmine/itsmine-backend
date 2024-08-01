@@ -50,6 +50,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		if (StringUtils.hasText(accessToken)) {
 			if (jwtProvider.validateAccessToken(accessToken)) {
 				log.info("액세스 토큰 검증 성공");
+				UserRole role = jwtProvider.getRoleFromToken(accessToken);
+				String newAccessToken = jwtProvider.createAccessToken(username, role);
+				jwtProvider.addJwtToCookie(newAccessToken, res);
 				setAuthentication(jwtProvider.getUsernameFromToken(accessToken));
 
 			} else if (Boolean.TRUE.equals(redisTemplate.hasKey(username))) {
@@ -58,12 +61,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 				if (jwtProvider.hasRefreshToken(username)) {
 					log.info("리프레시 토큰 검증 성공 & 새로운 액세스 토큰 발급");
 					UserRole role = jwtProvider.getRoleFromToken(refreshToken);
-
 					String newAccessToken = jwtProvider.createAccessToken(username, role);
-
-					jwtProvider.setHeaderAccessToken(res, newAccessToken);
+					jwtProvider.addJwtToCookie(newAccessToken, res);
 					setAuthentication(username);
-
 				} else {
 					log.error("리프레시 토큰 검증 실패");
 					jwtExceptionHandler(res, HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh 토큰입니다.");

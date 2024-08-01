@@ -38,7 +38,7 @@ public class JwtProvider {
     public static final String AUTHORIZATION_KEY = "auth";
 
     public static final Long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
-    public static final Long ACCESS_TOKEN_TIME = 5 * 1000L;
+    public static final Long ACCESS_TOKEN_TIME = 30 * 60L; // 30분
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenAdapter refreshTokenAdapter;
@@ -95,7 +95,7 @@ public class JwtProvider {
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         cookie.setPath("/");
-        cookie.setMaxAge(Math.toIntExact(REFRESH_TOKEN_TIME));
+        cookie.setMaxAge(Math.toIntExact(ACCESS_TOKEN_TIME));
 
         response.addCookie(cookie);
     }
@@ -200,5 +200,16 @@ public class JwtProvider {
             return tokenValue.substring(BEARER_PREFIX.length());
         }
         throw new NullPointerException("토큰이 없습니다.");
+    }
+
+    /**
+     * 쿠키 무효화
+     */
+    public static void clearCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 }
