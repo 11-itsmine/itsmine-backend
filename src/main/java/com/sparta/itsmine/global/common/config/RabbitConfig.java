@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.CustomExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -20,19 +23,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * RabbitMQ 메시징을 설정하는 구성 클래스입니다.
- * <p>
- * 이 클래스는 RabbitMQ와의 연결, 큐, 교환기, 바인딩 및 메시지 변환기 등을 설정합니다.
- */
 @Configuration
 @EnableRabbit
-@RequiredArgsConstructor
 public class RabbitConfig {
 
+    public static final String PRODUCT_ROUTING_KEY = "product.routing.key";
+    public static final String PRODUCT_QUEUE_NAME = "product.queue";
+    public static final String DELAYED_EXCHANGE_NAME = "delayed.exchange";
+    protected static final String DELAYED_QUEUE_NAME = "delayed.queue";
     private static final String CHAT_QUEUE_NAME = "chat.queue";
     private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
-    private static final String ROUTING_KEY = "*.room.*";
+    private static final String CHAT_ROUTING_KEY = "*.room.*";
 
     @Value("${spring.rabbitmq.host}")
     private String rabbitHost;
@@ -48,46 +49,108 @@ public class RabbitConfig {
 
     @Value("${spring.rabbitmq.virtual-host}")
     private String rabbitVh;
-//    @Value("${spring.rabbitmq.port}")
-//    private int rabbitPort;
 
     /**
-     * 큐 설정
-     * <p>
-     * CHAT_QUEUE_NAME이라는 이름의 큐를 생성합니다. true 매개변수는 큐가 지속되도록 설정합니다.
+     * productQueue를 생성합니다.
+     *
+     * @return 생성된 Queue 객체
+     */
+    @Bean
+    @Qualifier("productQueue")
+    public Queue productQueue() {
+        return new Queue(PRODUCT_QUEUE_NAME, true);
+    }
+
+    /**
+     * delayedQueue를 생성합니다.
+     *
+     * @return 생성된 Queue 객체
+     */
+    @Bean
+    @Qualifier("delayedQueue")
+    public Queue delayedQueue() {
+        return QueueBuilder.durable(DELAYED_QUEUE_NAME).build();
+    }
+
+    /**
+     * chatQueue를 생성합니다.
+     *
+     * @return 생성된 Queue 객체
      */
     @Bean
     @Qualifier("chatQueue")
-    public Queue queue() {
+    public Queue chatQueue() {
         return new Queue(CHAT_QUEUE_NAME, true);
     }
 
     /**
-     * 교환기 설정
-     * <p>
-     * CHAT_EXCHANGE_NAME이라는 이름의 Topic Exchange를 생성합니다.
-     * <p>
-     * false는 자동 삭제되지 않도록 설정합니다.
+     * 지연된 메시지 전송을 위한 커스텀 교환기를 생성합니다.
+     *
+     * @return 생성된 CustomExchange 객체
      */
     @Bean
-    public TopicExchange exchange() {
+    public CustomExchange delayedExchange() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-delayed-type", "direct");
+        return new CustomExchange(DELAYED_EXCHANGE_NAME, "x-delayed-message", true, false, args);
+    }
+
+    /**
+     * chatExchange를 생성합니다.
+     *
+     * @return 생성된 TopicExchange 객체
+     */
+    @Bean
+    public TopicExchange chatExchange() {
         return new TopicExchange(CHAT_EXCHANGE_NAME, true, false);
     }
 
     /**
-     * 바인딩 설정
-     * <p>
-     * 큐와 교환기를 라우팅 키(ROUTING_KEY)를 사용하여 바인딩합니다.
+     * productQueue와 delayedExchange를 바인딩합니다.
+     *
+     * @param productQueue    바인딩할 Queue 객체
+     * @param delayedExchange 바인딩할 CustomExchange 객체
+     * @return 생성된 Binding 객체
      */
     @Bean
-    public Binding binding(@Qualifier("chatQueue") Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+    public Binding productBinding(@Qualifier("productQueue") Queue productQueue,
+            CustomExchange delayedExchange) {
+        return BindingBuilder.bind(productQueue).to(delayedExchange).with(PRODUCT_ROUTING_KEY)
+                .noargs();
     }
 
     /**
-     * RabbitListener 컨테이너 팩토리 설정
-     * <p>
-     * 연결 팩토리를 설정하고, JSON 메시지 변환기를 사용하도록 설정합니다.
+     * delayedQueue와 delayedExchange를 바인딩합니다.
+     *
+     * @param delayedQueue    바인딩할 Queue 객체
+     * @param delayedExchange 바인딩할 CustomExchange 객체
+     * @return 생성된 Binding 객체
+     */
+    @Bean
+    public Binding delayedBinding(@Qualifier("delayedQueue") Queue delayedQueue,
+            CustomExchange delayedExchange) {
+        return BindingBuilder.bind(delayedQueue).to(delayedExchange).with(PRODUCT_ROUTING_KEY)
+                .noargs();
+    }
+
+    /**
+     * chatQueue와 chatExchange를 바인딩합니다.
+     *
+     * @param chatQueue    바인딩할 Queue 객체
+     * @param chatExchange 바인딩할 TopicExchange 객체
+     * @return 생성된 Binding 객체
+     */
+    @Bean
+    public Binding chatBinding(@Qualifier("chatQueue") Queue chatQueue,
+            TopicExchange chatExchange) {
+        return BindingBuilder.bind(chatQueue).to(chatExchange).with(CHAT_ROUTING_KEY);
+    }
+
+    /**
+     * RabbitMQ 메시지 리스너 컨테이너 팩토리를 생성합니다.
+     *
+     * @param connectionFactory 연결 팩토리 객체
+     * @return 생성된 SimpleRabbitListenerContainerFactory 객체
      */
     @Bean
     SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(
@@ -99,24 +162,22 @@ public class RabbitConfig {
     }
 
     /**
-     * RabbitTemplate 설정
-     * <p>
-     * 연결 팩토리를 사용하여 RabbitTemplate를 설정하고, JSON 메시지 변환기를 사용하도록 설정합니다.
+     * RabbitTemplate 객체를 생성합니다.
+     *
+     * @param connectionFactory 연결 팩토리 객체
+     * @return 생성된 RabbitTemplate 객체
      */
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
-        rabbitTemplate.setRoutingKey(ROUTING_KEY);
         return rabbitTemplate;
     }
 
     /**
-     * 연결 팩토리 설정
-     * <p>
-     * RabbitMQ 서버에 연결하기 위한 CachingConnectionFactory를 설정합니다.
-     * <p>
-     * 호스트, 포트, 사용자 이름, 비밀번호 및 가상 호스트를 설정합니다.
+     * RabbitMQ 연결 팩토리를 생성합니다.
+     *
+     * @return 생성된 ConnectionFactory 객체
      */
     @Bean
     public ConnectionFactory connectionFactory() {
@@ -130,11 +191,9 @@ public class RabbitConfig {
     }
 
     /**
-     * JSON 메시지 변환기 설정
-     * <p>
-     * Jackson ObjectMapper를 사용하여 JSON 메시지 변환기를 설정합니다.
-     * <p>
-     * 날짜 및 시간 모듈을 등록하여 날짜를 타임스탬프로 쓰도록 설정합니다.
+     * JSON 메시지 변환기를 생성합니다.
+     *
+     * @return 생성된 Jackson2JsonMessageConverter 객체
      */
     @Bean
     public Jackson2JsonMessageConverter jsonMessageConverter() {

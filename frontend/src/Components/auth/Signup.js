@@ -4,10 +4,14 @@ import axiosInstance from '../../api/axiosInstance'; // 경로 수정
 import styled from 'styled-components';
 import Link from '@mui/material/Link';
 
-const SignIn = ({onLogin}) => {
-  const [loginRequest, setLoginRequest] = useState({
+const SignUp = () => {
+  const [signupRequest, setSignupRequest] = useState({
+    name: '',
     username: '',
-    password: ''
+    email: '',
+    password: '',
+    address: '',
+    nickname: '',
   });
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -18,80 +22,111 @@ const SignIn = ({onLogin}) => {
     event.preventDefault();
 
     try {
-      const response = await axiosInstance.post('/users/login', loginRequest);
+      await axiosInstance.post('/users', signupRequest);
 
-      // 응답 바디에서 토큰 추출
-      const token = response.data.data;
-      console.log('Login successful!', token);
-      console.log(response);
-
-      // 토큰을 localStorage에 저장
-      localStorage.setItem('Authorization', token);
-      // 부모 컴포넌트에 로그인 상태 변경 알리기
-      onLogin();
-
-      // 페이지를 리다이렉트하거나 상태를 업데이트할 수 있습니다.
-      navigate('/board');
+      console.log('Signup successful!');
+      navigate('/');
     } catch (error) {
-      // 로그인 실패 시 처리 로직
-      console.error('Login failed:', error);
+      console.error('Signup failed:', error);
       if (error.response && error.response.data) {
         setErrorMessage(error.response.data.message);
       } else {
-        setErrorMessage('로그인에 실패했습니다. 다시 시도해주세요.');
+        setErrorMessage('회원가입에 실패했습니다. 다시 시도해주세요.');
       }
     }
   };
 
   const handleChange = (e) => {
     const {name, value} = e.target;
-    setLoginRequest({...loginRequest, [name]: value});
+    setSignupRequest({...signupRequest, [name]: value});
   };
 
   return (
       <Container>
         <Logo>ItsMine</Logo>
         <Form onSubmit={handleSubmit}>
-          <LoginForm>
+          <SignUpForm>
+            <Label htmlFor="name">Name</Label>
+            <Input
+                id="name"
+                name="name"
+                placeholder="Enter your name"
+                value={signupRequest.name}
+                onChange={handleChange}
+                autoComplete="name"
+                autoFocus
+            />
+          </SignUpForm>
+          <SignUpForm>
             <Label htmlFor="username">Username</Label>
             <Input
                 id="username"
                 name="username"
                 placeholder="Enter your username"
-                value={loginRequest.username}
+                value={signupRequest.username}
                 onChange={handleChange}
                 autoComplete="username"
-                autoFocus
             />
-          </LoginForm>
-          <LoginForm>
+          </SignUpForm>
+          <SignUpForm>
+            <Label htmlFor="email">Email Address</Label>
+            <Input
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                value={signupRequest.email}
+                onChange={handleChange}
+                autoComplete="email"
+            />
+          </SignUpForm>
+          <SignUpForm>
             <Label htmlFor="password">Password</Label>
             <Input
                 id="password"
                 name="password"
                 type="password"
                 placeholder="Enter your password"
-                value={loginRequest.password}
+                value={signupRequest.password}
                 onChange={handleChange}
-                autoComplete="current-password"
+                autoComplete="new-password"
             />
-          </LoginForm>
+          </SignUpForm>
+          <SignUpForm>
+            <Label htmlFor="address">Address</Label>
+            <Input
+                id="address"
+                name="address"
+                placeholder="Enter your address"
+                value={signupRequest.address}
+                onChange={handleChange}
+                autoComplete="address"
+            />
+          </SignUpForm>
+          <SignUpForm>
+            <Label htmlFor="nickname">Nickname</Label>
+            <Input
+                id="nickname"
+                name="nickname"
+                placeholder="Enter your nickname"
+                value={signupRequest.nickname}
+                onChange={handleChange}
+                autoComplete="nickname"
+            />
+          </SignUpForm>
           <FormControlLabel>
             <Checkbox
                 type="checkbox"
-                value="remember"
+                value="allowExtraEmails"
                 color="primary"
             />
-            Remember me
+            I want to receive inspiration, marketing promotions and updates via
+            email.
           </FormControlLabel>
           {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
-          <LoginBtn type="submit">Log In</LoginBtn>
+          <SignUpBtn type="submit">Sign Up</SignUpBtn>
           <GridContainer>
             <GridItem>
-              <Link href="#">Forgot password?</Link>
-            </GridItem>
-            <GridItem>
-              <Link href="/signup">Don't have an account? Sign Up</Link>
+              <Link href="/">Already have an account? Sign in</Link>
             </GridItem>
           </GridContainer>
         </Form>
@@ -117,7 +152,7 @@ const Form = styled.form`
   width: 100%;
 `;
 
-const LoginForm = styled.div`
+const SignUpForm = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: ${props => props.theme.margins.xxl};
@@ -166,7 +201,7 @@ const ErrorText = styled.p`
   font-size: ${props => props.theme.fontSizes.small};
 `;
 
-const LoginBtn = styled.button`
+const SignUpBtn = styled.button`
   background: #ebebeb;
   width: 100%;
   margin: ${props => props.theme.margins.xl};
@@ -188,4 +223,4 @@ const GridItem = styled.div`
   font-size: ${props => props.theme.fontSizes.small};
 `;
 
-export default SignIn;
+export default SignUp;

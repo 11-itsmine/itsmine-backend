@@ -12,6 +12,7 @@ import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
+import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import jakarta.transaction.Transactional;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuctionService {
 
+    private final MessageSenderService messageSenderService;
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
     private final AuctionAdapter adapter;
@@ -51,11 +53,13 @@ public class AuctionService {
         //현재 구매가 갱신
         currentPriceUpdate(bidPrice, product);
 
+        auctionRepository.save(auction);
+
         //입찰가를 즉시구매가 만큼 썼으면 즉시 낙찰
         if (bidPrice.equals(product.getAuctionNowPrice())) {
-            successfulAuction(auction, productId);
+            messageSenderService.sendMessage(productId, 1);
         }
-        auctionRepository.save(auction);
+
         return new AuctionResponseDto(auction);
     }
 
