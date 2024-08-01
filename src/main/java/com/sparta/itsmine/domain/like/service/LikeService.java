@@ -24,18 +24,19 @@ public class LikeService {
 
     @Transactional
     public ResponseCodeEnum createLike(Long productId, User user) {
-        // 자기 물건에 좋아요 가능하게 만든다.
         Product product = productAdapter.getProduct(productId); // 좋아요할 상품을 찾는다.
         boolean likeExists = likeAdapter.existsLike(product.getId(),
-                user.getId()); // 해당 상품에 내가 좋아요를 했는지 찾는다. Empty, true
+                user.getId()); // 해당 상품에 내가 좋아요를 했는지 찾는다.
 
-        if (!product.getLike() && likeExists) {
-            product.toggleLike(); // Set like to true
-            likeRepository.save(new Like(product, user));
+        if (!likeExists) {
+            // 사용자가 해당 상품에 좋아요를 누르지 않은 경우
+            Like newLike = new Like(product, user);
+            likeRepository.save(newLike);
             return SUCCESS_TO_LIKE;
         } else {
-            product.toggleLike(); // Set like to false
-            likeRepository.deleteByProductIdAndUserId(product.getId(), user.getId());
+            // 사용자가 해당 상품에 이미 좋아요를 누른 경우
+            Like existingLike = likeAdapter.getLike(product.getId(), user.getId());
+            likeRepository.delete(existingLike);
             return SUCCESS_TO_REMOVE_LIKE;
         }
     }
