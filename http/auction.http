@@ -1,0 +1,52 @@
+### 유저 회원 가입
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password}}",
+  "name":"{{name}}",
+  "email":"{{email}}",
+  "address": "화성시",
+  "nickname": "Jak213r543"
+}
+
+### 로그인
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "username": "asd123456789",
+  "password": "asd123456789."
+}
+> {%
+  client.log(response.body.data);
+  client.log(response.headers.valueOf("RefreshToken"));
+  client.global.set("Authorization", response.body.data);
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
+%}
+
+
+
+### 입찰 생성
+POST http://localhost:8080/products/{productId}/auctions
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "bidPrice": 7500
+}
+
+
+
+### 유저(구매자(본인)) 입찰 조회
+GET http://localhost:8080/auctions?page=0&size=5
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+
+### 유저(구매자(본인)) 상품 입찰 조회
+GET http://localhost:8080/products/{productId}/auctions
+Authorization: {{Authorization}}
+Content-Type: application/json
