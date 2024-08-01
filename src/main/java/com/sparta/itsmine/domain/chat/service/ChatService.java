@@ -1,20 +1,17 @@
 package com.sparta.itsmine.domain.chat.service;
 
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_BLACKLIST_USER;
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_NOT_ONE_TO_ONE;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_NOT_FOUND;
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_USER_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
 
 import com.sparta.itsmine.domain.chat.dto.MessageRequestDto;
 import com.sparta.itsmine.domain.chat.dto.RoomInfoResponseDto;
 import com.sparta.itsmine.domain.chat.entity.BlackList;
 import com.sparta.itsmine.domain.chat.entity.ChatRoom;
-import com.sparta.itsmine.domain.chat.entity.JoinChat;
+import com.sparta.itsmine.domain.chat.entity.ChatStatus;
 import com.sparta.itsmine.domain.chat.entity.Message;
 import com.sparta.itsmine.domain.chat.repository.BlackListRepository;
 import com.sparta.itsmine.domain.chat.repository.ChatRoomRepository;
-import com.sparta.itsmine.domain.chat.repository.JoinChatRepository;
 import com.sparta.itsmine.domain.chat.repository.MessageRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
@@ -26,6 +23,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final JoinChatRepository joinChatRepository;
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final BlackListRepository blackListRepository;
+    private final MongoTemplate mongoTemplate;
 
     /**
      * 내가 지금 참여하고 있는 채팅방 리스트를 불러 옵니다.
@@ -47,7 +47,7 @@ public class ChatService {
      */
     public List<RoomInfoResponseDto> findAllRoom(Long userId) {
         List<ChatRoom> chatRooms = chatRoomRepository.findAllByFromUserId(userId);
-        return chatRooms.stream()
+        return chatRooms.stream().filter(chatRoom -> chatRoom.getFromUserStatus() != ChatStatus.END)
                 .map(RoomInfoResponseDto::new).collect(Collectors.toList());
     }
 
@@ -61,10 +61,11 @@ public class ChatService {
      */
     public RoomInfoResponseDto createChatRoom(User fromUser, Long userId) {
         Optional<BlackList> blackList = blackListRepository.findByFromUserIdAndToUserId(
-                fromUser.getId(),
-                userId);
+                fromUser.getId(), userId);
+        Optional<BlackList> toBlackList = blackListRepository.findByFromUserIdAndToUserId(
+                userId, fromUser.getId());
         User toUser = getUser(userId);
-        if (blackList.isPresent()) {
+        if (blackList.isPresent() || toBlackList.isPresent()) {
             throw new DataDuplicatedException(CHAT_BLACKLIST_USER);
         }
 
@@ -99,12 +100,24 @@ public class ChatService {
      * @param user   인가된 본인 유저 정보
      * @param roomId 채팅방 정보
      */
+    @Transactional
     public void leaveUser(User user, String roomId) {
         ChatRoom chatRoom = getChatRoom(roomId);
-        JoinChat joinChat = joinChatRepository.findByUserIdAndChatRoomId(user.getId(),
-                        chatRoom.getId())
-                .orElseThrow(() -> new DataNotFoundException(CHAT_ROOM_USER_NOT_FOUND));
-        joinChatRepository.delete(joinChat);
+
+        chatRoom.userStatusUpdate(user);
+
+        if (chatRoom.getFromUserStatus().equals(ChatStatus.END)
+                && chatRoom.getToUserStatus().equals(ChatStatus.END)) {
+            //messageRepository.delete를 하면 삭제가 되지 않아 Query 클래스 활용
+            Query query = new Query();
+            query.addCriteria(Criteria.where("roomId").is(roomId));
+
+            chatRoomRepository.delete(chatRoom);
+
+            mongoTemplate.remove(query, Message.class);
+
+        }
+
     }
 
     /**
@@ -164,19 +177,6 @@ public class ChatService {
         return chatRoomRepository.findByRoomId(roomId).orElseThrow(
                 () -> new DataNotFoundException(CHAT_ROOM_NOT_FOUND)
         );
-    }
-
-    /**
-     * 채팅방 유저가 2명 이하면 채팅 이용 불가 예외 처리
-     * <p>
-     *
-     * @param roomId 채팅방 ID
-     */
-    public void getUserCount(String roomId) {
-        long userCount = joinChatRepository.countByChatRoomId(roomId);
-        if (userCount < 2) {
-            throw new DataNotFoundException(CHAT_NOT_ONE_TO_ONE);
-        }
     }
 
 }
