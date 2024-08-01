@@ -105,7 +105,7 @@ Content-Type: application/json
 Authorization: {{Authorization}}
 
 ### 채팅방에 나감
-DELETE http://localhost:8080/chatrooms/6f495264-421c-4a24-950c-ce50b42aaacb
+DELETE http://localhost:8080/chatrooms/8f590e23-cf24-4ec7-a358-8961c531f6b4
 Content-Type: application/json
 Authorization: {{Authorization}}
 

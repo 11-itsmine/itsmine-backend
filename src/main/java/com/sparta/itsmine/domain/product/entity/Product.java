@@ -62,9 +62,6 @@ public class Product extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    // 시작 날짜와 끝 날짜를 혹시 모르니 생성해 둡니다.
-    @Column(nullable = false)
-    private LocalDateTime startDate;
     @Column(nullable = false)
     private LocalDateTime dueDate;
     private LocalDateTime deletedAt;
@@ -107,7 +104,6 @@ public class Product extends TimeStamp {
 
         // set up initialized values
         this.status = BID;
-        this.startDate = LocalDateTime.now();
         this.like = false;
     }
 
@@ -166,7 +162,7 @@ public class Product extends TimeStamp {
 
     public List<String> getImageUrls() {
         return productImagesList.stream()
-                .flatMap(productImage -> productImage.getImagesUrl().stream())
+                .map(ProductImages::getImagesUrl)
                 .collect(Collectors.toList());
     }
 }

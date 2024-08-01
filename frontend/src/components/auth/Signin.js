@@ -1,37 +1,10 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axiosInstance from '../../api/axiosInstance'; // 경로 수정
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
+import styled from 'styled-components';
 import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import {createTheme, ThemeProvider} from '@mui/material/styles';
 
-const defaultTheme = createTheme();
-
-function Copyright(props) {
-  return (
-      <Typography variant="body2" color="text.secondary"
-                  align="center" {...props}>
-        {'Copyright © '}
-        <Link color="inherit" href="https://mui.com/">
-          Yours?
-        </Link>{' '}
-        {new Date().getFullYear()}
-        {'.'}
-      </Typography>
-  );
-}
-
-export default function SignIn({onLogin}) {
+const SignIn = ({onLogin}) => {
   const [loginRequest, setLoginRequest] = useState({
     username: '',
     password: ''
@@ -49,7 +22,6 @@ export default function SignIn({onLogin}) {
 
       // 응답 바디에서 토큰 추출
       const token = response.data.data;
-      // const token = response.headers.getAuthorization(); // 응답에서 토큰 추출 // 응답에서 토큰 추출 (예: { "status": 200, "message": "로그인 성공", "data": "토큰" })
       console.log('Login successful!', token);
       console.log(response);
 
@@ -76,84 +48,144 @@ export default function SignIn({onLogin}) {
     setLoginRequest({...loginRequest, [name]: value});
   };
 
-  const goToSignup = () => {
-    navigate('/signup');
-  };
-
   return (
-      <ThemeProvider theme={defaultTheme}>
-        <Container component="main" maxWidth="xs">
-          <CssBaseline/>
-          <Box
-              sx={{
-                marginTop: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-          >
-            <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
-              <LockOutlinedIcon/>
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign in
-            </Typography>
-            <Box component="form" onSubmit={handleSubmit} noValidate
-                 sx={{mt: 1}}>
-              <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="username"
-                  label="Username"
-                  name="username"
-                  autoComplete="username"
-                  autoFocus
-                  value={loginRequest.username}
-                  onChange={handleChange}
-              />
-              <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={loginRequest.password}
-                  onChange={handleChange}
-              />
-              <FormControlLabel
-                  control={<Checkbox value="remember" color="primary"/>}
-                  label="Remember me"
-              />
-              {errorMessage && <Typography
-                  color="error">{errorMessage}</Typography>}
-              <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{mt: 3, mb: 2}}
-              >
-                Sign In
-              </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link href="#" variant="body2" onClick={goToSignup}>
-                    {"Don't have an account? Sign Up"}
-                  </Link>
-                </Grid>
-              </Grid>
-            </Box>
-          </Box>
-          <Copyright sx={{mt: 8, mb: 4}}/>
-        </Container>
-      </ThemeProvider>
+      <Container>
+        <Logo>ItsMine</Logo>
+        <Form onSubmit={handleSubmit}>
+          <LoginForm>
+            <Label htmlFor="username">Username</Label>
+            <Input
+                id="username"
+                name="username"
+                placeholder="Enter your username"
+                value={loginRequest.username}
+                onChange={handleChange}
+                autoComplete="username"
+                autoFocus
+            />
+          </LoginForm>
+          <LoginForm>
+            <Label htmlFor="password">Password</Label>
+            <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Enter your password"
+                value={loginRequest.password}
+                onChange={handleChange}
+                autoComplete="current-password"
+            />
+          </LoginForm>
+          <FormControlLabel>
+            <Checkbox
+                type="checkbox"
+                value="remember"
+                color="primary"
+            />
+            Remember me
+          </FormControlLabel>
+          {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
+          <LoginBtn type="submit">Log In</LoginBtn>
+          <GridContainer>
+            <GridItem>
+              <Link href="#">Forgot password?</Link>
+            </GridItem>
+            <GridItem>
+              <Link href="/signup">Don't have an account? Sign Up</Link>
+            </GridItem>
+          </GridContainer>
+        </Form>
+      </Container>
   );
-}
+};
+
+const Container = styled.section`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 9.375rem auto auto;
+  max-width: 25rem;
+`;
+
+const Logo = styled.h1`
+  margin-bottom: 2.8rem;
+  font-size: ${props => props.theme.fontSizes.titleSize};
+  font-weight: bold;
+`;
+
+const Form = styled.form`
+  width: 100%;
+`;
+
+const LoginForm = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: ${props => props.theme.margins.xxl};
+  width: 100%;
+  height: 4.375rem;
+`;
+
+const Label = styled.label`
+  font-size: ${props => props.theme.fontSizes.small};
+  padding-bottom: ${props => props.theme.paddings.base};
+`;
+
+const Input = styled.input`
+  border: none;
+  border-bottom: 1px solid #ebebeb;
+  padding: ${props => props.theme.paddings.base} 0;
+  font-size: ${props => props.theme.fontSizes.small};
+
+  &:focus {
+    outline: none;
+    border-bottom: 2px solid black;
+
+    ::placeholder {
+      opacity: 0;
+    }
+  }
+
+  ::placeholder {
+    color: #bbb;
+    opacity: 1;
+  }
+`;
+
+const FormControlLabel = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: ${props => props.theme.margins.large};
+`;
+
+const Checkbox = styled.input`
+  margin-right: ${props => props.theme.margins.base};
+`;
+
+const ErrorText = styled.p`
+  color: ${props => props.theme.palette.error.main};
+  font-size: ${props => props.theme.fontSizes.small};
+`;
+
+const LoginBtn = styled.button`
+  background: #ebebeb;
+  width: 100%;
+  margin: ${props => props.theme.margins.xl};
+  padding: ${props => props.theme.paddings.large};
+  border: none;
+  border-radius: 10px;
+  font-size: ${props => props.theme.fontSizes.base};
+  color: ${props => props.theme.colors.white};
+  cursor: pointer;
+`;
+
+const GridContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const GridItem = styled.div`
+  font-size: ${props => props.theme.fontSizes.small};
+`;
+
+export default SignIn;

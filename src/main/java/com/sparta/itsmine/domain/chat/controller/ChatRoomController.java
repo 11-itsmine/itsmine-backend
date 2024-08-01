@@ -4,8 +4,8 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_BL
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_BLACKLIST_USER_CANCEL;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_GET_MESSAGE_LIST;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_GET_ROOM_LIST;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_SUCCESS_CREATE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.CHAT_SUCCESS_ROOM_LEAVE;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.COMMENT_SUCCESS_CREATE;
 
 import com.sparta.itsmine.domain.chat.dto.RoomInfoResponseDto;
 import com.sparta.itsmine.domain.chat.dto.UserRequestDto;
@@ -66,7 +66,7 @@ public class ChatRoomController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         RoomInfoResponseDto responseDto = chatService.createChatRoom(user, requestDto.getUserId());
-        return ResponseUtils.of(COMMENT_SUCCESS_CREATE, responseDto);
+        return ResponseUtils.of(CHAT_SUCCESS_CREATE, responseDto);
     }
 
     /**

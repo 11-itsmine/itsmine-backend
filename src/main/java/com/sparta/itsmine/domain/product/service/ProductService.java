@@ -9,8 +9,8 @@ import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
+import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
-import com.sparta.itsmine.domain.product.utils.rabbitmq.MessageSenderService;
 import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
 import com.sparta.itsmine.domain.user.entity.User;
@@ -50,7 +50,7 @@ public class ProductService {
         product.setCategory(category);
 
         Product newProduct = adapter.saveProduct(product);
-        productImagesService.createProductImages(imagesRequestDto, product, userId);
+        productImagesService.createProductImages(imagesRequestDto, product);
         scheduleProductUpdate(newProduct);
         return new ProductResponseDto(newProduct, imagesRequestDto);
     }
@@ -102,17 +102,11 @@ public class ProductService {
         LocalDateTime now = LocalDateTime.now();
 
         // 시작 시간과 종료 시간
-        LocalDateTime startDate = product.getStartDate();
+        LocalDateTime startDate = product.getCreatedAt();
         LocalDateTime dueDate = product.getDueDate();
 
-        // 시작 시간부터 종료 시간까지의 차이를 계산
-        Duration durationBetween = Duration.between(startDate, dueDate);
-
         // 현재 시간과 시작 시간 사이의 차이를 계산
-        Duration timeUntilStart = Duration.between(now, startDate);
-
-        // 딜레이 계산
-        long delayMillis = durationBetween.toMillis() - timeUntilStart.toMillis();
+        long delayMillis = Duration.between(now, dueDate).toMillis();
 
         // delayMillis가 0 이하일 경우 바로 처리
         if (delayMillis <= 0) {

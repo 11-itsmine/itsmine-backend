@@ -32,10 +32,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //        registry.setApplicationDestinationPrefixes("/pub");       //클라이언트에서 보낸 메세지를 받을 prefix
 //        registry.enableSimpleBroker("/sub");    //해당 주소를 구독하고 있는 클라이언트들에게 메세지 전달
         registry.enableStompBrokerRelay("/exchange")
-                .setClientLogin("guest")
-                .setClientPasscode("guest")
-                .setSystemLogin("guest")
-                .setSystemPasscode("guest")
+                .setClientLogin(rabbitUser)
+                .setClientPasscode(rabbitPwd)
+                .setSystemLogin(rabbitUser)
+                .setSystemPasscode(rabbitPwd)
                 .setRelayHost(rabbitHost)
                 .setRelayPort(61613)
                 .setVirtualHost("/");
@@ -48,15 +48,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOrigins("*");
-//                .withSockJS();//SockJS 연결 주소
+        //.withSockJS();//SockJS 연결 주소
 
         // 주소 : ws://localhost:8080/ws
     }
-
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(chatPreHandler);
-//    }
-
 
 }

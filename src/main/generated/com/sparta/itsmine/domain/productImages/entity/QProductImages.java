@@ -29,14 +29,12 @@ public class QProductImages extends EntityPathBase<ProductImages> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final ListPath<String, StringPath> imagesUrl = this.<String, StringPath>createList("imagesUrl", String.class, StringPath.class, PathInits.DIRECT2);
+    public final StringPath imagesUrl = createString("imagesUrl");
 
     public final com.sparta.itsmine.domain.product.entity.QProduct product;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
-
-    public final com.sparta.itsmine.domain.user.entity.QUser user;
 
     public QProductImages(String variable) {
         this(ProductImages.class, forVariable(variable), INITS);
@@ -57,7 +55,6 @@ public class QProductImages extends EntityPathBase<ProductImages> {
     public QProductImages(Class<? extends ProductImages> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.product = inits.isInitialized("product") ? new com.sparta.itsmine.domain.product.entity.QProduct(forProperty("product"), inits.get("product")) : null;
-        this.user = inits.isInitialized("user") ? new com.sparta.itsmine.domain.user.entity.QUser(forProperty("user")) : null;
     }
 
 }

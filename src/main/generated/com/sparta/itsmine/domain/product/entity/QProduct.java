@@ -49,8 +49,6 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath productName = createString("productName");
 
-    public final DateTimePath<java.time.LocalDateTime> startDate = createDateTime("startDate", java.time.LocalDateTime.class);
-
     public final NumberPath<Integer> startPrice = createNumber("startPrice", Integer.class);
 
     public final EnumPath<com.sparta.itsmine.domain.product.utils.ProductStatus> status = createEnum("status", com.sparta.itsmine.domain.product.utils.ProductStatus.class);
