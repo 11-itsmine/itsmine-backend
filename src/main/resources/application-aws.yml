@@ -14,6 +14,7 @@ cloud:
   aws:
     s3:
       bucket: ${CLOUD_AWS_S3_BUCKET}
+      domain: ${CLOUD_AWS_S3_DOMAIN}
     stack.auto: false
     region.static: ${CLOUD_AWS_REGION_STATIC}
     credentials:

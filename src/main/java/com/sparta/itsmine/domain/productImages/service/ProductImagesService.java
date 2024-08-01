@@ -33,6 +33,9 @@ public class ProductImagesService {
     private final AmazonS3 amazonS3;
     private final ProductImagesRepository productImagesRepository;
 
+    @Value("${CLOUD_AWS_S3_DOMAIN}")
+    private String CLOUD_FRONT_DOMAIN_NAME;
+
     @Value("${CLOUD_AWS_S3_BUCKET}")
     private String bucket;
 
@@ -45,7 +48,7 @@ public class ProductImagesService {
         metadata.setContentType(multipartFile.getContentType());
 
         amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
-        return amazonS3.getUrl(bucket, originalFilename).toString();
+        return CLOUD_FRONT_DOMAIN_NAME+"/"+originalFilename;
     }
 
     // 파일 삭제 메소드
