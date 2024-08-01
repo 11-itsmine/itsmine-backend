@@ -28,6 +28,7 @@ public enum ResponseCodeEnum {
 
     // 카테고리
     SUCCESS_TO_MAKE_NEW_CATEGORY(HttpStatus.OK, "새로운 카테고리를 만드셨습니다."),
+    CATEGORY_SUCCESS_GET(HttpStatus.OK, "카테고리 목록 조회에 성공하셨습니다."),
     //QnA
     SUCCESS_CREATE_QNA(HttpStatus.CREATED, "문의 내용이 등록 되었습니다."),
     SUCCESS_QNA_LIST(HttpStatus.OK, "문의 목록 조회"),

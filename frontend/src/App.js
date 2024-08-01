@@ -6,6 +6,7 @@ import SignUp from "./Components/auth/Signup";
 import Main from "./main/Main";
 import Footer from "./Components/footer/Footer";
 import Nav from "./Components/nav/Nav";
+import CreateProduct from "./components/createproduct/CreateProduct";
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/" element={<SignIn/>}/>
           <Route path="/signup" element={<SignUp/>}/>
           <Route path="/itsmine" element={<Main/>}/>
+          <Route path="/products" element={<CreateProduct/>}/>
         </Routes>
         <Footer/>
       </BrowserRouter>
