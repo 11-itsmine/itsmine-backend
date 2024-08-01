@@ -20,6 +20,9 @@ spring:
     username: ${DB-USER}
     password: ${DB-PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
+    ssl:
+      ca: /etc/ssl/certs/rds-combined-ca-bundle.pem
+      enabled: true
   mongodb:
     url: mongodb://localhost:27017/itsmine
 
