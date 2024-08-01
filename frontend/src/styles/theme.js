@@ -49,6 +49,7 @@ const colors = {
   lightGray: '#f4f4f4',
   disabled: '#ebebeb',
   white: '#ffffff',
+  error: '#f44336',
 };
 
 const borders = {
@@ -73,6 +74,11 @@ const theme = {
   colors,
   borders,
   flex,
+  palette: {
+    error: {
+      main: '#f44336', // Error color
+    },
+  },
 };
 
 export default theme;

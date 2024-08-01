@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
-import SignIn from "./Components/auth/Signin";
-import SignUp from "./Components/auth/Signup";
+import SignUp from "./components/auth/Signup";
 import Main from "./main/Main";
-import Footer from "./Components/footer/Footer";
-import Nav from "./Components/nav/Nav";
+import Footer from "./components/footer/Footer";
+import Nav from "./components/nav/Nav";
 import CreateProduct from "./components/createproduct/CreateProduct";
+import {ThemeProvider} from "styled-components";
+import SignIn from "./components/auth/Signin";
+import theme from "./styles/theme";
 
 function App() {
 
@@ -29,19 +31,21 @@ function App() {
   };
 
   return (
-      <BrowserRouter>
-        <Nav/>
-        <Routes>
-          <Route path="/"
-                 element={isLoggedIn ? <Navigate to="/itsmine "/> : <SignIn
-                     onLogin={handleLogin}/>}/>
-          <Route path="/" element={<SignIn/>}/>
-          <Route path="/signup" element={<SignUp/>}/>
-          <Route path="/itsmine" element={<Main/>}/>
-          <Route path="/products" element={<CreateProduct/>}/>
-        </Routes>
-        <Footer/>
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <Nav/>
+          <Routes>
+            <Route path="/" element={<Navigate to="/itsmine"/>}/>
+            <Route path="/itsmine" element={<Main/>}/>
+            <Route path="/itsmine/login"
+                   element={<SignIn isLoggedIn={isLoggedIn}
+                                    onLogin={handleLogin}/>}/>
+            <Route path="/signup" element={<SignUp/>}/>
+            <Route path="/products" element={<CreateProduct/>}/>
+          </Routes>
+          <Footer/>
+        </BrowserRouter>
+      </ThemeProvider>
   );
 }
 

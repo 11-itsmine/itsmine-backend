@@ -31,7 +31,7 @@ const SignIn = ({onLogin}) => {
       onLogin();
 
       // 페이지를 리다이렉트하거나 상태를 업데이트할 수 있습니다.
-      navigate('/board');
+      navigate('/itsmine');
     } catch (error) {
       // 로그인 실패 시 처리 로직
       console.error('Login failed:', error);
