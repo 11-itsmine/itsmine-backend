@@ -4,6 +4,8 @@ import com.sparta.itsmine.global.security.JwtProvider;
 import com.sparta.itsmine.global.security.UserDetailsServiceImpl;
 import com.sparta.itsmine.global.security.filters.JwtAuthenticationFilter;
 import com.sparta.itsmine.global.security.filters.JwtAuthorizationFilter;
+
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -72,10 +74,9 @@ public class WebSecurityConfig {
         );
 
         // 필터 관리
+        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
 
         return http.build();
     }
-
 }

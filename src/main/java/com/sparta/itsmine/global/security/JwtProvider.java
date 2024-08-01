@@ -173,6 +173,8 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             // 토큰이 만료된 경우에도 가져옴
             return e.getClaims().getSubject();
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 

@@ -38,6 +38,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res,
 		FilterChain filterChain) throws ServletException, IOException {
 
+		// 로그인 URL은 건너뛰기
+		if (req.getRequestURI().equals("/users/login")) {
+			filterChain.doFilter(req, res);
+			return;
+		}
+
 		String accessToken = jwtProvider.getAccessTokenFromRequest(req);
 		String username = jwtProvider.getUsernameFromToken(accessToken);
 
@@ -59,7 +65,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 					setAuthentication(username);
 
 				} else {
-					log.info("리프레시 토큰 검증 실패");
+					log.error("리프레시 토큰 검증 실패");
 					jwtExceptionHandler(res, HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh 토큰입니다.");
 					return;
 				}
@@ -67,6 +73,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 				jwtExceptionHandler(res, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 				return;
 			}
+		} else {
+			log.error("토큰 없음");
 		}
 		filterChain.doFilter(req, res);
 	}
