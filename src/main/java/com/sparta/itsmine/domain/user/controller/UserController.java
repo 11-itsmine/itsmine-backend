@@ -10,6 +10,7 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_UP
 import static com.sparta.itsmine.global.common.response.ResponseUtils.*;
 
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
+import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
@@ -52,11 +53,11 @@ public class UserController {
         return of(SUCCESS_LOGOUT);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/profile")
     public ResponseEntity<HttpResponseDto> getUser(
-        @PathVariable Long userId
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        UserResponseDto response = userService.getUser(userId);
+        UserResponseDto response = userService.getUser(userDetails.getUser().getId());
         return of(USER_SUCCESS_GET, response);
     }
 

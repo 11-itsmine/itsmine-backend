@@ -15,7 +15,7 @@ spring:
     virtual-host: /
   data:
     redis:
-      host: localhost
+      host: itsmine-redis-scjn5h.serverless.apn2.cache.amazonaws.com
       port: 6379
   # 배포 환경이라는 것은 각각 다양한 환경이 존재한다. 이때 각각의 주소가 다르다.
   # 이런것을 다 실행할때 각각을 하드코딩하면 제대로 사용할 수 없다. 이렇게 되면 따로 브랜치를 생성하는 식으로 관리를 해야한다.
