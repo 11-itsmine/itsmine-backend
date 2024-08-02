@@ -75,6 +75,13 @@ jobs:
         # 태그된 Docker 이미지를 ECR에 푸시
 
       # EC2 인스턴스에 SSH로 접속하여 Docker 컨테이너를 배포
+      - name: Log in to Amazon ECR again
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
       - name: SSH into EC2 and deploy Docker container
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -87,7 +94,7 @@ jobs:
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
             docker stop itsmine || true
             docker rm itsmine || true
-            docker run -d --name itsmine -p 8080:8080 \
+            docker run -d --name itsmine -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
               -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
               -e DB_URL=${{ secrets.DB_URL }} \
               -e DB_USER=${{ secrets.DB_USER }} \
