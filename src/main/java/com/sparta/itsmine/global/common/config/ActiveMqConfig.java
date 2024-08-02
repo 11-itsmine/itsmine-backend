@@ -1,9 +1,8 @@
 package com.sparta.itsmine.global.common.config;
 
+import com.sparta.itsmine.domain.chat.dto.MessageRequestDto;
 import jakarta.jms.Queue;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +13,9 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class ActiveMqConfig {
@@ -41,21 +43,26 @@ public class ActiveMqConfig {
     }
 
     /**
-     * ActiveMQ 연결을 위한 ActiveMQConnectionFactory 빈을 생성하여 반환
+     * ActiveMQ SSL ConnectionFactory를 생성하여 반환합니다.
      *
-     * @return ActiveMQConnectionFactory 객체
+     * @return ActiveMQSslConnectionFactory 객체
      */
     @Bean
-    public ActiveMQConnectionFactory activeMQConnectionFactory() {
-        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
-        activeMQConnectionFactory.setBrokerURL(activemqBrokerUrl);
-        activeMQConnectionFactory.setUserName(activemqUsername);
-        activeMQConnectionFactory.setPassword(activemqPassword);
-        return activeMQConnectionFactory;
+    public ActiveMQSslConnectionFactory activeMQConnectionFactory() {
+        ActiveMQSslConnectionFactory factory = new ActiveMQSslConnectionFactory();
+        factory.setBrokerURL(activemqBrokerUrl);
+        factory.setUserName(activemqUsername);
+        factory.setPassword(activemqPassword);
+
+        // SSL 설정
+        //factory.setTrustStore("path/to/your/truststore.jks"); // TrustStore 경로를 설정하세요.
+        //factory.setTrustStorePassword("yourTrustStorePassword");
+
+        return factory;
     }
 
     /**
-     * JmsTemplate을 생성하여 반환
+     * JmsTemplate을 생성하여 반환합니다.
      *
      * @return JmsTemplate 객체
      */
@@ -94,7 +101,7 @@ public class ActiveMqConfig {
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_typeId");
         Map<String, Class<?>> typeIdMappings = new HashMap<>();
-        typeIdMappings.put("message", MessageDto.class);
+        typeIdMappings.put("message", MessageRequestDto.class);
         converter.setTypeIdMappings(typeIdMappings);
         return converter;
     }

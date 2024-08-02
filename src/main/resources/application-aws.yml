@@ -20,3 +20,9 @@ cloud:
     credentials:
       accessKey: ${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
       secretKey: ${CLOUD_AWS_CREDENTIALS_SECRETKEY}
+dynamodb:
+  table:
+    name: Messages
+  credentials:
+    accessKey: ${CLOUD_AWS_DYNAMODB_ACCESSKEY}
+    secretKey: ${CLOUD_AWS_DYNAMODB_SECRETKEY}
