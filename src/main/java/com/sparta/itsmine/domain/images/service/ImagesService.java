@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.images.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.images.dto.ProfileImagesResponseDto;
 import com.sparta.itsmine.domain.images.entity.Images;
 import com.sparta.itsmine.domain.images.respository.ImagesRepository;
 import com.sparta.itsmine.domain.images.util.ImageType;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,7 +65,7 @@ public class ImagesService {
 
     // 프로필 업로드 메소드
     @Transactional
-    public String uploadProfile(MultipartFile file, UserDetailsImpl userDetails) throws IOException {
+    public ProfileImagesResponseDto uploadProfile(MultipartFile file, UserDetailsImpl userDetails) throws IOException {
         String originalFilename = file.getOriginalFilename();
         String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalFilename;
 
@@ -87,7 +89,7 @@ public class ImagesService {
         Images profileImage = new Images(profileURL, ImageType.PROFILE, user);
         imagesRepository.save(profileImage);
 
-        return "프로필 업로드 완료";
+        return new ProfileImagesResponseDto(profileURL);
     }
 
     // 파일 삭제 메소드

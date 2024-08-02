@@ -22,11 +22,11 @@ public class Images extends TimeStamp {
     private String imagesUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "contentType", nullable = false)
+    @Column(name = "contentType", nullable = true)
     private ImageType contentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id", nullable = true)
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
