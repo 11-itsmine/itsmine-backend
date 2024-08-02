@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
 import {
   Box,
   Button,
@@ -15,6 +14,7 @@ import {
 } from '@mui/material';
 import {useNavigate} from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
+import axiosInstance from "../../api/axiosInstance";
 
 const ProductCreatePage = () => {
   const [productName, setProductName] = useState('');
@@ -30,7 +30,7 @@ const ProductCreatePage = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/categories');
+        const response = await axiosInstance.get('/categories');
         setCategories(response.data.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -53,7 +53,7 @@ const ProductCreatePage = () => {
     });
 
     try {
-      const response = await axios.post('http://localhost:8080/s3/upload',
+      const response = await axiosInstance.post('http://localhost:8080/s3/upload',
           formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -92,7 +92,7 @@ const ProductCreatePage = () => {
         }
       };
 
-      await axios.post('http://localhost:8080/products', productData, {
+      await axiosInstance.post('http://localhost:8080/products', productData, {
         headers: {
           Authorization: token
         }

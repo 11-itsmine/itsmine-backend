@@ -65,8 +65,6 @@ main:
 
 jwt-secret-key: ${JWT_KEY}
 
-admin-token: ${ADMIN_TOKEN}
-
 cloud:
   aws:
     s3:
