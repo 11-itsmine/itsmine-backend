@@ -44,7 +44,7 @@ Content-Type: application/json
 
 {
   "productCreateDto": {
-    "productName": "상품6",
+    "productName": "상품2",
     "description": "상품 설명입니다",
     "auctionNowPrice": 1000,
     "startPrice": 1000,

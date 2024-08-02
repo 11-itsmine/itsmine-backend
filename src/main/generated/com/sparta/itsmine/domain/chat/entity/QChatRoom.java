@@ -24,13 +24,15 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
 
     public final com.sparta.itsmine.domain.user.entity.QUser fromUser;
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final EnumPath<ChatStatus> fromUserStatus = createEnum("fromUserStatus", ChatStatus.class);
 
-    public final ListPath<JoinChat, QJoinChat> joinChats = this.<JoinChat, QJoinChat>createList("joinChats", JoinChat.class, QJoinChat.class, PathInits.DIRECT2);
+    public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath roomId = createString("roomId");
 
     public final com.sparta.itsmine.domain.user.entity.QUser toUser;
+
+    public final EnumPath<ChatStatus> toUserStatus = createEnum("toUserStatus", ChatStatus.class);
 
     public QChatRoom(String variable) {
         this(ChatRoom.class, forVariable(variable), INITS);

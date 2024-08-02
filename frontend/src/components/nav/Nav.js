@@ -4,7 +4,7 @@ import styled, {css} from 'styled-components';
 
 const Nav = () => {
   const [isLogin, setIsLogin] = useState(false);
-  const creamToken = localStorage.getItem('accessToken');
+  const creamToken = localStorage.getItem('Authorization');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,21 +12,20 @@ const Nav = () => {
   }, [creamToken, isLogin]);
 
   const logout = () => {
-    localStorage.removeItem('access_token');
+    localStorage.removeItem('Authorization');
     alert('로그아웃 되었습니다');
     setIsLogin(false);
   };
 
   const goToMain = () => {
-    navigate(`/products`);
+    navigate(`/itsmine`);
   };
 
   return (
       <Container>
         <Logo onClick={goToMain}>ITSMINE</Logo>
         <ButtonContainer>
-          <Button>STYLE</Button>
-          <Button>SHOP</Button>
+          <Button>SELL</Button>
           <Button>ABOUT</Button>
           {isLogin ? (
               <>
@@ -39,7 +38,7 @@ const Nav = () => {
               <Button
                   login
                   onClick={() => {
-                    navigate('/login');
+                    navigate('/itsmine/login');
                   }}
               >
                 LOGIN
