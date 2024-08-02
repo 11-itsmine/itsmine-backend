@@ -25,7 +25,6 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
 
 # 로컬용
-# spring:
 #   datasource:
 #     url: jdbc:mysql://${DB_URL}/itsmine
 #     username: ${DB_USER}
