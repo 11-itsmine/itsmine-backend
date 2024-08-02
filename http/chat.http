@@ -3,12 +3,12 @@ POST http://localhost:8080/users
 Content-Type: application/json
 
 {
-  "username": "username1234",
-  "password": "password1234!",
-  "name": "이순모",
-  "email": "fltnsah@nate.com",
-  "address": "화성시",
-  "nickname": "7777"
+  "username": "username55555",
+  "password": "password55555!",
+  "name": "이순모111",
+  "email": "fltnsah@nate.com12333",
+  "address": "화성시21313",
+  "nickname": "7777123123"
 }
 
 ### 로그인1
@@ -16,8 +16,8 @@ POST http://localhost:8080/users/login
 Content-Type: application/json
 
 {
-  "username": "username1234",
-  "password": "password1234!"
+  "username": "username55555",
+  "password": "password55555!"
 }
 > {%
   client.log(response.headers.valueOf("Authorization"));

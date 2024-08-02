@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import MessageInput from './MessageInput';
 import SockJS from 'sockjs-client';
-import {Client} from '@stomp/stompjs';
+import { Client } from '@stomp/stompjs';
 import axiosInstance from '../../api/axiosInstance'; // 인증 헤더가 포함된 axios 인스턴스
 import './Chat.css';
 
-const ChatWindow = ({roomId, onLeaveRoom}) => {
+const ChatWindow = ({ roomId, onLeaveRoom }) => {
   const [messages, setMessages] = useState([]);
   const [stompClient, setStompClient] = useState(null);
 
@@ -72,15 +72,22 @@ const ChatWindow = ({roomId, onLeaveRoom}) => {
       <div className="chat-window">
         <h2>Chat Room {roomId}</h2>
         <button onClick={handleLeaveRoom}>Leave Room</button>
-        {/* 나가기 버튼 */}
         <div className="messages">
-          {messages.map((msg, index) => (
-              <div key={index}>
-                <strong>{msg.sender}</strong>: {msg.content}
-              </div>
-          ))}
+          {/* 메시지들을 수동으로 렌더링 */}
+          {(() => {
+            const messageElements = [];
+            for (let i = 0; i < messages.length; i++) {
+              const msg = messages[i];
+              messageElements.push(
+                  <div key={i}>
+                    <strong>{msg.sender}</strong>: {msg.content}
+                  </div>
+              );
+            }
+            return messageElements;
+          })()}
         </div>
-        <MessageInput onSend={handleSendMessage}/>
+        <MessageInput onSend={handleSendMessage} />
       </div>
   );
 };
