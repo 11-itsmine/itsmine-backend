@@ -1,9 +1,9 @@
 server:
-  port: ${SERVER-PORT:8080}
+  port: ${SERVER_PORT}
 
 spring:
   rabbitmq:
-    host: b-74842f32-f57f-4c31-89d4-1f6d3c4703fc.mq.ap-northeast-2.amazonaws.com
+    host: ${RABBITMQ_BROKER}
     port: ${RABBITMQ_PORT} # RabbitMQ SSL port
     username: ${RABBITMQ_USERNAME}
     password: ${RABBITMQ_PASSWORD}
@@ -12,73 +12,81 @@ spring:
       enabled: true
   data:
     redis:
-      host: localhost
-      port: 6379
-
+      host: ${REDIS_DOMAIN} # 로컬에서 할 때는 localhost
+      port: ${REDIS_PORT}
   activemq:
-    broker-url: ${ACTIVEMQ-BROKER}
-    user: ${ACTIVEMQ-USER}
-    password: ${ACTIVEMQ-PASSWORD}
-    queue:
-      name: sample-queue
-
-  
-  # 배포 환경이라는 것은 각각 다양한 환경이 존재한다. 이때 각각의 주소가 다르다.
-  # 이런것을 다 실행할때 각각을 하드코딩하면 제대로 사용할 수 없다. 이렇게 되면 따로 브랜치를 생성하는 식으로 관리를 해야한다.
-  # 이렇게 변경되는 것들에 대해서 따로 빼서 관리하는 것 입니다.
+    broker-url: ${ACTIVEMQ_BROKER}
+    user: ${ACTIVEMQ_USER}
+    password: ${ACTIVEMQ_PASSWORD}
   datasource:
-    url: jdbc:mariadb://${DB-URL}/itsmine
-    username: ${DB-USER}
-    password: ${DB-PASSWORD}
+    url: jdbc:mariadb://${DB_URL}/itsmine
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
-#  mongodb:
-#    url: mongodb://localhost:27017/itsmine
+# 로컬용
+# spring:
+#   datasource:
+#     url: jdbc:mysql://${DB_URL}/itsmine
+#     username: ${DB_USER}
+#     password: ${DB_PASSWORD}
+#     driver-class-name: com.mysql.cj.jdbc.Driver
 
-    #  rabbitmq:
-    #    host: ${RABBIT-MQ-HOST}
-    #    port: ${RABBIT-MQ-PORT}
-    #    username: ${RABBIT-MQ-USER}
-    #    password: ${RABBIT-MQ-PWD}
-    #    virtual-host: ${RABBIT-MQ-VH}
-    #port: 61613
+sql:
+  init:
+    encoding: UTF-8
 
-
-
-  sql:
-    init:
-      encoding: UTF-8
-
-  jpa:
+jpa:
+  hibernate:
+    ddl-auto: update
+  properties:
     hibernate:
-      ddl-auto: update
+      show_sql: true
+      format_sql: true
+      connection:
+        CharSet: utf-8
+        characterEncoding: utf-8
+        useUnicode: true
 
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        connection:
-          CharSet: utf-8
-          characterEncoding: utf-8
-          useUnicode: true
-  web:
-    resources:
-      static-locations: classpath:/static/
-  thymeleaf:
-    suffix: .html
-    prefix: classpath:templates/
+web:
+  resources:
+    static-locations: classpath:/static/
 
-  profiles:
-    include:
-      - aws
-  main:
-    allow-bean-definition-overriding: true
+thymeleaf:
+  suffix: .html
+  prefix: classpath:templates/
 
-jwt-secret-key: ${JWT-KEY}
+profiles:
+  include:
+    - aws
 
-admin-token: ${ADMIN-TOKEN}
+main:
+  allow-bean-definition-overriding: true
+
+jwt-secret-key: ${JWT_KEY}
+
+admin-token: ${ADMIN_TOKEN}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCKET}
+      domain: ${CLOUD_AWS_S3_DOMAIN}
+    stack:
+      auto: false
+    region:
+      static: ${CLOUD_AWS_REGION_STATIC}
+    credentials:
+      accessKey: ${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
+      secretKey: ${CLOUD_AWS_CREDENTIALS_SECRETKEY}
+
+dynamodb:
+  table:
+    name: Messages
+  credentials:
+    accessKey: ${CLOUD_AWS_DYNAMODB_ACCESSKEY}
+    secretKey: ${CLOUD_AWS_DYNAMODB_SECRETKEY}
 
 activemq:
-  queue.name: ${ACTIVEMQ-QNAME}
-
-
+  queue:
+    name: ${ACTIVEMQ_QNAME}
