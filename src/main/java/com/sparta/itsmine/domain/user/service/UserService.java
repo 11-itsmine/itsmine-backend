@@ -20,6 +20,8 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenAdapter refreshTokenAdapter;
     private final UserAdapter userAdapter;
+    private final RedisTemplate<String, String> redisTemplate;
 
     // @Value("${admin.token}")
     // private String adminToken;
@@ -58,8 +61,8 @@ public class UserService {
         return requestDto.getName();
     }
 
-    public void logout(String username, HttpServletResponse response) {
-        response.setHeader(AUTHORIZATION_HEADER, "");
+    public void logout(String username) {
+        redisTemplate.delete(username);
         refreshTokenAdapter.deleteByUsername(username);
     }
 

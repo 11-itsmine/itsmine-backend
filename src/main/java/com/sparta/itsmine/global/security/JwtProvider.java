@@ -23,6 +23,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -33,14 +34,15 @@ public class JwtProvider {
 
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String REFRESH_TOKEN_COOKIE_NAME = "RefreshToken";
+    public static final String ACCESS_TOKEN_COOKIE_NAME = "AccessToken";
     public static final String AUTHORIZATION_KEY = "auth";
 
     public static final Long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
-    public static final Long ACCESS_TOKEN_TIME = 60 * 60 * 1000L;
+    public static final Long ACCESS_TOKEN_TIME = 30 * 60L; // 30분
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenAdapter refreshTokenAdapter;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${jwt-secret-key}")
     private String secretKey;
@@ -83,17 +85,17 @@ public class JwtProvider {
     }
 
     /**
-     * Cookie에 Refresh 토큰 저장
+     * Cookie에 Access 토큰 저장
      */
     public void addJwtToCookie(String token, HttpServletResponse response) {
         String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8)
                 .replaceAll("\\+", "%20");
 
-        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, encodedToken);
+        Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, encodedToken);
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         cookie.setPath("/");
-        cookie.setMaxAge(Math.toIntExact(REFRESH_TOKEN_TIME));
+        cookie.setMaxAge(Math.toIntExact(ACCESS_TOKEN_TIME));
 
         response.addCookie(cookie);
     }
@@ -115,13 +117,13 @@ public class JwtProvider {
     /**
      * HttpServletRequest에 들어있는 Cookie에서 Refresh 토큰 가져오기
      */
-    public String getRefreshTokenFromRequest(HttpServletRequest request) {
+    public String getAccessTokenFromRequest(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return null;
         }
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(REFRESH_TOKEN_COOKIE_NAME)) {
+            if (cookie.getName().equals(ACCESS_TOKEN_COOKIE_NAME)) {
                 return URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8)
                         .substring(7);
             }
@@ -151,11 +153,10 @@ public class JwtProvider {
     /**
      * Refresh 토큰 검증
      */
-    public boolean validateRefreshToken(String token) {
+    public boolean hasRefreshToken(String username) {
         log.info("Refresh 토큰 검증");
-        String username = getUsernameFromToken(token);
-        // 비어 있지 않으면 true 반환
-        return !refreshTokenAdapter.findByUsername(username).getRefreshToken().isBlank();
+        // redis에서 토큰에 맞는 키가 존재하면 true
+        return Boolean.TRUE.equals(redisTemplate.hasKey(username));
     }
 
     /**
@@ -172,6 +173,8 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             // 토큰이 만료된 경우에도 가져옴
             return e.getClaims().getSubject();
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 
@@ -197,5 +200,16 @@ public class JwtProvider {
             return tokenValue.substring(BEARER_PREFIX.length());
         }
         throw new NullPointerException("토큰이 없습니다.");
+    }
+
+    /**
+     * 쿠키 무효화
+     */
+    public static void clearCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 }
