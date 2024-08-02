@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.productImages.dto;
+package com.sparta.itsmine.domain.images.dto;
 
 import lombok.Getter;
 

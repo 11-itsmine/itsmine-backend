@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.productImages.entity;
+package com.sparta.itsmine.domain.images.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 

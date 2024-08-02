@@ -4,9 +4,9 @@ import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.category.entity.Category;
+import com.sparta.itsmine.domain.images.entity.Images;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
-import com.sparta.itsmine.domain.productImages.entity.ProductImages;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.CascadeType;
@@ -81,7 +81,7 @@ public class Product extends TimeStamp {
     private User user;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ProductImages> productImagesList = new ArrayList<>();
+    private List<Images> imagesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Auction> auction = new ArrayList<>();
@@ -161,8 +161,8 @@ public class Product extends TimeStamp {
     }
 
     public List<String> getImageUrls() {
-        return productImagesList.stream()
-                .map(ProductImages::getImagesUrl)
+        return imagesList.stream()
+                .map(Images::getImagesUrl)
                 .collect(Collectors.toList());
     }
 }

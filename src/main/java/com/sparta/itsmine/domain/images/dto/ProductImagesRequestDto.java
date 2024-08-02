@@ -1,4 +1,4 @@
-package com.sparta.itsmine.domain.productImages.dto;
+package com.sparta.itsmine.domain.images.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -5,7 +5,7 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
 import lombok.Getter;
 
 @Getter
