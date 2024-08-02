@@ -2,11 +2,11 @@ const SORT_LIST = [
   {
     id: 1,
     value: 'sales',
-    title: '인기순',
+    title: '인기순', // like 가 많은 순
   },
   {
     id: 2,
-    value: 'release_date',
+    value: 'createdAt',
     title: '발매일순',
   },
   {
@@ -17,12 +17,7 @@ const SORT_LIST = [
   {
     id: 4,
     value: 'sell_now',
-    title: '즉시 판매가 높은순',
-  },
-  {
-    id: 5,
-    value: 'premium',
-    title: '프리미엄순',
+    title: '현재 구매가 높은순',
   },
 ];
 

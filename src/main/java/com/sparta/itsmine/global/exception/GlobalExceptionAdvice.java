@@ -3,7 +3,6 @@ package com.sparta.itsmine.global.exception;
 import static com.sparta.itsmine.global.common.response.ResponseUtils.of;
 
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
-import com.sparta.itsmine.global.exception.category.CategoryException;
 import com.sparta.itsmine.global.exception.product.ProductException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +22,6 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(ProductException.class)
     public ResponseEntity<HttpResponseDto> handlerProductException(ProductException e) {
-        log.error("에러 메세지: ", e);
-        return of(e.getResponseExceptionEnum());
-    }
-
-    @ExceptionHandler(CategoryException.class)
-    public ResponseEntity<HttpResponseDto> handlerCategoryException(CategoryException e) {
         log.error("에러 메세지: ", e);
         return of(e.getResponseExceptionEnum());
     }

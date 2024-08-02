@@ -126,7 +126,8 @@ const SignUp = () => {
           <SignUpBtn type="submit">Sign Up</SignUpBtn>
           <GridContainer>
             <GridItem>
-              <Link href="/login">Already have an account? Sign in</Link>
+              <Link href="/itsmine/login">Already have an account? Sign
+                in</Link>
             </GridItem>
           </GridContainer>
         </Form>

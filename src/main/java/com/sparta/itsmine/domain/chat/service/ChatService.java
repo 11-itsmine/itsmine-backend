@@ -12,7 +12,6 @@ import com.sparta.itsmine.domain.chat.entity.ChatStatus;
 import com.sparta.itsmine.domain.chat.entity.Message;
 import com.sparta.itsmine.domain.chat.repository.BlackListRepository;
 import com.sparta.itsmine.domain.chat.repository.ChatRoomRepository;
-import com.sparta.itsmine.domain.chat.repository.MessageRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.global.exception.DataDuplicatedException;
@@ -23,11 +22,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
 @Slf4j
 @Service
@@ -36,9 +35,12 @@ public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
-    private final MessageRepository messageRepository;
     private final BlackListRepository blackListRepository;
-    private final MongoTemplate mongoTemplate;
+    private final DynamoDbEnhancedClient dynamoDbEnhancedClient;
+
+    private DynamoDbTable<Message> getMessageTable() {
+        return dynamoDbEnhancedClient.table("message", TableSchema.fromBean(Message.class));
+    }
 
     /**
      * 내가 지금 참여하고 있는 채팅방 리스트를 불러 옵니다.
@@ -86,10 +88,14 @@ public class ChatService {
      */
     public List<Message> getMessageList(String roomId) {
 
-        chatRoomRepository.findByRoomId(roomId).orElseThrow(
-                () -> new DataNotFoundException(CHAT_ROOM_NOT_FOUND)
-        );
-        return messageRepository.findAllByRoomId(roomId).stream()
+        chatRoomRepository.findByRoomId(roomId)
+                .orElseThrow(() -> new DataNotFoundException(CHAT_ROOM_NOT_FOUND));
+        DynamoDbTable<Message> messageTable = getMessageTable();
+
+        return messageTable.scan()
+                .items()
+                .stream()
+                .filter(message -> message.getRoomId().equals(roomId))
                 .sorted(Comparator.comparing(Message::getTime))
                 .collect(Collectors.toList());
     }
@@ -106,16 +112,10 @@ public class ChatService {
 
         chatRoom.userStatusUpdate(user);
 
-        if (chatRoom.getFromUserStatus().equals(ChatStatus.END)
-                && chatRoom.getToUserStatus().equals(ChatStatus.END)) {
-            //messageRepository.delete를 하면 삭제가 되지 않아 Query 클래스 활용
-            Query query = new Query();
-            query.addCriteria(Criteria.where("roomId").is(roomId));
-
+        if (chatRoom.getFromUserStatus().equals(ChatStatus.END) && chatRoom.getToUserStatus()
+                .equals(ChatStatus.END)) {
             chatRoomRepository.delete(chatRoom);
-
-            mongoTemplate.remove(query, Message.class);
-
+            deleteMessagesByRoomId(roomId);
         }
 
     }
@@ -127,7 +127,8 @@ public class ChatService {
      */
     public void saveMessage(MessageRequestDto requestDto) {
         Message message = new Message(requestDto);
-        messageRepository.save(message);
+        DynamoDbTable<Message> messageTable = getMessageTable();
+        messageTable.putItem(message);
     }
 
     /**
@@ -179,4 +180,17 @@ public class ChatService {
         );
     }
 
+
+    private void deleteMessagesByRoomId(String roomId) {
+        DynamoDbTable<Message> messageTable = getMessageTable();
+        List<Message> messages = messageTable.scan()
+                .items()
+                .stream()
+                .filter(message -> message.getRoomId().equals(roomId))
+                .toList();
+
+        for (Message message : messages) {
+            messageTable.deleteItem(message);
+        }
+    }
 }
