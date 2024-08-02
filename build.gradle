@@ -92,9 +92,6 @@ dependencies {
     // active mq
     implementation 'org.springframework.boot:spring-boot-starter-activemq'
 
-    // MongoDB
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     // DynamoDB
     implementation 'software.amazon.awssdk:dynamodb-enhanced:2.17.28'
