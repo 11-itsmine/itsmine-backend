@@ -53,7 +53,8 @@ const ProductCreatePage = () => {
     });
 
     try {
-      const response = await axiosInstance.post('http://localhost:8080/s3/upload',
+      const response = await axiosInstance.post(
+          'http://localhost:8080/s3/upload',
           formData, {
             headers: {
               'Content-Type': 'multipart/form-data'

@@ -45,11 +45,10 @@ public class Product extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String productName;
     @Column(nullable = false)
     private String description;
-    // TODO : 시작 가격을 명시해주고 추적하자
     @Column(nullable = false)
     private Integer startPrice;
     @Column

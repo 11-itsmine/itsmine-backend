@@ -8,8 +8,9 @@ Content-Type: application/json
   "name":"{{name}}",
   "email":"{{email}}",
   "address": "화성시",
-  "nickname": "Jak213"
+  "nickname": "Jack2"
 }
+
 
 ### 로그인
 POST http://localhost:8080/users/login
@@ -20,9 +21,9 @@ Content-Type: application/json
   "password":"{{password}}"
 }
 > {%
-  client.log(response.body.data);
+  client.log(response.headers.valueOf("Authorization"));
   client.log(response.headers.valueOf("RefreshToken"));
-  client.global.set("Authorization", response.body.data);
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
   client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
 
@@ -33,7 +34,7 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "categoryName": "중고"
+  "categoryName": "뉴딜"
 }
 
 
@@ -44,7 +45,7 @@ Content-Type: application/json
 
 {
   "productCreateDto": {
-    "productName": "상품16",
+    "productName": "상품1",
     "description": "상품 설명입니다",
     "auctionNowPrice": 1000,
     "startPrice": 1000,
@@ -60,10 +61,6 @@ Content-Type: application/json
     ]
   }
 }
-
-
-
-
 
 
 ### 특정 상품 조회하기
