@@ -19,46 +19,48 @@ spring:
     user: ${ACTIVEMQ_USER}
     password: ${ACTIVEMQ_PASSWORD}
   datasource:
-    url: jdbc:mysql://${DB_URL}/itsmine
+    url: jdbc:mariadb://${DB_URL}/itsmine
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  # mariaDB
-  #  datasource:
-  #    url: jdbc:mariadb://${DB_URL}/itsmine
-  #    username: ${DB_USER}
-  #    password: ${DB_PASSWORD}
-  #    driver-class-name: org.mariadb.jdbc.Driver
-  sql:
-    init:
-      encoding: UTF-8
+    driver-class-name: org.mariadb.jdbc.Driver
 
-  jpa:
+# 로컬용
+#   datasource:
+#     url: jdbc:mysql://${DB_URL}/itsmine
+#     username: ${DB_USER}
+#     password: ${DB_PASSWORD}
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+
+sql:
+  init:
+    encoding: UTF-8
+
+jpa:
+  hibernate:
+    ddl-auto: update
+  properties:
     hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        connection:
-          CharSet: utf-8
-          characterEncoding: utf-8
-          useUnicode: true
+      show_sql: true
+      format_sql: true
+      connection:
+        CharSet: utf-8
+        characterEncoding: utf-8
+        useUnicode: true
 
-  web:
-    resources:
-      static-locations: classpath:/static/
+web:
+  resources:
+    static-locations: classpath:/static/
 
-  thymeleaf:
-    suffix: .html
-    prefix: classpath:templates/
+thymeleaf:
+  suffix: .html
+  prefix: classpath:templates/
 
-  profiles:
-    include:
-      - aws
+profiles:
+  include:
+    - aws
 
-  main:
-    allow-bean-definition-overriding: true
+main:
+  allow-bean-definition-overriding: true
 
 jwt-secret-key: ${JWT_KEY}
 
