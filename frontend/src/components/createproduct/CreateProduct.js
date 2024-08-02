@@ -1,7 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import { Box, Button, Container, Grid, TextField, Typography, IconButton, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  Container,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography
+} from '@mui/material';
+import {useNavigate} from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const ProductCreatePage = () => {
@@ -31,7 +43,9 @@ const ProductCreatePage = () => {
 
   const handleImageChange = async (event) => {
     const files = event.target.files;
-    if (!files.length) return;
+    if (!files.length) {
+      return;
+    }
 
     const formData = new FormData();
     Array.from(files).forEach((file) => {
@@ -39,11 +53,12 @@ const ProductCreatePage = () => {
     });
 
     try {
-      const response = await axios.post('http://localhost:8080/s3/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await axios.post('http://localhost:8080/s3/upload',
+          formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
       const newImageUrls = [...imageUrls, ...response.data.imagesUrl];
       setImageUrls(newImageUrls.slice(0, 5)); // 최대 5개 이미지 저장
     } catch (error) {
@@ -83,7 +98,7 @@ const ProductCreatePage = () => {
         }
       });
 
-      navigate('/'); // 상품 등록 후 홈 페이지로 이동
+      navigate('/itsmine'); // 상품 등록 후 홈 페이지로 이동
     } catch (error) {
       console.error('Error creating product:', error);
       alert("상품 등록이 불가능합니다 해당 상품의 이름과 정보를 다시 한번 확인해주세요.");
@@ -91,8 +106,8 @@ const ProductCreatePage = () => {
   };
 
   return (
-      <Container sx={{ backgroundColor: '#f2f2f2', padding: 3, borderRadius: 2 }}>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+      <Container sx={{backgroundColor: '#f2f2f2', padding: 3, borderRadius: 2}}>
+        <Box component="form" onSubmit={handleSubmit} sx={{mt: 3}}>
           <Typography variant="h4" component="h1" gutterBottom>
             상품 등록
           </Typography>
@@ -100,19 +115,28 @@ const ProductCreatePage = () => {
             <Grid item xs={12}>
               <Button variant="contained" component="label">
                 이미지 업로드
-                <input type="file" hidden onChange={handleImageChange} multiple />
+                <input type="file" hidden onChange={handleImageChange}
+                       multiple/>
               </Button>
             </Grid>
             <Grid item xs={12}>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2 }}>
+              <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2}}>
                 {imageUrls.map((url, index) => (
-                    <Box key={index} sx={{ position: 'relative', width: '18%', height: 'auto' }}>
-                      <img src={url} alt={`이미지 ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Box key={index} sx={{
+                      position: 'relative',
+                      width: '18%',
+                      height: 'auto'
+                    }}>
+                      <img src={url} alt={`이미지 ${index + 1}`} style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}/>
                       <IconButton
                           onClick={() => handleImageDelete(index)}
-                          sx={{ position: 'absolute', top: 0, right: 0 }}
+                          sx={{position: 'absolute', top: 0, right: 0}}
                       >
-                        <DeleteIcon />
+                        <DeleteIcon/>
                       </IconButton>
                     </Box>
                 ))}
@@ -186,7 +210,8 @@ const ProductCreatePage = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary" fullWidth>
+              <Button type="submit" variant="contained" color="primary"
+                      fullWidth>
                 등록
               </Button>
             </Grid>

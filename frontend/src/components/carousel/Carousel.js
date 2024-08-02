@@ -5,12 +5,13 @@ import {FaCaretLeft, FaCaretRight} from 'react-icons/fa';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-const SlickArrowLeft = ({currentSlide, slideCount, ...props}) => (
-    <FaCaretLeft {...props} />
-);
-const SlickArrowRight = ({currentSlide, slideCount, ...props}) => (
-    <FaCaretRight {...props} />
-);
+const SlickArrowLeft = styled(FaCaretLeft)`
+  color: black; // Change color to black
+`;
+
+const SlickArrowRight = styled(FaCaretRight)`
+  color: black; // Change color to black
+`;
 
 const settings = {
   dots: true,
@@ -30,7 +31,7 @@ const Carousel = () => {
         {thumbnail.map(item => {
           return (
               <ImageContainer key={item.id}>
-                <Img src={item.url} backgroundColor={item.background}/>
+                <Img src={item.url} $backgroundColor={item.background}/>
               </ImageContainer>
           );
         })}
@@ -63,7 +64,6 @@ const StyledSlider = styled(Slider)`
     left: 3.125rem;
     width: 2.5rem;
     height: 5rem;
-    color: ${props => props.theme.colors.red};
     opacity: 0.5;
   }
 
@@ -71,7 +71,6 @@ const StyledSlider = styled(Slider)`
     right: 3.125rem;
     width: 2.5rem;
     height: 5rem;
-    color: ${props => props.theme.colors.red};
     opacity: 0.5;
   }
 `;
@@ -90,14 +89,15 @@ const ImageContainer = styled.div`
 `;
 
 const thumbnail = [
-  {id: 1, url: '/images/banner/appliance.png', background: 'rgb(94, 0, 215)'},
-  {id: 2, url: '/images/banner/babyAndKids.png', background: 'rgb(0, 198, 91)'},
+  {id: 1, url: '/images/banner/hanhwa.png', background: 'rgb(249, 249, 249)'},
+  {id: 2, url: '/images/ours/성찬.png', background: 'rgb(249, 249, 249)'},
   {
     id: 3,
-    url: '/images/banner/cookingPot.png',
+    url: '/images/ours/장현.png',
     background: 'rgb(249, 249, 249)'
   },
-  {id: 4, url: '/images/banner/couch.png', background: 'rgb(12, 129, 237)'},
-  {id: 5, url: '/images/banner/makeup.png', background: 'rgb(243, 241, 236)'},
-  {id: 6, url: '/images/banner/pc.png', background: 'rgb(255, 238, 244)'},
+  {id: 4, url: '/images/ours/순모.png', background: 'rgb(249, 249, 249)'},
+  {id: 5, url: '/images/ours/동우님.png', background: 'rgb(249, 249, 249)'},
+  {id: 6, url: '/images/ours/정빈.png', background: 'rgb(249, 249, 249)'},
+  {id: 7, url: '/images/banner/nbcamp.png', background: 'rgb(249, 249, 249)'}
 ];

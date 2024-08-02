@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
-
 import Item from "./Item";
 import SearchBar from "./SearchBar";
 import Banner from "./Banner";
@@ -16,10 +15,10 @@ const ItemList = () => {
   const [selectCategory, setSelectCategory] = useState({});
   const [selectPrice, setSelectPrice] = useState({});
   const [userInput, setUserInput] = useState('');
-  const [optionValue, setOptionValue] = useState('sales');
-  const [limit, setLimit] = useState(8);
+  const [optionValue, setOptionValue] = useState('createdAt'); // Default sort by createdAt
+  const [limit] = useState(8); // Number of items per page
+  const [page, setPage] = useState(0); // Current page number
   const [isScrolled, setIsScrolled] = useState(false);
-  const [page, setPage] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,14 +48,15 @@ const ItemList = () => {
   };
 
   useEffect(() => {
-    const categoryString = selectCategory.query
-        ? `&category=${selectCategory.query}` : '';
-    const priceString = selectPrice.query ? `&price=${selectPrice.query}` : '';
-
     const fetchProducts = async () => {
+      const categoryString = selectCategory.query
+          ? `&category=${selectCategory.query}` : '';
+      const priceString = selectPrice.query ? `&price=${selectPrice.query}`
+          : '';
+
       try {
         const response = await fetch(
-            `https://localhost:8080/products?page=${page}&size=${limit}${categoryString}${priceString}&search=${userInput}&sort=${optionValue}`,
+            `http://localhost:8080/products?page=${page}&size=${limit}${categoryString}${priceString}&search=${userInput}&sort=${optionValue}`,
             {
               method: 'GET',
               headers: {
@@ -184,20 +184,27 @@ const ItemList = () => {
                   <ItemsList>
                     {productsList.map(product => {
                       const {
-                        product_id,
-                        eng_name,
-                        kor_name,
-                        thumbnail_url,
-                        price,
+                        id,
+                        productName,
+                        description,
+                        startPrice,
+                        currentPrice,
+                        auctionNowPrice,
+                        dueDate,
+                        category,
+                        productImagesList,
+                        status,
+                        like
                       } = product;
                       return (
                           <Item
-                              key={product_id}
-                              eng_name={eng_name}
-                              kor_name={kor_name}
-                              price={price}
-                              thumbnail_url={thumbnail_url}
-                              productId={product_id}
+                              key={id}
+                              eng_name={productName}
+                              kor_name={description}
+                              price={currentPrice}
+                              thumbnail_url={productImagesList.length > 0
+                                  ? productImagesList[0] : ''}
+                              productId={id}
                           />
                       );
                     })}
@@ -213,6 +220,7 @@ const ItemList = () => {
       </ContentWrapper>
   );
 };
+
 export default ItemList;
 
 const ContentWrapper = styled.div`
