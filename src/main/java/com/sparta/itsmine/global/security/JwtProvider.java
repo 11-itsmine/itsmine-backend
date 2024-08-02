@@ -103,7 +103,6 @@ public class JwtProvider {
     /**
      * 요청 바디에서 액세스 토큰 추출
      */
-
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
