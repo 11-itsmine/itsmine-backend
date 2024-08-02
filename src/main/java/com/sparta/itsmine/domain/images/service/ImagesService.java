@@ -1,11 +1,12 @@
-package com.sparta.itsmine.domain.productImages.service;
+package com.sparta.itsmine.domain.images.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.images.entity.Images;
+import com.sparta.itsmine.domain.images.respository.ImagesRepository;
+import com.sparta.itsmine.domain.images.util.ImageType;
 import com.sparta.itsmine.domain.product.entity.Product;
-import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
-import com.sparta.itsmine.domain.productImages.entity.ProductImages;
-import com.sparta.itsmine.domain.productImages.respository.ProductImagesRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.exception.productimages.InvalidURLException;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
@@ -19,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,10 +28,10 @@ import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.IN
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProductImagesService {
+public class ImagesService {
 
     private final AmazonS3 amazonS3;
-    private final ProductImagesRepository productImagesRepository;
+    private final ImagesRepository imagesRepository;
 
     @Value("${CLOUD_AWS_S3_DOMAIN}")
     private String CLOUD_FRONT_DOMAIN_NAME;
@@ -49,6 +49,45 @@ public class ProductImagesService {
 
         amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
         return CLOUD_FRONT_DOMAIN_NAME+"/"+originalFilename;
+    }
+
+    // ProductImages 엔티티 생성 및 저장
+    public void createProductImages(ProductImagesRequestDto imagesRequestDto, Product product) {
+        List<String> imagesUrl = imagesRequestDto.getImagesUrl();
+        for (String imageUrl : imagesUrl) {
+            Images images = new Images(imageUrl, ImageType.PRODUCT ,product);
+            product.getImagesList().add(images);
+            imagesRepository.save(images);
+        }
+    }
+
+    // 프로필 업로드 메소드
+    @Transactional
+    public String uploadProfile(MultipartFile file, UserDetailsImpl userDetails) throws IOException {
+        String originalFilename = file.getOriginalFilename();
+        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalFilename;
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(file.getContentType());
+        metadata.setContentLength(file.getSize());
+
+        amazonS3.putObject(bucket, s3FileName, file.getInputStream(), metadata);
+        String profileURL = CLOUD_FRONT_DOMAIN_NAME + "/" + s3FileName;
+
+        User user = userDetails.getUser();
+
+        // 이전 프로필 이미지 삭제
+        Images existingProfileImage = imagesRepository.findByUserAndContentType(user, ImageType.PROFILE);
+        if (existingProfileImage != null) {
+            deleteFile(existingProfileImage.getImagesUrl());
+            imagesRepository.delete(existingProfileImage);
+        }
+
+        // 새로운 프로필 이미지 저장
+        Images profileImage = new Images(profileURL, ImageType.PROFILE, user);
+        imagesRepository.save(profileImage);
+
+        return "프로필 업로드 완료";
     }
 
     // 파일 삭제 메소드
@@ -69,17 +108,7 @@ public class ProductImagesService {
         }
     }
 
-    // ProductImages 엔티티 생성 및 저장
-    public void createProductImages(ProductImagesRequestDto imagesRequestDto, Product product) {
-        List<String> imagesUrl = imagesRequestDto.getImagesUrl();
-        for (String imageUrl : imagesUrl) {
-            ProductImages productImages = new ProductImages(imageUrl, product);
-            product.getProductImagesList().add(productImages);
-            productImagesRepository.save(productImages);
-        }
-    }
-
-//    // 여러 파일 업로드 메소드
+    //    // 여러 파일 업로드 메소드
 //    public List<String> saveFiles(List<MultipartFile> multipartFiles) throws IOException {
 //        List<String> fileUrls = new ArrayList<>();
 //        for (MultipartFile file : multipartFiles) {
@@ -88,37 +117,6 @@ public class ProductImagesService {
 //        }
 //        return fileUrls;
 //    }
-
-
-    // 프로필 업로드 메소드
-//    @Transactional
-//    public String uploadProfile(MultipartFile file, UserDetailsImpl userDetails) {
-//        String originalFilename = file.getOriginalFilename();
-//        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalFilename;
-//
-//        ObjectMetadata metadata = new ObjectMetadata();
-//        metadata.setContentType(file.getContentType());
-//        metadata.setContentLength(file.getSize());
-//
-//        String profileURL;
-//        try {
-//            amazonS3.putObject(bucket, s3FileName, file.getInputStream(), metadata);
-//            profileURL = amazonS3.getUrl(bucket, s3FileName).toString();
-//        } catch (IOException e) {
-//            log.error("업로드 중 오류가 발생했습니다.", e);
-//            throw new IllegalArgumentException("업로드 중 오류가 발생했습니다.");
-//        }
-//
-//        User user = userDetails.getUser();
-//
-//        if (user.getProfileUrl() != null) {
-//            deleteFile(user.getProfileUrl());
-//        }
-//
-//        user.updateProfileUrl(profileURL);
-//        userRepository.save(user);
-//
-//        return "프로필 업로드 완료";
-//    }
 }
+
 

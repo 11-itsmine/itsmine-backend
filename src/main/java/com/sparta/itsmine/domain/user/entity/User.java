@@ -1,16 +1,15 @@
 package com.sparta.itsmine.domain.user.entity;
 
+import com.sparta.itsmine.domain.images.entity.Images;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.TimeStamp;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,6 +53,9 @@ public class User extends TimeStamp {
     private String address;
 
     private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Images> imagesList = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "user")
 //    private List<JoinChat> joinChatList;

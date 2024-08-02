@@ -2,7 +2,7 @@ package com.sparta.itsmine.domain.product.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
 import lombok.Getter;
 
 @Getter
