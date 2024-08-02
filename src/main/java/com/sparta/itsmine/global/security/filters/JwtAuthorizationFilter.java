@@ -1,5 +1,7 @@
 package com.sparta.itsmine.global.security.filters;
 
+import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
@@ -96,8 +98,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		UserRole role = jwtProvider.getRoleFromToken(token);
 		String newAccessToken = jwtProvider.createAccessToken(username, role);
 
-		jwtProvider.setHeaderAccessToken(res, newAccessToken);
-		setAuthentication(jwtProvider.getUsernameFromToken(jwtProvider.substringToken(newAccessToken)));
+		res.setHeader(AUTHORIZATION_HEADER, newAccessToken);
+		setAuthentication(jwtProvider.getUsernameFromToken(newAccessToken));
 
 		String jsonResponse = new ObjectMapper().writeValueAsString(
 			new HttpResponseDto(HttpStatus.OK.value(), "토큰 갱신 성공", newAccessToken)
