@@ -98,4 +98,22 @@ jobs:
               -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
               -e AWS_REGION=${{ secrets.AWS_REGION }} \
               -e AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }} \
+              -e RABBITMQ_BROKER=${{ secrets.RABBITMQ_BROKER }} \
+              -e RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }} \
+              -e RABBITMQ_USERNAME=${{ secrets.RABBITMQ_USERNAME }} \
+              -e RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }} \
+              -e RABBITMQ_VIRTUAL_HOST=${{ secrets.RABBITMQ_VIRTUAL_HOST }} \
+              -e REDIS_DOMAIN=${{ secrets.REDIS_DOMAIN }} \
+              -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
+              -e ACTIVEMQ_BROKER=${{ secrets.ACTIVEMQ_BROKER }} \
+              -e ACTIVEMQ_USER=${{ secrets.ACTIVEMQ_USER }} \
+              -e ACTIVEMQ_PASSWORD=${{ secrets.ACTIVEMQ_PASSWORD }} \
+              -e CLOUD_AWS_S3_BUCKET=${{ secrets.CLOUD_AWS_S3_BUCKET }} \
+              -e CLOUD_AWS_S3_DOMAIN=${{ secrets.CLOUD_AWS_S3_DOMAIN }} \
+              -e CLOUD_AWS_REGION_STATIC=${{ secrets.CLOUD_AWS_REGION_STATIC }} \
+              -e CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }} \
+              -e CLOUD_AWS_CREDENTIALS_SECRETKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }} \
+              -e CLOUD_AWS_DYNAMODB_ACCESSKEY=${{ secrets.CLOUD_AWS_DYNAMODB_ACCESSKEY }} \
+              -e CLOUD_AWS_DYNAMODB_SECRETKEY=${{ secrets.CLOUD_AWS_DYNAMODB_SECRETKEY }} \
+              -e ACTIVEMQ_QNAME=${{ secrets.ACTIVEMQ_QNAME }} \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
