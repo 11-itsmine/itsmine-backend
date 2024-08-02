@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
-
 import Item from "./Item";
-
 import SearchBar from "./SearchBar";
 import Banner from "./Banner";
 import Category from "./Category";
@@ -12,22 +10,24 @@ import BANNER_LIST from "../Data/bannerListData";
 import {CATEGORY_FILTER, PRICE_FILTER} from "../Data/categoryData";
 import ItemNotFound from "./ItemNotFound";
 
-const OFFSET = 0;
-
 const ItemList = () => {
   const [productsList, setProductsList] = useState([]);
   const [selectCategory, setSelectCategory] = useState({});
   const [selectPrice, setSelectPrice] = useState({});
   const [userInput, setUserInput] = useState('');
-  const [optionValue, setOptionValue] = useState('sales');
-  const [limit, setLimit] = useState(8);
+  const [optionValue, setOptionValue] = useState('createdAt'); // Default sort by createdAt
+  const [limit] = useState(8); // Number of items per page
+  const [page, setPage] = useState(0); // Current page number
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    window.addEventListener('scroll', () => {
+    const handleScroll = () => {
       const isTop = window.scrollY < 500;
       setIsScrolled(!isTop);
-    });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleGoToTop = () => {
@@ -40,61 +40,73 @@ const ItemList = () => {
   const handleInput = e => {
     e.preventDefault();
     setUserInput(e.target.search.value);
+    setPage(0); // Reset page on new search
   };
 
-  const loadQueryString = `&offset=${OFFSET}&limit=${limit}`;
   const loadMore = () => {
-    if (limit > 64) {
-      alert('상품이 더 이상 없습니다!');
-    } else {
-      setLimit(limit + 8);
-    }
+    setPage(prevPage => prevPage + 1);
   };
 
   useEffect(() => {
-    const categoryString = selectCategory.query
-        ? `&category=${selectCategory.query}`
-        : '';
-    const priceString = selectPrice.query ? `&price=${selectPrice.query}` : '';
+    const fetchProducts = async () => {
+      const categoryString = selectCategory.query
+          ? `&category=${selectCategory.query}` : '';
+      const priceString = selectPrice.query ? `&price=${selectPrice.query}`
+          : '';
 
-    fetch(
-        `https://localhost:8080/products?${categoryString}${priceString}&search=${userInput}&sort=${optionValue}${loadQueryString}`,
-        {
-          method: 'GET',
+      try {
+        const response = await fetch(
+            `http://localhost:8080/products?page=${page}&size=${limit}${categoryString}${priceString}&search=${userInput}&sort=${optionValue}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem(
+                    'Authorization')}`,
+              },
+            });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch');
         }
-    )
-    .then(res => res.json())
-    .then(data => {
-      setProductsList(data.product_list);
-    });
-  }, [selectCategory, selectPrice, userInput, optionValue, loadQueryString]);
 
-  const handelCategory = category => {
-    if (selectCategory.name === category.name) {
-      setSelectCategory({});
-    } else {
-      setSelectCategory(category);
-    }
+        const data = await response.json();
+        setProductsList(
+            prevProducts => (page === 0 ? data.content : [...prevProducts,
+              ...data.content]));
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, [selectCategory, selectPrice, userInput, optionValue, page, limit]);
+
+  const handleCategory = category => {
+    setSelectCategory(
+        prevCategory => (prevCategory.name === category.name ? {} : category));
+    setPage(0); // Reset page on filter change
   };
 
-  const handelPrice = price => {
-    if (selectPrice.name === price.name) {
-      setSelectPrice({});
-    } else {
-      setSelectPrice(price);
-    }
+  const handlePrice = price => {
+    setSelectPrice(prevPrice => (prevPrice.name === price.name ? {} : price));
+    setPage(0); // Reset page on filter change
   };
 
-  const deleteALLFilter = () => {
+  const deleteAllFilters = () => {
     setSelectCategory({});
     setSelectPrice({});
+    setPage(0); // Reset page on filter reset
   };
 
   const deleteFilter = selectedCategory => {
-    setSelectCategory(
-        selectCategory === selectedCategory ? {} : selectCategory
-    );
-    setSelectPrice(selectPrice === selectedCategory ? {} : selectPrice);
+    if (selectCategory === selectedCategory) {
+      setSelectCategory({});
+    }
+    if (selectPrice === selectedCategory) {
+      setSelectPrice({});
+    }
+    setPage(0); // Reset page on filter removal
   };
 
   const isCategorySelected = selectCategory.name || selectPrice.name;
@@ -106,11 +118,9 @@ const ItemList = () => {
         <SearchBar handleInput={handleInput} userInput={userInput}/>
         <BannerWrapper>
           <BannerList>
-            {BANNER_LIST.map(banner => {
-              return (
-                  <Banner key={banner.id} src={banner.src} text={banner.text}/>
-              );
-            })}
+            {BANNER_LIST.map(banner => (
+                <Banner key={banner.id} src={banner.src} text={banner.text}/>
+            ))}
           </BannerList>
         </BannerWrapper>
         <Content>
@@ -120,19 +130,19 @@ const ItemList = () => {
               {isCategorySelected && (
                   <>
                     <FilterStatus>{totalFilter}</FilterStatus>
-                    <FilterDelete onClick={deleteALLFilter}>모두 삭제</FilterDelete>
+                    <FilterDelete onClick={deleteAllFilters}>모두
+                      삭제</FilterDelete>
                   </>
               )}
             </Filter>
-
             <Category
                 categorydata={CATEGORY_FILTER}
-                selectCategory={handelCategory}
+                selectCategory={handleCategory}
                 filterSelect={selectCategory}
             />
             <Price
                 categorydata={PRICE_FILTER}
-                selectPrice={handelPrice}
+                selectPrice={handlePrice}
                 filterSelect={selectPrice}
             />
           </SearchFilter>
@@ -142,18 +152,15 @@ const ItemList = () => {
                 {selectCategory.name && (
                     <FilterCategory>
                       {selectCategory.name}
-                      <DeleteButton
-                          onClick={() => deleteFilter(selectCategory)}>
-                        X
-                      </DeleteButton>
+                      <DeleteButton onClick={() => deleteFilter(
+                          selectCategory)}>X</DeleteButton>
                     </FilterCategory>
                 )}
                 {selectPrice.name && (
                     <FilterCategory>
                       {selectPrice.name}
-                      <DeleteButton onClick={() => deleteFilter(selectPrice)}>
-                        X
-                      </DeleteButton>
+                      <DeleteButton onClick={() => deleteFilter(
+                          selectPrice)}>X</DeleteButton>
                     </FilterCategory>
                 )}
               </FilterCategorys>
@@ -161,15 +168,14 @@ const ItemList = () => {
                 <Title
                     onChange={e => {
                       setOptionValue(e.target.value);
+                      setPage(0); // Reset page on sort change
                     }}
                 >
-                  {SORT_LIST.map(title => {
-                    return (
-                        <option key={title.id} value={title.value}>
-                          {title.title}
-                        </option>
-                    );
-                  })}
+                  {SORT_LIST.map(title => (
+                      <option key={title.id} value={title.value}>
+                        {title.title}
+                      </option>
+                  ))}
                 </Title>
               </SortingWrapper>
             </SearchOption>
@@ -178,20 +184,27 @@ const ItemList = () => {
                   <ItemsList>
                     {productsList.map(product => {
                       const {
-                        product_id,
-                        eng_name,
-                        kor_name,
-                        thumbnail_url,
-                        price,
+                        id,
+                        productName,
+                        description,
+                        startPrice,
+                        currentPrice,
+                        auctionNowPrice,
+                        dueDate,
+                        category,
+                        productImagesList,
+                        status,
+                        like
                       } = product;
                       return (
                           <Item
-                              key={product_id}
-                              eng_name={eng_name}
-                              kor_name={kor_name}
-                              price={price}
-                              thumbnail_url={thumbnail_url}
-                              productId={product_id}
+                              key={id}
+                              eng_name={productName}
+                              kor_name={description}
+                              price={currentPrice}
+                              thumbnail_url={productImagesList.length > 0
+                                  ? productImagesList[0] : ''}
+                              productId={id}
                           />
                       );
                     })}
@@ -207,6 +220,7 @@ const ItemList = () => {
       </ContentWrapper>
   );
 };
+
 export default ItemList;
 
 const ContentWrapper = styled.div`

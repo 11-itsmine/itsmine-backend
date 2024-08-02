@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Carousel from "../Components/carousel/Carousel";
-import ItemList from "../Components/item/ItemList";
+import Carousel from "../components/carousel/Carousel";
+import ItemList from "../components/item/ItemList";
 
 function Main() {
   return (

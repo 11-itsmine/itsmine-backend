@@ -1,22 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const SearchBar = ({ handleInput }) => {
+const SearchBar = ({handleInput}) => {
   return (
-    <SearchWrapper onSubmit={handleInput}>
-      <Input
-        name="search"
-        type="search"
-        placeholder="Search and Enter"
-        onFocus={e => {
-          e.target.placeholder = '';
-        }}
-        onBlur={e => {
-          e.target.placeholder = 'Search Anything';
-        }}
-        autoComplete="off"
-      />
-    </SearchWrapper>
+      <SearchWrapper onSubmit={handleInput}>
+        <Input
+            name="search"
+            type="search"
+            placeholder="Search and Enter"
+            onFocus={e => {
+              e.target.placeholder = '';
+            }}
+            onBlur={e => {
+              e.target.placeholder = 'Search Anything';
+            }}
+            autoComplete="off"
+        />
+      </SearchWrapper>
   );
 };
 
@@ -37,6 +37,7 @@ const Input = styled.input`
   margin-top: ${props => props.theme.margins.xxl};
   text-align: center;
   font-size: ${props => props.theme.fontSizes.titleSize};
+
   :focus {
     border-color: navy;
   }

@@ -1,5 +1,6 @@
 import React from 'react';
 import {FaGithub, FaInstagram} from 'react-icons/fa';
+import {RiNotionFill} from "react-icons/ri";
 import styled from 'styled-components';
 
 const Footer = () => {
@@ -19,10 +20,8 @@ const Footer = () => {
               href="https://www.notion.so/teamsparta/faf10b31eec04c97a18819caad6e1a54?pvs=4"
               target="_blank"
               rel="noopener noreferrer">
-            <img src="/images/icons8-개념-128.png" alt="Notion"
-                 style={{width: '24px', height: '24px'}}/>
+            <RiNotionFill/>
           </FooterLink>
-
         </FooterIcons>
         <Contents>이용안내</Contents>
         <Contents>고객지원</Contents>
@@ -43,16 +42,16 @@ const FooterContainer = styled.footer`
 `;
 
 const FooterIcons = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: ${props => props.theme.margins.xxl};
   cursor: pointer;
 
   svg {
-    margin-right: ${props => props.theme.margins.large};
-    margin-bottom: ${props => props.theme.margins.xxl};
-    font-size: ${props => props.theme.fontSizes.xxl};
-
-    &:last-child {
-      margin-right: 0;
-    }
+    width: 40px;
+    height: 40px;
+    margin: 0 10px;
   }
 `;
 
@@ -66,6 +65,7 @@ const FooterLink = styled.a`
 `;
 
 const Contents = styled.span`
+  display: block;
   margin-top: ${props => props.theme.margins.xxxl};
   padding: ${props => props.theme.paddings.large};
   cursor: pointer;
@@ -76,6 +76,7 @@ const ContentDetails = styled.div`
   padding: ${props => props.theme.paddings.xl};
   color: gray;
 `;
+
 const Reserved = styled.div`
   font-weight: bold;
   padding: ${props => props.theme.paddings.xl};
