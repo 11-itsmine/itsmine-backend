@@ -1,5 +1,6 @@
 package com.sparta.itsmine.global.security.filters;
 
+import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
@@ -84,7 +85,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtProvider.createRefreshToken(username, role);
 
         // 헤더에 액세스 토큰 추가
-//        res.setHeader(AUTHORIZATION_HEADER, accessToken);
+        res.setHeader(AUTHORIZATION_HEADER, accessToken);
 
         // 쿠키에 액세스 토큰 추가
         jwtProvider.addJwtToCookie(accessToken, res);
