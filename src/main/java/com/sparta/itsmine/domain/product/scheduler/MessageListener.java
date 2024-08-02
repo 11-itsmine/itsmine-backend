@@ -2,7 +2,7 @@ package com.sparta.itsmine.domain.product.scheduler;
 
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.FAIL_BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
-import static com.sparta.itsmine.global.common.config.RabbitConfig.PRODUCT_QUEUE_NAME;
+import static com.sparta.itsmine.global.common.config.RabbitConfig.DELAYED_QUEUE_NAME;
 
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
@@ -21,7 +21,7 @@ public class MessageListener {
     private final ProductRepository productRepository;
     private final AuctionRepository auctionRepository;
 
-    @RabbitListener(queues = PRODUCT_QUEUE_NAME)
+    @RabbitListener(queues = DELAYED_QUEUE_NAME)
     public void receiveMessage(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
