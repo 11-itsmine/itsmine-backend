@@ -14,14 +14,14 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-//    private final ChatPreHandler chatPreHandler;
-
     @Value("${spring.rabbitmq.username}")
     private String rabbitUser;
     @Value("${spring.rabbitmq.password}")
     private String rabbitPwd;
     @Value("${spring.rabbitmq.host}")
     private String rabbitHost;
+    @Value("${spring.activemq.broker-url}")
+    private String activeHost;
     @Value("${spring.rabbitmq.port}")
     private int rabbitPort;
     @Value("${spring.rabbitmq.virtual-host}")
@@ -36,9 +36,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setClientPasscode(rabbitPwd)
                 .setSystemLogin(rabbitUser)
                 .setSystemPasscode(rabbitPwd)
-                .setRelayHost(rabbitHost)
-                .setRelayPort(61613)
-                .setVirtualHost("/");
+                .setRelayHost(activeHost)
+                .setRelayPort(61614)
+                .setVirtualHost(rabbitVh);
 
         registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
