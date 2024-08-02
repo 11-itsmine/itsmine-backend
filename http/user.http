@@ -16,7 +16,7 @@ POST http://localhost:8080/users/login
 Content-Type: application/json
 
 {
-  "username":"seongchankim",
+  "username":"seongchankim3",
   "password":"12345678!@#ASD"
 }
 > {%client.global.set("Authorization", response.headers.valueOf("Authorization"));%}
@@ -29,7 +29,7 @@ Authorization: {{Authorization}}
 
 
 ### 유저 조회
-GET http://localhost:8080/users/5
+GET http://localhost:8080/users/profile
 Content-Type: application/json
 Authorization: {{Authorization}}
 

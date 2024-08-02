@@ -12,8 +12,8 @@ import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
-import com.sparta.itsmine.domain.productImages.dto.ProductImagesRequestDto;
-import com.sparta.itsmine.domain.productImages.service.ProductImagesService;
+import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.images.service.ImagesService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
 import java.time.Duration;
@@ -35,7 +35,7 @@ public class ProductService {
 
     private final ProductAdapter adapter;
     private final AuctionService auctionService;
-    private final ProductImagesService productImagesService;
+    private final ImagesService imagesService;
     private final MessageSenderService messageSenderService;
     private final ProductRepository productRepository;
 
@@ -52,7 +52,7 @@ public class ProductService {
         product.setCategory(category);
 
         Product newProduct = adapter.saveProduct(product);
-        productImagesService.createProductImages(imagesRequestDto, product);
+        imagesService.createProductImages(imagesRequestDto, product);
         scheduleProductUpdate(newProduct);
         return new ProductResponseDto(newProduct, imagesRequestDto);
     }
