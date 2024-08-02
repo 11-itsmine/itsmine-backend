@@ -2,45 +2,53 @@ package com.sparta.itsmine.domain.chat.controller;
 
 import com.sparta.itsmine.domain.chat.dto.MessageRequestDto;
 import com.sparta.itsmine.domain.chat.service.ChatService;
+import jakarta.jms.Queue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
 @Slf4j
 @RequiredArgsConstructor
-@RestController
+@Controller
 public class ChatController {
 
-    private static final String CHAT_QUEUE_NAME = "chat.queue";
-    private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
     private final ChatService chatService;
-    private final RabbitTemplate rabbitTemplate;
-
+    private final JmsTemplate jmsTemplate;
+    private final Queue queue; // Queue 빈 주입
 
     /**
-     * 웹소켓 통신을 할때 메세지를 보냅니다.
-     * <p>
-     * 메시지를 받을 공간 : /exchange/chat.exchange/room.{roomId},보내는 방식 : /pub/chat.message.{roomId}
+     * 클라이언트가 /app/chat.message.{chatRoomId}로 메시지를 전송할 때 호출됩니다.
+     * 메시지를 ActiveMQ로 전송합니다.
      *
-     * @param requestDto 메시지 보낼 정보를 담았습니다 누가 보냈는지 방의 ID가 뭔지 등입니다.
+     * @param requestDto 메시지 보낼 정보를 담고 있는 DTO
      */
     @MessageMapping("chat.message.{chatRoomId}")
     public void sendMessage(@Payload MessageRequestDto requestDto) {
-        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + requestDto.getRoomId(),
-                requestDto);
+        log.info("Sending message: {}", requestDto.getMessage());
+
+        // 메시지를 ActiveMQ의 특정 큐로 전송
+        jmsTemplate.convertAndSend(queue, requestDto);
     }
 
     /**
-     * 메시지 전송 큐 담당하는 곳입니다.. 메시지가 제대로 갔는지 안갔는지 로그를 통해 확인할수 있습니다.
-     * <p>
-     * 여기에서 mongoDB 저장을 합니다.
+     * ActiveMQ에서 메시지를 수신하여 WebSocket 클라이언트로 전달합니다.
+     * 수신한 메시지는 특정 채팅 방의 구독자에게 전송됩니다.
+     *
+     * @param requestDto 수신한 메시지를 담고 있는 DTO
      */
-    @RabbitListener(queues = CHAT_QUEUE_NAME)
-    public void receive(MessageRequestDto requestDto) {
+    @JmsListener(destination = "${activemq.queue.name}") // Queue 이름을 외부 설정으로부터 가져옴
+    public void receiveMessage(MessageRequestDto requestDto) {
+        log.info("Received message: {}", requestDto.getMessage());
+
+        // 메시지를 데이터베이스에 저장하는 서비스 호출
         chatService.saveMessage(requestDto);
+
+        // WebSocket 클라이언트에게 메시지 전송
+        // messagingTemplate.convertAndSend("/topic/room." + requestDto.getRoomId(), requestDto);
+        // 메시지 전송 로직 추가
     }
 }

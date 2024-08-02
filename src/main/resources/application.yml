@@ -4,10 +4,10 @@ server:
 spring:
   rabbitmq:
     host: b-74842f32-f57f-4c31-89d4-1f6d3c4703fc.mq.ap-northeast-2.amazonaws.com
-    port: ${RABBITMQ_PORT:5671} # RabbitMQ SSL port
-    username: ${RABBITMQ_USERNAME:itsmine1010}
-    password: ${RABBITMQ_PASSWORD:itsmine101010}
-    virtual-host: ${RABBITMQ_VIRTUAL_HOST:/}
+    port: ${RABBITMQ_PORT} # RabbitMQ SSL port
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST}
     ssl:
       enabled: true
   data:
@@ -16,9 +16,12 @@ spring:
       port: 6379
 
   activemq:
-    broker-url: b-58f9491d-c8de-422c-8b11-4a18f612ec43-1.mq.ap-northeast-2.amazonaws.com
-    user: itsmine1010
-    password: itsmine101010
+    broker-url: ${ACTIVEMQ-BROKER}
+    user: ${ACTIVEMQ-USER}
+    password: ${ACTIVEMQ-PASSWORD}
+    queue:
+      name: sample-queue
+
   
   # 배포 환경이라는 것은 각각 다양한 환경이 존재한다. 이때 각각의 주소가 다르다.
   # 이런것을 다 실행할때 각각을 하드코딩하면 제대로 사용할 수 없다. 이렇게 되면 따로 브랜치를 생성하는 식으로 관리를 해야한다.
@@ -28,11 +31,6 @@ spring:
     username: ${DB-USER}
     password: ${DB-PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  mongodb:
-    url: mongodb://localhost:27017/itsmine
-  sql:
-    init:
-      encoding: UTF-8
 
   jpa:
     hibernate:
@@ -64,6 +62,6 @@ jwt-secret-key: ${JWT-KEY}
 admin-token: ${ADMIN-TOKEN}
 
 activemq:
-  queue.name: sample-queue
+  queue.name: ${ACTIVEMQ-QNAME}
 
 
