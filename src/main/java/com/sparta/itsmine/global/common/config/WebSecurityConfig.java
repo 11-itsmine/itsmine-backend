@@ -61,6 +61,8 @@ public class WebSecurityConfig {
         // CSRF 설정
         http.csrf(AbstractHttpConfigurer::disable);
 
+
+
         // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
         http.sessionManagement((sessionManagement) ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -70,6 +72,8 @@ public class WebSecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(HttpMethod.POST, "/users", "/users/login").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/users/resign/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/chatrooms").permitAll()
+                .requestMatchers("/ws/**").permitAll()
                 .anyRequest().authenticated()
         );
 

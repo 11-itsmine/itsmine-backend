@@ -38,8 +38,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("*");
-        //.withSockJS();//SockJS 연결 주소
+                .setAllowedOrigins("http://localhost:3000/**")
+                .withSockJS();//SockJS 연결 주소
 
         // 주소 : ws://localhost:8080/ws
     }
