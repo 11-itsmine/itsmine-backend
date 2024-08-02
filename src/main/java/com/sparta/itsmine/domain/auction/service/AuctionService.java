@@ -16,6 +16,7 @@ import com.sparta.itsmine.domain.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,7 @@ public class AuctionService {
 
         if (bidPrice.equals(product.getAuctionNowPrice())) {
             successfulAuction(productId);
+            auction.updateStatus(SUCCESS_BID);
         } else {
             scheduleMessage(productId, product.getDueDate());
         }
@@ -75,15 +77,9 @@ public class AuctionService {
 
     @Transactional
     public void successfulAuction(Long productId) {
-        allDeleteBid(productId);
-        turnToSuccessBidProduct(productId);
+        List<Auction> failedBids = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
+        auctionRepository.deleteAll(failedBids);
         messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
-    }
-
-    private void turnToSuccessBidProduct(Long productId) {
-        Product product = productAdapter.getProduct(productId);
-        product.updateStatus(SUCCESS_BID);
-        productRepository.save(product);
     }
 
     public void allDeleteBid(Long productId) {

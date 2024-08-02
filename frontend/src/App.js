@@ -10,6 +10,7 @@ import {ThemeProvider} from "styled-components";
 import SignIn from "./components/auth/Signin";
 import theme from "./styles/theme";
 import ItemList from "./components/item/ItemList";
+import AuctionComponent from "./components/Auction/AuctionComponent";
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="/signup" element={<SignUp/>}/>
             <Route path="/products" element={<CreateProduct/>}/>
             <Route path="/items" element={<ItemList/>}/>
+            <Route path="/products/:productId" element={<AuctionComponent/>}/>
           </Routes>
           <Footer/>
         </BrowserRouter>

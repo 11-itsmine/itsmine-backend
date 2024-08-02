@@ -10,32 +10,37 @@ spring:
     virtual-host: ${RABBITMQ_VIRTUAL_HOST}
     ssl:
       enabled: true
+
   data:
     redis:
       host: ${REDIS_DOMAIN} # 로컬에서 할 때는 localhost
       port: ${REDIS_PORT}
+
   activemq:
     broker-url: ${ACTIVEMQ_BROKER}
     user: ${ACTIVEMQ_USER}
     password: ${ACTIVEMQ_PASSWORD}
+
   datasource:
     url: jdbc:mysql://${DB_URL}/itsmine
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  # mariaDB
-  #  datasource:
-  #    url: jdbc:mariadb://${DB_URL}/itsmine
-  #    username: ${DB_USER}
-  #    password: ${DB_PASSWORD}
-  #    driver-class-name: org.mariadb.jdbc.Driver
+    # 주석을 활성화할 경우 아래를 사용
+    # datasource:
+    #   url: jdbc:mariadb://${DB_URL}/itsmine
+    #   username: ${DB_USER}
+    #   password: ${DB_PASSWORD}
+    #   driver-class-name: org.mariadb.jdbc.Driver
+
   sql:
     init:
       encoding: UTF-8
 
-jpa:
-  hibernate:
-    ddl-auto: update
+  jpa:
+    hibernate:
+      ddl-auto: update
+
   properties:
     hibernate:
       show_sql: true
