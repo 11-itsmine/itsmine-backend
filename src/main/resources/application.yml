@@ -18,34 +18,34 @@ spring:
     broker-url: ${ACTIVEMQ_BROKER}
     user: ${ACTIVEMQ_USER}
     password: ${ACTIVEMQ_PASSWORD}
-#  datasource:
-#    url: jdbc:mariadb://${DB_URL}/itsmine
-#    username: ${DB_USER}
-#    password: ${DB_PASSWORD}
-#    driver-class-name: org.mariadb.jdbc.Driver
+  datasource:
+    url: jdbc:mariadb://${DB_URL}/itsmine
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
 
 # 로컬용
-  datasource:
-    url: jdbc:mysql://${MY_DB_URL}/itsmine
-    username: ${MY_DB_USER}
-    password: ${MY_DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+#   datasource:
+#     url: jdbc:mysql://${DB_URL}/itsmine
+#     username: ${DB_USER}
+#     password: ${DB_PASSWORD}
+#     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  sql:
-    init:
-      encoding: UTF-8
+sql:
+  init:
+    encoding: UTF-8
 
-  jpa:
+jpa:
+  hibernate:
+    ddl-auto: update
+  properties:
     hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        connection:
-          CharSet: utf-8
-          characterEncoding: utf-8
-          useUnicode: true
+      show_sql: true
+      format_sql: true
+      connection:
+        CharSet: utf-8
+        characterEncoding: utf-8
+        useUnicode: true
 
 web:
   resources:
@@ -63,6 +63,8 @@ main:
   allow-bean-definition-overriding: true
 
 jwt-secret-key: ${JWT_KEY}
+
+admin-token: ${ADMIN_TOKEN}
 
 cloud:
   aws:
