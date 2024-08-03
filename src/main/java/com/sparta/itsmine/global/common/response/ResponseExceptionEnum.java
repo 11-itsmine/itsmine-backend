@@ -40,6 +40,7 @@ public enum ResponseExceptionEnum {
     COMMENT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "해당 문의사항에는 이미 댓글이 작성 되어 있습니다."),
 
     //경매
+    AUCTION_DENIED_BID(HttpStatus.BAD_REQUEST,"판매자 자신이 경매에 참여할 순 없습니다."),
     AUCTION_IMPOSSIBLE_BID(HttpStatus.BAD_REQUEST,
             "상품의 입찰가보다 낮거나 즉시구매가보다 높은 입찰가입니다 입찰 금액을 확인해주세요."),
     AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "입찰 기록을 찾을 수 없습니다."),

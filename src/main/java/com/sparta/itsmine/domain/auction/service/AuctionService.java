@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.auction.service;
 
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_DENIED_BID;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
@@ -13,6 +14,7 @@ import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
 import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -40,7 +42,7 @@ public class AuctionService {
 
         Auction auction = createAuctionEntity(user, product, bidPrice);
 
-        checkAuctionValidity(auction, product, bidPrice);
+        checkAuctionValidity(auction, product, bidPrice, user);
 
         currentPriceUpdate(bidPrice, product);
         auctionRepository.save(auction);
@@ -59,9 +61,11 @@ public class AuctionService {
         return new Auction(user, product, bidPrice, product.getStatus());
     }
 
-    private void checkAuctionValidity(Auction auction, Product product, Integer bidPrice) {
+    private void checkAuctionValidity(Auction auction, Product product, Integer bidPrice,
+            User user) {
+        auction.checkUser(user, product);
         auction.checkStatus(product.getStatus());
-        auction.checkBidPrice(bidPrice);
+        auction.checkBidPrice(bidPrice,product);
         auction.checkCurrentPrice(bidPrice, product.getCurrentPrice());
     }
 
