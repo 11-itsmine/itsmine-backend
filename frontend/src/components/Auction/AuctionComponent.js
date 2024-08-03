@@ -9,6 +9,7 @@ const AuctionComponent = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태 추가
 
   const navigate = useNavigate();
   const { productId } = useParams();
@@ -24,9 +25,48 @@ const AuctionComponent = () => {
     }
   };
 
-  // 컴포넌트가 마운트될 때 제품 정보를 가져옴
+  // 좋아요 상태를 가져오는 함수
+  const fetchLikeStatus = async () => {
+    try {
+      const token = localStorage.getItem("Authorization");
+      const response = await axiosInstance.get(
+          `/users/products/${productId}/likes`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+      );
+      setIsLiked(response.data.isLiked);
+    } catch (err) {
+      console.error("Error fetching like status:", err);
+    }
+  };
+
+  // 좋아요 상태를 토글하는 함수
+  const toggleLike = async () => {
+    try {
+      const token = localStorage.getItem("Authorization");
+      await axiosInstance.post(
+          `/users/products/${productId}/likes`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+      );
+      setIsLiked(!isLiked); // 상태를 토글
+    } catch (err) {
+      setError("좋아요 변경에 실패했습니다. 다시 시도하세요.");
+      console.error("Error toggling like status:", err);
+    }
+  };
+
+  // 컴포넌트가 마운트될 때 제품 정보와 좋아요 상태를 가져옴
   useEffect(() => {
     fetchProduct();
+    fetchLikeStatus();
   }, [productId]);
 
   // 입찰을 처리하는 함수
@@ -78,6 +118,11 @@ const AuctionComponent = () => {
     setBidPrice(product.auctionNowPrice);
   };
 
+  // 현재 입찰가를 입찰 가격에 자동 입력
+  const handleCurrentPrice = () => {
+    setBidPrice(product.currentPrice);
+  };
+
   // 로딩 중 또는 에러 메시지 처리
   if (error) {
     return <ErrorText>{error}</ErrorText>;
@@ -90,14 +135,14 @@ const AuctionComponent = () => {
   return (
       <Container>
         <ImageSlider>
-          <Arrow left onClick={prevImage}>&lt;</Arrow>
-          {/* 이 화살표의 배경을 투명하게 해주세요 */}
+          <Arrow left onClick={prevImage}>
+            &lt;
+          </Arrow>
           <ProductImage
               src={product.imagesUrl[currentImageIndex]}
               alt={`Product ${currentImageIndex}`}
           />
           <Arrow onClick={nextImage}>&gt;</Arrow>
-          {/* 이 화살표의 배경을 투명하게 해주세요 */}
         </ImageSlider>
         <Indicator>
           {product.imagesUrl.map((_, index) => (
@@ -106,6 +151,9 @@ const AuctionComponent = () => {
         </Indicator>
         <Details>
           <Title>{product.productName}</Title>
+          <LikeButton onClick={toggleLike} isLiked={isLiked}>
+            {isLiked ? "♥" : "♡"}
+          </LikeButton>
           <Description>{product.description}</Description>
         </Details>
         <AdditionalInfo>
@@ -113,10 +161,9 @@ const AuctionComponent = () => {
         </AdditionalInfo>
         <ButtonContainer>
           <PriceButton className="buy-btn" onClick={handleBuyNow}>
-            {/* 버튼을 클릭하면 BidInput에 product.auctionNowPrice 값을 자동으로 입력해주세요 */}
             구매 {product.auctionNowPrice.toLocaleString()}원 즉시 구매가
           </PriceButton>
-          <PriceButton className="bid-btn">
+          <PriceButton className="bid-btn" onClick={handleCurrentPrice}>
             입찰 {product.currentPrice.toLocaleString()}원 현재 입찰가
           </PriceButton>
         </ButtonContainer>
@@ -143,7 +190,7 @@ export default AuctionComponent;
 const Container = styled.div`
   width: 100%;
   max-width: 600px;
-  margin: 100px auto 0;  // 위쪽에 100px의 여백 추가
+  margin: 100px auto 0; // 위쪽에 100px의 여백 추가
   background-color: #f2f2f2;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -216,6 +263,7 @@ const Details = styled.div`
   background-color: #fff;
   border-radius: 8px;
   margin-bottom: 10px;
+  position: relative; /* 좋아요 버튼 위치 설정을 위해 추가 */
 `;
 
 const Title = styled.div`
@@ -226,6 +274,7 @@ const Title = styled.div`
 
 const Description = styled.div`
   color: #666;
+  margin-top: 10px; /* 좋아요 버튼과 설명 사이의 간격 */
 `;
 
 const AdditionalInfo = styled.div`
@@ -316,3 +365,19 @@ const LoadingText = styled.div`
   font-size: 1.2rem;
   margin-top: 50px;
 `;
+
+const LikeButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  font-size: 1.5rem;
+  background-color: transparent;
+  color: ${({ isLiked }) => (isLiked ? "#e74c3c" : "#bbb")};
+  border: none;
+  cursor: pointer;
+  &:hover {
+    color: ${({ isLiked }) => (isLiked ? "#c0392b" : "#888")};
+  }
+`;
+
