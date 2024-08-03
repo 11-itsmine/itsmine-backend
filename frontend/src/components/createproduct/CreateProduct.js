@@ -107,7 +107,7 @@ const ProductCreatePage = () => {
   };
 
   return (
-      <Container sx={{backgroundColor: '#f2f2f2', padding: 3, borderRadius: 2}}>
+      <Container>
         <Box component="form" onSubmit={handleSubmit} sx={{mt: 3}}>
           <Typography variant="h4" component="h1" gutterBottom>
             상품 등록

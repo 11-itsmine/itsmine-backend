@@ -68,6 +68,7 @@ public class WebSecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(HttpMethod.POST, "/users", "/users/login").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/users/resign/*").permitAll()
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
         );
 
