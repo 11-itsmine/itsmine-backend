@@ -1,12 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from "../../api/axiosInstance"; // axios 설정 파일을 불러옵니다.
+import axiosInstance from "../../api/axiosInstance";
 
 const Profile = () => {
+  // 사용자 프로필 상태 관리
   const [profile, setProfile] = useState(null);
-  const [error, setError] = useState(null);
+  const [profileError, setProfileError] = useState(null);
   const [file, setFile] = useState(null);
   const [uploadError, setUploadError] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  // 제품 목록 상태 관리
+  const [products, setProducts] = useState([]);
+  const [productError, setProductError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10); // 한 페이지에 표시할 제품 수
+  const [category, setCategory] = useState(null);
+  const [price, setPrice] = useState(null);
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('createdAt');
+
+  // 좋아요한 제품 목록 상태 관리
+  const [likedProducts, setLikedProducts] = useState([]);
+  const [likedError, setLikedError] = useState(null);
 
   // 사용자 프로필 데이터를 가져오는 함수
   useEffect(() => {
@@ -15,12 +30,54 @@ const Profile = () => {
         const response = await axiosInstance.get('/users/profile');
         setProfile(response.data.data);
       } catch (err) {
-        setError(err.response ? err.response.data : "프로필 정보를 가져오는 중 오류가 발생했습니다.");
+        setProfileError(err.response ? err.response.data : "프로필 정보를 가져오는 중 오류가 발생했습니다.");
       }
     };
 
     fetchUserProfile();
   }, []);
+
+  // 제품 목록을 가져오는 함수
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axiosInstance.get('/products', {
+          params: {
+            page,
+            size,
+            category,
+            price,
+            search,
+            sort,
+          }
+        });
+        setProducts(response.data.data.content);
+      } catch (err) {
+        setProductError(err.response ? err.response.data : "제품 목록을 가져오는 중 오류가 발생했습니다.");
+      }
+    };
+
+    fetchProducts();
+  }, [page, size, category, price, search, sort]);
+
+  // 좋아요한 제품 목록을 가져오는 함수
+  useEffect(() => {
+    const fetchLikedProducts = async () => {
+      try {
+        const response = await axiosInstance.get('/products/likes', {
+          params: {
+            page,
+            size,
+          }
+        });
+        setLikedProducts(response.data.data.content);
+      } catch (err) {
+        setLikedError(err.response ? err.response.data : "좋아하는 제품 목록을 가져오는 중 오류가 발생했습니다.");
+      }
+    };
+
+    fetchLikedProducts();
+  }, [page, size]);
 
   // 파일 입력 변경 처리 함수
   const handleFileChange = (e) => {
@@ -49,7 +106,7 @@ const Profile = () => {
       setUploadSuccess(true);
       setProfile((prevProfile) => ({
         ...prevProfile,
-        imageUrl: response.data.imageUrl, // 새로운 프로필 URL로 업데이트
+        imageUrl: response.data.imageUrl,
       }));
       setUploadError(null);
     } catch (err) {
@@ -58,31 +115,71 @@ const Profile = () => {
     }
   };
 
-  if (!profile && !error) {
-    return <div style={containerStyle}>로딩 중...</div>;
-  }
-
-  if (error) {
-    return <div style={containerStyle}>오류: {error}</div>;
-  }
-
   return (
       <div style={containerStyle}>
+        {/* 사용자 프로필 영역 */}
         <div style={contentStyle}>
           <h1>사용자 프로필</h1>
-          {profile.imageUrl && <img src={profile.imageUrl} alt="프로필 사진" style={imageStyle} />}
-          <p><strong>사용자 이름:</strong> {profile.username}</p>
-          <p><strong>이름:</strong> {profile.name}</p>
-          <p><strong>닉네임:</strong> {profile.nickname}</p>
-          <p><strong>이메일:</strong> {profile.email}</p>
-          <p><strong>주소:</strong> {profile.address}</p>
+          {profileError && <p style={{ color: 'red' }}>오류: {profileError}</p>}
+          {profile ? (
+              <>
+                {profile.imageUrl && <img src={profile.imageUrl} alt="프로필 사진" style={imageStyle} />}
+                <p><strong>사용자 이름:</strong> {profile.username}</p>
+                <p><strong>이름:</strong> {profile.name}</p>
+                <p><strong>닉네임:</strong> {profile.nickname}</p>
+                <p><strong>이메일:</strong> {profile.email}</p>
+                <p><strong>주소:</strong> {profile.address}</p>
 
-          <form onSubmit={handleProfileUpload} style={formStyle}>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-            <button type="submit">프로필 사진 업로드</button>
-          </form>
-          {uploadSuccess && <p style={{ color: 'green' }}>프로필 사진이 성공적으로 업로드되었습니다.</p>}
-          {uploadError && <p style={{ color: 'red' }}>오류: {uploadError}</p>}
+                <form onSubmit={handleProfileUpload} style={formStyle}>
+                  <input type="file" accept="image/*" onChange={handleFileChange} />
+                  <button type="submit">프로필 사진 업로드</button>
+                </form>
+                {uploadSuccess && <p style={{ color: 'green' }}>프로필 사진이 성공적으로 업로드되었습니다.</p>}
+                {uploadError && <p style={{ color: 'red' }}>오류: {uploadError}</p>}
+              </>
+          ) : (
+              <p>로딩 중...</p>
+          )}
+        </div>
+
+        {/* 제품 목록 영역 */}
+        <div style={contentStyle}>
+          <h2>제품 목록</h2>
+          {productError && <p style={{ color: 'red' }}>오류: {productError}</p>}
+          <div style={productListStyle}>
+            {products.map((product) => (
+                <div key={product.id} style={productItemStyle}>
+                  {product.imagesUrl.length > 0 && (
+                      <img src={product.imagesUrl[0]} alt={product.productName} style={productImageStyle} />
+                  )}
+                  <h3>{product.productName}</h3>
+                  <p>{product.description}</p>
+                  <p><strong>시작 가격:</strong> {product.startPrice}원</p>
+                  <p><strong>현재 가격:</strong> {product.currentPrice}원</p>
+                  <p><strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}</p>
+                </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 좋아요한 제품 목록 영역 */}
+        <div style={contentStyle}>
+          <h2>좋아하는 제품 목록</h2>
+          {likedError && <p style={{ color: 'red' }}>오류: {likedError}</p>}
+          <div style={productListStyle}>
+            {likedProducts.map((product) => (
+                <div key={product.id} style={productItemStyle}>
+                  {product.imagesUrl.length > 0 && (
+                      <img src={product.imagesUrl[0]} alt={product.productName} style={productImageStyle} />
+                  )}
+                  <h3>{product.productName}</h3>
+                  <p>{product.description}</p>
+                  <p><strong>시작 가격:</strong> {product.startPrice}원</p>
+                  <p><strong>현재 가격:</strong> {product.currentPrice}원</p>
+                  <p><strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}</p>
+                </div>
+            ))}
+          </div>
         </div>
       </div>
   );
@@ -92,27 +189,28 @@ const Profile = () => {
 const containerStyle = {
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'flex-end', // 하단에 배치
-  alignItems: 'center', // 수평 중앙 정렬
-  minHeight: '100vh', // 화면 전체 높이 사용
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  minHeight: '100vh',
   padding: '20px',
   boxSizing: 'border-box',
 };
 
 const contentStyle = {
-  textAlign: 'left', // 텍스트 왼쪽 정렬
-  maxWidth: '600px', // 최대 너비 설정
+  textAlign: 'left',
+  maxWidth: '600px',
   width: '100%',
-  backgroundColor: '#f9f9f9', // 배경색
+  backgroundColor: '#f9f9f9',
   padding: '20px',
   borderRadius: '8px',
   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  marginBottom: '20px',
 };
 
 const imageStyle = {
-  maxWidth: '100%', // 이미지 너비 제한
+  maxWidth: '100%',
   height: 'auto',
-  borderRadius: '50%', // 원형으로 만들기
+  borderRadius: '50%',
   marginBottom: '20px',
 };
 
@@ -121,6 +219,28 @@ const formStyle = {
   flexDirection: 'column',
   gap: '10px',
   marginTop: '20px',
+};
+
+const productListStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '10px',
+};
+
+const productItemStyle = {
+  border: '1px solid #ddd',
+  borderRadius: '8px',
+  padding: '10px',
+  textAlign: 'left',
+  backgroundColor: '#fff',
+  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+};
+
+const productImageStyle = {
+  maxWidth: '100%',
+  height: 'auto',
+  borderRadius: '8px',
+  marginBottom: '10px',
 };
 
 export default Profile;
