@@ -1,11 +1,10 @@
 package com.sparta.itsmine.domain.product.dto;
 
 import com.sparta.itsmine.domain.category.entity.Category;
+import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
 import lombok.Getter;
 
 @Getter
@@ -26,7 +25,7 @@ public class ProductResponseDto {
         this.productName = product.getProductName();
         this.description = product.getDescription();
         this.auctionNowPrice = product.getAuctionNowPrice();
-        this.startPrice=product.getStartPrice();//수정부분
+        this.startPrice = product.getStartPrice();//수정부분
         this.currentPrice = product.getCurrentPrice();
         this.dueDate = product.getDueDate();
         this.category = product.getCategory();
@@ -38,11 +37,10 @@ public class ProductResponseDto {
         this.productName = product.getProductName();
         this.description = product.getDescription();
         this.auctionNowPrice = product.getAuctionNowPrice();
-        this.startPrice=product.getStartPrice();//수정부분
+        this.startPrice = product.getStartPrice();//수정부분
         this.currentPrice = product.getCurrentPrice();
         this.dueDate = product.getDueDate();
         this.category = product.getCategory();
         this.imagesUrl = productImagesRequestDto.getImagesUrl();
     }
-
 }

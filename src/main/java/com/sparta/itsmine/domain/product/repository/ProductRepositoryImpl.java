@@ -50,43 +50,25 @@ public class ProductRepositoryImpl implements CustomProductRepository {
     @Override
     public Page<Product> findAllByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable) {
         List<Product> products = queryFactory.selectFrom(product)
-                .where(product.user.id.eq(userId)
-                        .and(product.deletedAt.isNull()))
+                .where(product.user.id.eq(userId).and(product.deletedAt.isNull()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         long total = queryFactory.selectFrom(product)
-                .where(product.user.id.eq(userId)
-                        .and(product.deletedAt.isNull()))
+                .where(product.user.id.eq(userId).and(product.deletedAt.isNull()))
                 .fetch().size();
 
         return new PageImpl<>(products, pageable, total);
     }
 
-    @Override
-    public Page<Product> findAllByUserIdAndLikeTrueAndDeletedAtIsNull(Long userId,
-            Pageable pageable) {
-        List<Product> products = queryFactory.selectFrom(product)
-                .where(product.user.id.eq(userId)
-                        .and(product.like.isTrue())
-                        .and(product.deletedAt.isNull()))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        long total = queryFactory.selectFrom(product)
-                .where(product.user.id.eq(userId)
-                        .and(product.like.isTrue())
-                        .and(product.deletedAt.isNull()))
-                .fetch().size();
-
-        return new PageImpl<>(products, pageable, total);
-    }
 
     @Override
     public Page<Product> findProducts(Pageable pageable, String category, String price,
             String search, String sort) {
+        if (sort == null) {
+            sort = "createdAt"; // 기본 정렬 필드 설정
+        }
         List<Product> products = queryFactory
                 .selectFrom(product)
                 .where(
@@ -111,6 +93,7 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
         return new PageImpl<>(products, pageable, total);
     }
+
 
     private BooleanExpression categoryEq(String category) {
         return category != null ? product.category.categoryName.eq(category) : null;

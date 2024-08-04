@@ -45,8 +45,6 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final ListPath<com.sparta.itsmine.domain.images.entity.Images, com.sparta.itsmine.domain.images.entity.QImages> imagesList = this.<com.sparta.itsmine.domain.images.entity.Images, com.sparta.itsmine.domain.images.entity.QImages>createList("imagesList", com.sparta.itsmine.domain.images.entity.Images.class, com.sparta.itsmine.domain.images.entity.QImages.class, PathInits.DIRECT2);
 
-    public final BooleanPath like = createBoolean("like");
-
     public final StringPath productName = createString("productName");
 
     public final NumberPath<Integer> startPrice = createNumber("startPrice", Integer.class);
