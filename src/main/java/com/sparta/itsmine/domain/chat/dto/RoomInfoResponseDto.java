@@ -20,7 +20,7 @@ public class RoomInfoResponseDto {
         this.roomId = chatRoom.getRoomId();
         this.fromUserId = chatRoom.getFromUser().getId();
         this.fromUserNickname = chatRoom.getFromUser().getNickname();
-        this.fromUserStatus = chatRoom.getToUserStatus();
+        this.fromUserStatus = chatRoom.getFromUserStatus();
         this.toUserId = chatRoom.getToUser().getId();
         this.toUserNickname = chatRoom.getToUser().getNickname();
         this.toUserStatus = chatRoom.getToUserStatus();

@@ -14,38 +14,50 @@ spring:
     redis:
       host: ${REDIS_DOMAIN} # 로컬에서 할 때는 localhost
       port: ${REDIS_PORT}
+#  activemq:
+#    broker-url: ${ACTIVEMQ_BROKER}
+#    user: ${ACTIVEMQ_USER}
+#    password: ${ACTIVEMQ_PASSWORD}
+#    close-timeout: 10s
+#    packages:
+#      trust-all: true
+  #로컬용
   activemq:
-    broker-url: ${ACTIVEMQ_BROKER}
-    user: ${ACTIVEMQ_USER}
-    password: ${ACTIVEMQ_PASSWORD}
-  datasource:
-    url: jdbc:mariadb://${DB_URL}/itsmine
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
+    broker-url: tcp://localhost:61626
+    user: admin
+    password: admin
+    close-timeout: 10s
+    packages:
+      trust-all: true
 
+#  datasource:
+#    url: jdbc:mariadb://${DB_URL}/itsmine
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+#    driver-class-name: org.mariadb.jdbc.Driver
 # 로컬용
-#   datasource:
-#     url: jdbc:mysql://${DB_URL}/itsmine
-#     username: ${DB_USER}
-#     password: ${DB_PASSWORD}
-#     driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+    url: jdbc:mysql://${MY_DB_URL}/itsmine
+    username: ${MY_DB_USER}
+    password: ${MY_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-sql:
-  init:
-    encoding: UTF-8
+  sql:
+    init:
+      encoding: UTF-8
 
-jpa:
-  hibernate:
-    ddl-auto: update
-  properties:
+  jpa:
     hibernate:
-      show_sql: true
-      format_sql: true
-      connection:
-        CharSet: utf-8
-        characterEncoding: utf-8
-        useUnicode: true
+      ddl-auto: update
+    properties:
+     hibernate:
+        show_sql: true
+        format_sql: true
+        connection:
+          CharSet: utf-8
+          characterEncoding: utf-8
+          useUnicode: true
+
 
 web:
   resources:
@@ -85,6 +97,7 @@ dynamodb:
   credentials:
     accessKey: ${CLOUD_AWS_DYNAMODB_ACCESSKEY}
     secretKey: ${CLOUD_AWS_DYNAMODB_SECRETKEY}
+
 
 activemq:
   queue:

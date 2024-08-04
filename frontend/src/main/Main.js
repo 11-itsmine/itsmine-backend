@@ -26,6 +26,7 @@ function Main() {
         <Carousel />
         <ItemList items={items} />
         <Board chatRooms={chatRooms} />
+
       </MainWrapper>
   );
 }

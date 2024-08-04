@@ -9,6 +9,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
@@ -19,14 +20,14 @@ public class ChatController {
     private final ChatService chatService;
     private final JmsTemplate jmsTemplate;
     private final Queue queue; // Queue 빈 주입
-
+    private final SimpMessagingTemplate messagingTemplate;
     /**
      * 클라이언트가 /app/chat.message.{chatRoomId}로 메시지를 전송할 때 호출됩니다.
      * 메시지를 ActiveMQ로 전송합니다.
      *
      * @param requestDto 메시지 보낼 정보를 담고 있는 DTO
      */
-    @MessageMapping("chat.message.{chatRoomId}")
+    @MessageMapping("chat.message/{chatRoomId}")
     public void sendMessage(@Payload MessageRequestDto requestDto) {
         log.info("Sending message: {}", requestDto.getMessage());
 
@@ -40,15 +41,13 @@ public class ChatController {
      *
      * @param requestDto 수신한 메시지를 담고 있는 DTO
      */
-    @JmsListener(destination = "${activemq.queue.name}") // Queue 이름을 외부 설정으로부터 가져옴
+    @JmsListener(destination = "${activemq.queue.name}")
     public void receiveMessage(MessageRequestDto requestDto) {
         log.info("Received message: {}", requestDto.getMessage());
-
         // 메시지를 데이터베이스에 저장하는 서비스 호출
         chatService.saveMessage(requestDto);
 
         // WebSocket 클라이언트에게 메시지 전송
-        // messagingTemplate.convertAndSend("/topic/room." + requestDto.getRoomId(), requestDto);
-        // 메시지 전송 로직 추가
+        messagingTemplate.convertAndSend("/topic/chat.message/" + requestDto.getRoomId(), requestDto);
     }
 }

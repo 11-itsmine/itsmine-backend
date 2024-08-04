@@ -84,6 +84,22 @@ Content-Type: application/json
   client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
 
+
+
+### 유저 회원 가입1
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username": "username333",
+  "password": "password333!",
+  "name": "이순모33",
+  "email": "fltnsah@nate.com12333",
+  "address": "화성시21313",
+  "nickname": "332211"
+}
+
+
 ### 방 생성
 POST http://localhost:8080/chatrooms
 Content-Type: application/json

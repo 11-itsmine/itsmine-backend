@@ -48,9 +48,9 @@ public class ChatService {
      * @param userId 인가된 본인 유저 정보
      */
     public List<RoomInfoResponseDto> findAllRoom(Long userId) {
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByFromUserId(userId);
-        return chatRooms.stream().filter(chatRoom -> chatRoom.getFromUserStatus() != ChatStatus.END)
-                .map(RoomInfoResponseDto::new).collect(Collectors.toList());
+        log.info("user id : {}",userId);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByFromUserIdOrToUserId(userId);
+        return chatRooms.stream().map(RoomInfoResponseDto::new).collect(Collectors.toList());
     }
 
     /**
