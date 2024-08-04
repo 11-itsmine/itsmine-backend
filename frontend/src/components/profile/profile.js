@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axiosInstance from "../../api/axiosInstance";
 
 const Profile = () => {
@@ -30,7 +30,8 @@ const Profile = () => {
         const response = await axiosInstance.get('/users/profile');
         setProfile(response.data.data);
       } catch (err) {
-        setProfileError(err.response ? err.response.data : "프로필 정보를 가져오는 중 오류가 발생했습니다.");
+        setProfileError(JSON.stringify(
+            err.response ? err.response.data : "프로필 정보를 가져오는 중 오류가 발생했습니다."));
       }
     };
 
@@ -53,7 +54,8 @@ const Profile = () => {
         });
         setProducts(response.data.data.content);
       } catch (err) {
-        setProductError(err.response ? err.response.data : "제품 목록을 가져오는 중 오류가 발생했습니다.");
+        setProductError(JSON.stringify(
+            err.response ? err.response.data : "제품 목록을 가져오는 중 오류가 발생했습니다."));
       }
     };
 
@@ -72,7 +74,8 @@ const Profile = () => {
         });
         setLikedProducts(response.data.data.content);
       } catch (err) {
-        setLikedError(err.response ? err.response.data : "좋아하는 제품 목록을 가져오는 중 오류가 발생했습니다.");
+        setLikedError(JSON.stringify(err.response ? err.response.data
+            : "좋아하는 제품 목록을 가져오는 중 오류가 발생했습니다."));
       }
     };
 
@@ -97,11 +100,12 @@ const Profile = () => {
     formData.append("file", file);
 
     try {
-      const response = await axiosInstance.post('/s3/upload/profile', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axiosInstance.post('/s3/upload/profile', formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
 
       setUploadSuccess(true);
       setProfile((prevProfile) => ({
@@ -111,7 +115,8 @@ const Profile = () => {
       setUploadError(null);
     } catch (err) {
       setUploadSuccess(false);
-      setUploadError(err.response ? err.response.data : "프로필 업로드 중 오류가 발생했습니다.");
+      setUploadError(JSON.stringify(
+          err.response ? err.response.data : "프로필 업로드 중 오류가 발생했습니다."));
     }
   };
 
@@ -120,10 +125,11 @@ const Profile = () => {
         {/* 사용자 프로필 영역 */}
         <div style={contentStyle}>
           <h1>사용자 프로필</h1>
-          {profileError && <p style={{ color: 'red' }}>오류: {profileError}</p>}
+          {profileError && <p style={{color: 'red'}}>오류: {profileError}</p>}
           {profile ? (
               <>
-                {profile.imageUrl && <img src={profile.imageUrl} alt="프로필 사진" style={imageStyle} />}
+                {profile.imageUrl && <img src={profile.imageUrl} alt="프로필 사진"
+                                          style={imageStyle}/>}
                 <p><strong>사용자 이름:</strong> {profile.username}</p>
                 <p><strong>이름:</strong> {profile.name}</p>
                 <p><strong>닉네임:</strong> {profile.nickname}</p>
@@ -131,11 +137,13 @@ const Profile = () => {
                 <p><strong>주소:</strong> {profile.address}</p>
 
                 <form onSubmit={handleProfileUpload} style={formStyle}>
-                  <input type="file" accept="image/*" onChange={handleFileChange} />
+                  <input type="file" accept="image/*"
+                         onChange={handleFileChange}/>
                   <button type="submit">프로필 사진 업로드</button>
                 </form>
-                {uploadSuccess && <p style={{ color: 'green' }}>프로필 사진이 성공적으로 업로드되었습니다.</p>}
-                {uploadError && <p style={{ color: 'red' }}>오류: {uploadError}</p>}
+                {uploadSuccess && <p style={{color: 'green'}}>프로필 사진이 성공적으로
+                  업로드되었습니다.</p>}
+                {uploadError && <p style={{color: 'red'}}>오류: {uploadError}</p>}
               </>
           ) : (
               <p>로딩 중...</p>
@@ -145,18 +153,20 @@ const Profile = () => {
         {/* 제품 목록 영역 */}
         <div style={contentStyle}>
           <h2>제품 목록</h2>
-          {productError && <p style={{ color: 'red' }}>오류: {productError}</p>}
+          {productError && <p style={{color: 'red'}}>오류: {productError}</p>}
           <div style={productListStyle}>
             {products.map((product) => (
                 <div key={product.id} style={productItemStyle}>
                   {product.imagesUrl.length > 0 && (
-                      <img src={product.imagesUrl[0]} alt={product.productName} style={productImageStyle} />
+                      <img src={product.imagesUrl[0]} alt={product.productName}
+                           style={productImageStyle}/>
                   )}
                   <h3>{product.productName}</h3>
                   <p>{product.description}</p>
                   <p><strong>시작 가격:</strong> {product.startPrice}원</p>
                   <p><strong>현재 가격:</strong> {product.currentPrice}원</p>
-                  <p><strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}</p>
+                  <p><strong>마감일:</strong> {new Date(
+                      product.dueDate).toLocaleString()}</p>
                 </div>
             ))}
           </div>
@@ -165,18 +175,20 @@ const Profile = () => {
         {/* 좋아요한 제품 목록 영역 */}
         <div style={contentStyle}>
           <h2>좋아하는 제품 목록</h2>
-          {likedError && <p style={{ color: 'red' }}>오류: {likedError}</p>}
+          {likedError && <p style={{color: 'red'}}>오류: {likedError}</p>}
           <div style={productListStyle}>
             {likedProducts.map((product) => (
                 <div key={product.id} style={productItemStyle}>
                   {product.imagesUrl.length > 0 && (
-                      <img src={product.imagesUrl[0]} alt={product.productName} style={productImageStyle} />
+                      <img src={product.imagesUrl[0]} alt={product.productName}
+                           style={productImageStyle}/>
                   )}
                   <h3>{product.productName}</h3>
                   <p>{product.description}</p>
                   <p><strong>시작 가격:</strong> {product.startPrice}원</p>
                   <p><strong>현재 가격:</strong> {product.currentPrice}원</p>
-                  <p><strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}</p>
+                  <p><strong>마감일:</strong> {new Date(
+                      product.dueDate).toLocaleString()}</p>
                 </div>
             ))}
           </div>

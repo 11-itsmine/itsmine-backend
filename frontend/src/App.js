@@ -12,9 +12,9 @@ import theme from "./styles/theme";
 import ItemList from "./components/item/ItemList";
 import AuctionComponent from "./components/Auction/AuctionComponent";
 import Profile from "./components/profile/profile";
+import Item from "./components/item/Item";
 
 function App() {
-
   useEffect(() => {
     const token = localStorage.getItem('Authorization');
     if (token) {
@@ -45,6 +45,7 @@ function App() {
             <Route path="/signup" element={<SignUp/>}/>
             <Route path="/products" element={<CreateProduct/>}/>
             <Route path="/items" element={<ItemList/>}/>
+            <Route path="/item" element={<Item/>}/>
             <Route path="/products/:productId" element={<AuctionComponent/>}/>
             <Route path="/profile" element={<Profile/>}/>
           </Routes>
