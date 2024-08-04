@@ -54,8 +54,8 @@ public class User extends TimeStamp {
 
     private LocalDateTime deletedAt;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Images images;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Images> imagesList = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "user")
 //    private List<JoinChat> joinChatList;

@@ -14,7 +14,6 @@ public class UserResponseDto {
 	private String nickname;
 	private String email;
 	private String address;
-	private String images;
 
 	public UserResponseDto(User user) {
 		this.username = user.getUsername();
@@ -22,6 +21,5 @@ public class UserResponseDto {
 		this.nickname = user.getNickname();
 		this.email = user.getEmail();
 		this.address = user.getAddress();
-		this.images = (user.getImages() != null) ? user.getImages().getImagesUrl() : null;
 	}
 }

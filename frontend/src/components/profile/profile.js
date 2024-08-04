@@ -45,7 +45,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axiosInstance.get('/products', {
+        const response = await axiosInstance.get('/products/user', {
           params: {
             page,
             size,
@@ -129,12 +129,16 @@ const Profile = () => {
       setUploadSuccess(true);
       setProfile((prevProfile) => ({
         ...prevProfile,
-        imageUrl: response.data.imageUrl,
+        imagesUrl: response.data.imageUrl,
       }));
       setUploadError(null);
     } catch (err) {
+      if (err.response && err.response.status === 409) {
+        setUploadError("이미 존재하는 이미지입니다.");
+      } else {
+        setUploadError(err.response ? err.response.data : "프로필 업로드 중 오류가 발생했습니다.");
+      }
       setUploadSuccess(false);
-      setUploadError(err.response ? err.response.data : "프로필 업로드 중 오류가 발생했습니다.");
     }
   };
 
@@ -146,7 +150,7 @@ const Profile = () => {
           {profileError && <p style={{ color: 'red' }}>오류: {profileError}</p>}
           {profile ? (
               <>
-                {profile.imageUrl && <img src={profile.imageUrl} alt="프로필 사진" style={imageStyle} />}
+                {profile.imagesUrl && <img src={profile.imagesUrl} alt="프로필 사진" style={imageStyle} />}
                 <p><strong>사용자 이름:</strong> {profile.username}</p>
                 <p><strong>이름:</strong> {profile.name}</p>
                 <p><strong>닉네임:</strong> {profile.nickname}</p>
@@ -172,7 +176,7 @@ const Profile = () => {
           <div style={productListStyle}>
             {products.map((product) => (
                 <div key={product.id} style={productItemStyle}>
-                  {product.imagesUrl.length > 0 && (
+                  {product.imagesUrl && product.imagesUrl.length > 0 && (
                       <img src={product.imagesUrl[0]} alt={product.productName} style={productImageStyle} />
                   )}
                   <h3>{product.productName}</h3>
@@ -192,7 +196,7 @@ const Profile = () => {
           <div style={productListStyle}>
             {likedProducts.map((product) => (
                 <div key={product.id} style={productItemStyle}>
-                  {product.imagesUrl.length > 0 && (
+                  {product.imagesUrl && product.imagesUrl.length > 0 && (
                       <img src={product.imagesUrl[0]} alt={product.productName} style={productImageStyle} />
                   )}
                   <h3>{product.productName}</h3>

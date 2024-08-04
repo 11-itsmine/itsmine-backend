@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface CustomProductRepository {
 
-    Page<Product> findProducts(Pageable pageable, Long userId, String category, String price,
+    Page<Product> findProducts(Pageable pageable, String category, String price,
             String search, String sort);
 
     Optional<Product> existActiveProductByUserAndName(@Param("userId") Long userId,
