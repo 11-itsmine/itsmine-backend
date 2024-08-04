@@ -134,21 +134,25 @@ const AuctionComponent = () => {
 
   return (
       <Container>
-        <ImageSlider>
-          <Arrow left onClick={prevImage}>
-            &lt;
-          </Arrow>
-          <ProductImage
-              src={product.imagesUrl[currentImageIndex]}
-              alt={`Product ${currentImageIndex}`}
-          />
-          <Arrow onClick={nextImage}>&gt;</Arrow>
-        </ImageSlider>
-        <Indicator>
-          {product.imagesUrl.map((_, index) => (
-              <Dot key={index} isActive={index === currentImageIndex} />
-          ))}
-        </Indicator>
+        {product.imagesUrl && product.imagesUrl.length > 0 && (
+            <>
+              <ImageSlider>
+                <Arrow left onClick={prevImage}>
+                  &lt;
+                </Arrow>
+                <ProductImage
+                    src={product.imagesUrl[currentImageIndex]}
+                    alt={`Product ${currentImageIndex}`}
+                />
+                <Arrow onClick={nextImage}>&gt;</Arrow>
+              </ImageSlider>
+              <Indicator>
+                {product.imagesUrl.map((_, index) => (
+                    <Dot key={index} isActive={index === currentImageIndex} />
+                ))}
+              </Indicator>
+            </>
+        )}
         <Details>
           <Title>{product.productName}</Title>
           <LikeButton onClick={toggleLike} isLiked={isLiked}>

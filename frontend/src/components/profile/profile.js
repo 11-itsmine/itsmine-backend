@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from "../../api/axiosInstance";
+import {
+  Avatar,
+  Box,
+  Container,
+  Grid,
+  Typography,
+  Paper,
+  Tabs,
+  Tab,
+  Button,
+  IconButton,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import axiosInstance from '../../api/axiosInstance';
 
 const Profile = () => {
   // 사용자 프로필 상태 관리
@@ -9,23 +23,22 @@ const Profile = () => {
   const [uploadError, setUploadError] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  // 제품 목록 상태 관리
+  // 내 상품 목록 상태 관리
   const [products, setProducts] = useState([]);
   const [productError, setProductError] = useState(null);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10); // 한 페이지에 표시할 제품 수
-  const [category, setCategory] = useState(null);
-  const [price, setPrice] = useState(null);
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('createdAt');
 
-  // 좋아요한 제품 목록 상태 관리
+  // 좋아요한 내 상품 목록 상태 관리
   const [likedProducts, setLikedProducts] = useState([]);
   const [likedError, setLikedError] = useState(null);
 
   // 경매 목록 상태 관리
   const [auctions, setAuctions] = useState([]);
   const [auctionError, setAuctionError] = useState(null);
+
+  // 탭 상태 관리
+  const [tabValue, setTabValue] = useState(0);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
 
   // 사용자 프로필 데이터를 가져오는 함수
   useEffect(() => {
@@ -34,14 +47,16 @@ const Profile = () => {
         const response = await axiosInstance.get('/users/profile');
         setProfile(response.data.data);
       } catch (err) {
-        setProfileError(err.response ? err.response.data : "프로필 정보를 가져오는 중 오류가 발생했습니다.");
+        setProfileError(
+            err.response ? err.response.data : '프로필 정보를 가져오는 중 오류가 발생했습니다.'
+        );
       }
     };
 
     fetchUserProfile();
   }, []);
 
-  // 제품 목록을 가져오는 함수
+  // 내 상품 목록을 가져오는 함수
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -49,22 +64,20 @@ const Profile = () => {
           params: {
             page,
             size,
-            category,
-            price,
-            search,
-            sort,
-          }
+          },
         });
         setProducts(response.data.data.content);
       } catch (err) {
-        setProductError(err.response ? err.response.data : "제품 목록을 가져오는 중 오류가 발생했습니다.");
+        setProductError(
+            err.response ? err.response.data : '내 상품 목록을 가져오는 중 오류가 발생했습니다.'
+        );
       }
     };
 
     fetchProducts();
-  }, [page, size, category, price, search, sort]);
+  }, [page, size]);
 
-  // 좋아요한 제품 목록을 가져오는 함수
+  // 좋아요한 내 상품 목록을 가져오는 함수
   useEffect(() => {
     const fetchLikedProducts = async () => {
       try {
@@ -72,11 +85,13 @@ const Profile = () => {
           params: {
             page,
             size,
-          }
+          },
         });
         setLikedProducts(response.data.data.content);
       } catch (err) {
-        setLikedError(err.response ? err.response.data : "좋아하는 제품 목록을 가져오는 중 오류가 발생했습니다.");
+        setLikedError(
+            err.response ? err.response.data : '좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.'
+        );
       }
     };
 
@@ -91,11 +106,13 @@ const Profile = () => {
           params: {
             page,
             size,
-          }
+          },
         });
         setAuctions(response.data.data.content);
       } catch (err) {
-        setAuctionError(err.response ? err.response.data : "경매 목록을 가져오는 중 오류가 발생했습니다.");
+        setAuctionError(
+            err.response ? err.response.data : '경매 목록을 가져오는 중 오류가 발생했습니다.'
+        );
       }
     };
 
@@ -112,12 +129,12 @@ const Profile = () => {
     e.preventDefault();
 
     if (!file) {
-      setUploadError("업로드할 파일을 선택해주세요.");
+      setUploadError('업로드할 파일을 선택해주세요.');
       return;
     }
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
     try {
       const response = await axiosInstance.post('/s3/upload/profile', formData, {
@@ -134,155 +151,220 @@ const Profile = () => {
       setUploadError(null);
     } catch (err) {
       if (err.response && err.response.status === 409) {
-        setUploadError("이미 존재하는 이미지입니다.");
+        setUploadError('이미 존재하는 이미지입니다.');
       } else {
-        setUploadError(err.response ? err.response.data : "프로필 업로드 중 오류가 발생했습니다.");
+        setUploadError(err.response ? err.response.data : '프로필 업로드 중 오류가 발생했습니다.');
       }
       setUploadSuccess(false);
     }
   };
 
+  // 탭 변경 핸들러
+  const handleChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   return (
-      <div style={containerStyle}>
-        {/* 사용자 프로필 영역 */}
-        <div style={contentStyle}>
-          <h1>사용자 프로필</h1>
-          {profileError && <p style={{ color: 'red' }}>오류: {profileError}</p>}
-          {profile ? (
-              <>
-                {profile.imagesUrl && <img src={profile.imagesUrl} alt="프로필 사진" style={imageStyle} />}
-                <p><strong>사용자 이름:</strong> {profile.username}</p>
-                <p><strong>이름:</strong> {profile.name}</p>
-                <p><strong>닉네임:</strong> {profile.nickname}</p>
-                <p><strong>이메일:</strong> {profile.email}</p>
-                <p><strong>주소:</strong> {profile.address}</p>
-
-                <form onSubmit={handleProfileUpload} style={formStyle}>
-                  <input type="file" accept="image/*" onChange={handleFileChange} />
-                  <button type="submit">프로필 사진 업로드</button>
-                </form>
-                {uploadSuccess && <p style={{ color: 'green' }}>프로필 사진이 성공적으로 업로드되었습니다.</p>}
-                {uploadError && <p style={{ color: 'red' }}>오류: {uploadError}</p>}
-              </>
-          ) : (
-              <p>로딩 중...</p>
-          )}
-        </div>
-
-        {/* 제품 목록 영역 */}
-        <div style={contentStyle}>
-          <h2>제품 목록</h2>
-          {productError && <p style={{ color: 'red' }}>오류: {productError}</p>}
-          <div style={productListStyle}>
-            {products.map((product) => (
-                <div key={product.id} style={productItemStyle}>
-                  {product.imagesUrl && product.imagesUrl.length > 0 && (
-                      <img src={product.imagesUrl[0]} alt={product.productName} style={productImageStyle} />
-                  )}
-                  <h3>{product.productName}</h3>
-                  <p>{product.description}</p>
-                  <p><strong>시작 가격:</strong> {product.startPrice}원</p>
-                  <p><strong>현재 가격:</strong> {product.currentPrice}원</p>
-                  <p><strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}</p>
-                </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 좋아요한 제품 목록 영역 */}
-        <div style={contentStyle}>
-          <h2>좋아하는 제품 목록</h2>
-          {likedError && <p style={{ color: 'red' }}>오류: {likedError}</p>}
-          <div style={productListStyle}>
-            {likedProducts.map((product) => (
-                <div key={product.id} style={productItemStyle}>
-                  {product.imagesUrl && product.imagesUrl.length > 0 && (
-                      <img src={product.imagesUrl[0]} alt={product.productName} style={productImageStyle} />
-                  )}
-                  <h3>{product.productName}</h3>
-                  <p>{product.description}</p>
-                  <p><strong>시작 가격:</strong> {product.startPrice}원</p>
-                  <p><strong>현재 가격:</strong> {product.currentPrice}원</p>
-                  <p><strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}</p>
-                </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 경매 목록 영역 */}
-        <div style={contentStyle}>
-          <h2>경매 목록</h2>
-          {auctionError && <p style={{ color: 'red' }}>오류: {auctionError}</p>}
-          <div style={productListStyle}>
-            {auctions.map((auction) => (
-                <div key={auction.id} style={productItemStyle}>
-                  <h3>상품: {auction.productName}</h3>
-                  <p><strong>입찰자 이름:</strong> {auction.username}</p>
-                  <p><strong>입찰 가격:</strong> {auction.bidPrice}원</p>
-                </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <Container component="main" maxWidth="lg" sx={{ mt: 8 }}>
+        <Box sx={{ mt: 4, mb: 4 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    position: 'relative',
+                  }}
+              >
+                {profile && (
+                    <>
+                      <Avatar
+                          src={profile.imagesUrl}
+                          sx={{ width: 120, height: 120, bgcolor: 'grey.500' }}
+                      />
+                      <IconButton
+                          sx={{ position: 'absolute', top: 10, right: 10, color: 'black' }}
+                          onClick={handleProfileUpload}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <Box sx={{ mt: 2 }}>
+                        <input
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            id="profile-image-upload"
+                            type="file"
+                            onChange={handleFileChange}
+                        />
+                        <label htmlFor="profile-image-upload">
+                          <IconButton color="primary" component="span">
+                            <PhotoCamera />
+                          </IconButton>
+                        </label>
+                        {file && (
+                            <Button variant="contained" onClick={handleProfileUpload}>
+                              업로드
+                            </Button>
+                        )}
+                      </Box>
+                      {uploadSuccess && (
+                          <Typography variant="body2" color="green">
+                            프로필 사진이 성공적으로 업로드되었습니다.
+                          </Typography>
+                      )}
+                      {uploadError && (
+                          <Typography variant="body2" color="red">
+                            오류: {uploadError}
+                          </Typography>
+                      )}
+                    </>
+                )}
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <Paper sx={{ p: 2, height: '100%', position: 'relative' }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  사용자 정보
+                </Typography>
+                {profileError && (
+                    <Typography variant="body1" color="red">
+                      오류: {profileError}
+                    </Typography>
+                )}
+                {profile ? (
+                    <>
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        <strong>사용자 이름:</strong> {profile.username}
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        <strong>이름:</strong> {profile.name}
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        <strong>닉네임:</strong> {profile.nickname}
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        <strong>이메일:</strong> {profile.email}
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        <strong>주소:</strong> {profile.address}
+                      </Typography>
+                    </>
+                ) : (
+                    <Typography variant="body1">로딩 중...</Typography>
+                )}
+              </Paper>
+            </Grid>
+          </Grid>
+          <Box sx={{ mt: 4 }}>
+            <Tabs value={tabValue} onChange={handleChange} centered>
+              <Tab label="내 상품 목록" />
+              <Tab label="좋아하는 제품" />
+              <Tab label="경매 목록" />
+            </Tabs>
+            <Box sx={{ mt: 2 }}>
+              {tabValue === 0 && (
+                  <Grid container spacing={2}>
+                    {productError && (
+                        <Typography variant="body1" color="red">
+                          오류: {productError}
+                        </Typography>
+                    )}
+                    {products.map((product) => (
+                        <Grid item xs={12} sm={6} md={4} key={product.id}>
+                          <Paper sx={{ p: 2 }}>
+                            {product.imagesUrl && product.imagesUrl.length > 0 && (
+                                <img
+                                    src={product.imagesUrl[0]}
+                                    alt={product.productName}
+                                    style={{ width: '100%', height: 'auto' }}
+                                />
+                            )}
+                            <Typography variant="h6">{product.productName}</Typography>
+                            <Typography variant="body2">{product.description}</Typography>
+                            <Typography variant="body2">
+                              <strong>시작 가격:</strong> {product.startPrice}원
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>현재 가격:</strong> {product.currentPrice}원
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>즉시 구매가:</strong> {product.auctionNowPrice}원
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                    ))}
+                  </Grid>
+              )}
+              {tabValue === 1 && (
+                  <Grid container spacing={2}>
+                    {likedError && (
+                        <Typography variant="body1" color="red">
+                          오류: {likedError}
+                        </Typography>
+                    )}
+                    {likedProducts.map((product) => (
+                        <Grid item xs={12} sm={6} md={4} key={product.id}>
+                          <Paper sx={{ p: 2 }}>
+                            {product.imagesUrl && product.imagesUrl.length > 0 && (
+                                <img
+                                    src={product.imagesUrl[0]}
+                                    alt={product.productName}
+                                    style={{ width: '100%', height: 'auto' }}
+                                />
+                            )}
+                            <Typography variant="h6">{product.productName}</Typography>
+                            <Typography variant="body2">{product.description}</Typography>
+                            <Typography variant="body2">
+                              <strong>시작 가격:</strong> {product.startPrice}원
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>현재 가격:</strong> {product.currentPrice}원
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>즉시 구매가:</strong> {product.auctionNowPrice}원
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                    ))}
+                  </Grid>
+              )}
+              {tabValue === 2 && (
+                  <Grid container spacing={2}>
+                    {auctionError && (
+                        <Typography variant="body1" color="red">
+                          오류: {auctionError}
+                        </Typography>
+                    )}
+                    {auctions.map((auction) => (
+                        <Grid item xs={12} sm={6} md={4} key={auction.id}>
+                          <Paper sx={{ p: 2 }}>
+                            <Typography variant="h6">상품: {auction.productName}</Typography>
+                            <Typography variant="body2">
+                              <strong>입찰자 이름:</strong> {auction.username}
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>입찰 가격:</strong> {auction.bidPrice}원
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                    ))}
+                  </Grid>
+              )}
+            </Box>
+          </Box>
+        </Box>
+      </Container>
   );
-};
-
-// 인라인 스타일 정의
-const containerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  minHeight: '100vh',
-  padding: '20px',
-  boxSizing: 'border-box',
-};
-
-const contentStyle = {
-  textAlign: 'left',
-  maxWidth: '600px',
-  width: '100%',
-  backgroundColor: '#f9f9f9',
-  padding: '20px',
-  borderRadius: '8px',
-  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  marginBottom: '20px',
-};
-
-const imageStyle = {
-  maxWidth: '100%',
-  height: 'auto',
-  borderRadius: '50%',
-  marginBottom: '20px',
-};
-
-const formStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px',
-  marginTop: '20px',
-};
-
-const productListStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px',
-};
-
-const productItemStyle = {
-  border: '1px solid #ddd',
-  borderRadius: '8px',
-  padding: '10px',
-  textAlign: 'left',
-  backgroundColor: '#fff',
-  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-};
-
-const productImageStyle = {
-  maxWidth: '100%',
-  height: 'auto',
-  borderRadius: '8px',
-  marginBottom: '10px',
 };
 
 export default Profile;
