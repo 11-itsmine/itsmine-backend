@@ -99,6 +99,7 @@ const ProductCreatePage = () => {
         }
       });
 
+      alert('상품 등록이 완료 되었습니다.\n홈 화면으로 이동합니다.');
       navigate('/itsmine'); // 상품 등록 후 홈 페이지로 이동
     } catch (error) {
       console.error('Error creating product:', error);

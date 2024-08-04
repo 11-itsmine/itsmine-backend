@@ -40,13 +40,28 @@ const Profile = () => {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
 
+  // 기본 프로필 이미지 URL 설정
+  const defaultProfileImageUrl = '/images/default-profile.png';
+
+  // 프로필 이미지 URL 상태 관리
+  const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImageUrl);
+
   // 사용자 프로필 데이터를 가져오는 함수
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const response = await axiosInstance.get('/users/profile');
-        setProfile(response.data.data);
+        const userData = response.data.data;
+        setProfile(userData);
+
+        // 이미지 URL이 있는 경우 설정, 없으면 기본 이미지 사용
+        if (userData.imageUrls && userData.imageUrls.length > 0) {
+          setProfileImageUrl(userData.imageUrls[0]); // 첫 번째 이미지를 프로필 이미지로 사용
+        } else {
+          setProfileImageUrl(defaultProfileImageUrl); // 기본 이미지 사용
+        }
       } catch (err) {
+        alert("프로필 정보를 가져오는 중 오류가 발생했습니다.");
         setProfileError(
             err.response ? err.response.data : '프로필 정보를 가져오는 중 오류가 발생했습니다.'
         );
@@ -68,6 +83,7 @@ const Profile = () => {
         });
         setProducts(response.data.data.content);
       } catch (err) {
+        alert("내 상품 목록을 가져오는 중 오류가 발생했습니다.");
         setProductError(
             err.response ? err.response.data : '내 상품 목록을 가져오는 중 오류가 발생했습니다.'
         );
@@ -89,6 +105,7 @@ const Profile = () => {
         });
         setLikedProducts(response.data.data.content);
       } catch (err) {
+        alert("좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.");
         setLikedError(
             err.response ? err.response.data : '좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.'
         );
@@ -110,6 +127,7 @@ const Profile = () => {
         });
         setAuctions(response.data.data.content);
       } catch (err) {
+        alert("경매 목록을 가져오는 중 오류가 발생했습니다.");
         setAuctionError(
             err.response ? err.response.data : '경매 목록을 가져오는 중 오류가 발생했습니다.'
         );
@@ -153,6 +171,7 @@ const Profile = () => {
       if (err.response && err.response.status === 409) {
         setUploadError('이미 존재하는 이미지입니다.');
       } else {
+        alert('프로필 업로드 중 오류가 발생했습니다.');
         setUploadError(err.response ? err.response.data : '프로필 업로드 중 오류가 발생했습니다.');
       }
       setUploadSuccess(false);
@@ -183,7 +202,7 @@ const Profile = () => {
                 {profile && (
                     <>
                       <Avatar
-                          src={profile.imagesUrl}
+                          src={profileImageUrl} // 변경된 프로필 이미지 URL 사용
                           sx={{ width: 120, height: 120, bgcolor: 'grey.500' }}
                       />
                       <IconButton
