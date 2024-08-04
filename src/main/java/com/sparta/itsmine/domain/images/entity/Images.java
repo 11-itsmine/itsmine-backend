@@ -29,7 +29,7 @@ public class Images extends TimeStamp {
     @JoinColumn(name = "product_id", nullable = true)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
