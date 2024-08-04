@@ -95,3 +95,4 @@ dynamodb:
 activemq:
   queue:
     name: ${ACTIVEMQ_QNAME}
+  stomp-host: ${STOMP_HOST}

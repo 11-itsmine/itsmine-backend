@@ -19,17 +19,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private String activePwd;
     @Value("${spring.activemq.broker-url}")
     private String activeHost;
+    @Value("${activemq.stomp-host}")
+    private String stompHost = "b-58f9491d-c8de-422c-8b11-4a18f612ec43-1.mq.ap-northeast-2.amazonaws.com";
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         //배포 했을때 주석한 부분 해제
-//        registry.enableSimpleBroker("/topic", "/queue");
-//                .setRelayHost("b-58f9491d-c8de-422c-8b11-4a18f612ec43-1.mq.ap-northeast-2.amazonaws.com")
+//        registry.enableStompBrokerRelay("/topic", "/queue")
+//                .setRelayHost(stompHost)
 //                .setClientLogin(activeUser)
 //                .setClientPasscode(activePwd)
 //                .setRelayPort(61614)
 
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableSimpleBroker("/topic", "/queue"); // 배포 시 이부분만 주석
         registry.setApplicationDestinationPrefixes("/app");
     }
 
