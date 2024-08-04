@@ -50,7 +50,9 @@ public class ChatService {
     public List<RoomInfoResponseDto> findAllRoom(Long userId) {
         log.info("user id : {}",userId);
         List<ChatRoom> chatRooms = chatRoomRepository.findAllByFromUserIdOrToUserId(userId);
-        return chatRooms.stream().map(RoomInfoResponseDto::new).collect(Collectors.toList());
+        return chatRooms.stream()
+                .map(chatRoom -> new RoomInfoResponseDto(chatRoom, userId)) // userDetailId 추가
+                .collect(Collectors.toList());
     }
 
     /**
@@ -77,7 +79,7 @@ public class ChatService {
 
         //chat_room,join_chat 테이블에 동시 저장
         chatRoomRepository.save(chatRoom);
-        return new RoomInfoResponseDto(chatRoom);
+        return new RoomInfoResponseDto(chatRoom,fromUser.getId());
     }
 
     /**

@@ -4,16 +4,30 @@ import React from 'react';
 import styled from 'styled-components';
 
 const ChatRoom = ({ room, onOpenChat }) => {
-  console.log(room)
-  return (
+  console.log(room);
 
-      <ChatRoomItem onClick={onOpenChat}> {/* 클릭 시 부모에서 전달된 함수 호출 */}
-        <RoomId>채팅방 ID: {room.roomId}</RoomId>
+  // 현재 로그인한 사용자가 발신자인지 수신자인지를 판단
+  const isCurrentUserSender = room.fromUserId === room.userDetailId;
+
+  // 나 또는 상대방으로 표현하기
+  const senderLabel = isCurrentUserSender ? '나' : '상대방';
+  const receiverLabel = !isCurrentUserSender ? '나' : '상대방';
+
+  // 상대방과 나의 정보를 한 번에 출력하기 위한 변수
+  const otherUserNickname = isCurrentUserSender ? room.toUserNickname : room.fromUserNickname;
+  const otherUserStatus = isCurrentUserSender ? room.toUserStatus : room.fromUserStatus;
+  const currentUserNickname = isCurrentUserSender ? room.fromUserNickname : room.toUserNickname;
+  const currentUserStatus = isCurrentUserSender ? room.fromUserStatus : room.toUserStatus;
+
+  return (
+      <ChatRoomItem onClick={onOpenChat}> {/* 클릭 시 채팅 열기 */}
+        {/* 채팅방 ID는 필요할 경우 여기에 추가 */}
+        {/* <RoomId>채팅방 ID: {room.roomId}</RoomId> */}
         <UserInfo>
-          발신자: {room.fromUserNickname} (상태: {room.fromUserStatus})
+          상대방 : ({otherUserNickname}) (상태: {otherUserStatus})
         </UserInfo>
         <UserInfo>
-          수신자: {room.toUserNickname} (상태: {room.toUserStatus})
+          나 : ({currentUserNickname}) (상태: {currentUserStatus})
         </UserInfo>
       </ChatRoomItem>
   );
@@ -21,7 +35,7 @@ const ChatRoom = ({ room, onOpenChat }) => {
 
 export default ChatRoom;
 
-// 스타일링 정의
+// 스타일 정의
 const ChatRoomItem = styled.li`
   background-color: #ffffff;
   margin-bottom: 15px;
@@ -40,6 +54,7 @@ const RoomId = styled.h3`
   margin-bottom: 10px;
   color: #007bff;
   font-size: 1.1em;
+  display: none; /* 채팅방 ID는 보이지 않도록 설정 */
 `;
 
 const UserInfo = styled.p`

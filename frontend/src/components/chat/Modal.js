@@ -4,7 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Modal = ({ isOpen, children, onClose }) => {
-  if (!isOpen) return null; // 모달이 열리지 않으면 null 반환
+  if (!isOpen) return null;
 
   return (
       <ModalOverlay>
@@ -18,7 +18,7 @@ const Modal = ({ isOpen, children, onClose }) => {
 
 export default Modal;
 
-// 스타일링 정의
+// Styles
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;

@@ -1,18 +1,18 @@
 // Board.js
 
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../api/axiosInstance'; // axios 인스턴스 가져오기
+import axiosInstance from '../../api/axiosInstance';
 import ChatRoom from './ChatRoom';
-import ChatWindow from './ChatWindow'; // ChatWindow 컴포넌트 가져오기
-import Modal from './Modal'; // Modal 컴포넌트 가져오기
+import ChatWindow from './ChatWindow';
+import Modal from './Modal';
 import styled from 'styled-components';
 
-const Board = () => {
+const Board = ({ currentUserId }) => {
   const [chatRooms, setChatRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
 
   // 채팅방 목록 가져오기
   const fetchRooms = async () => {
@@ -42,16 +42,16 @@ const Board = () => {
   }, []);
 
   // 모달 열기 함수
-  const openModal = (roomId) => {
-    setSelectedRoomId(roomId);
+  const openModal = (room) => {
+    setSelectedRoom(room);
     setIsModalOpen(true);
   };
 
   // 모달 닫기 함수
   const closeModal = () => {
-    setSelectedRoomId(null);
+    setSelectedRoom(null);
     setIsModalOpen(false);
-    fetchRooms(); // 채팅방 목록 새로고침
+    fetchRooms();
   };
 
   // 채팅방 렌더링
@@ -60,7 +60,7 @@ const Board = () => {
         <ChatRoom
             key={room.roomId}
             room={room}
-            onOpenChat={() => openModal(room.roomId)} // openModal 함수 전달
+            onOpenChat={() => openModal(room)} // 클릭 시 room 정보를 전달
         />
     ));
   };
@@ -80,9 +80,14 @@ const Board = () => {
             </ChatRoomList>
         )}
 
-        {/* 모달을 통해 ChatWindow 컴포넌트 표시 */}
         <Modal isOpen={isModalOpen} onClose={closeModal}>
-          {selectedRoomId && <ChatWindow roomId={selectedRoomId} />} {/* ChatWindow에 roomId 전달 */}
+          {selectedRoom && (
+              <ChatWindow
+                  room={selectedRoom}
+                  currentUserId={currentUserId} // currentUserId를 전달
+                  onClose={closeModal}
+              />
+          )}
         </Modal>
       </BoardContainer>
   );

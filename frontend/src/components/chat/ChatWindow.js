@@ -4,13 +4,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
-import axiosInstance from '../../api/axiosInstance'; // axios 인스턴스 가져오기
+import axiosInstance from '../../api/axiosInstance';
 
-const ChatWindow = ({ roomId }) => {
+const ChatWindow = ({ room, onClose }) => {
+  const { roomId, userDetailId, fromUserId, fromUserNickname, toUserId, toUserNickname } = room;
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const stompClient = useRef(null);
-  const messageListRef = useRef(null); // 메시지 리스트 스크롤을 위한 ref
+  const messageListRef = useRef(null);
 
   useEffect(() => {
     if (!roomId) {
@@ -42,7 +43,7 @@ const ChatWindow = ({ roomId }) => {
         (frame) => {
           console.log('Connected: ' + frame);
 
-          // 서버가 전송하는 경로에 대한 구독 설정
+          // 서버에서 전송하는 메시지를 구독합니다.
           stompClient.current.subscribe(`/topic/chat.message/${roomId}`, (message) => {
             const newMsg = JSON.parse(message.body);
             setMessages((prevMessages) => [...prevMessages, newMsg]);
@@ -59,12 +60,11 @@ const ChatWindow = ({ roomId }) => {
     };
   }, [roomId]);
 
-  // 메시지 로드 시 스크롤을 맨 아래로 이동
   useEffect(() => {
     if (messageListRef.current) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
-  }, [messages]); // messages가 변경될 때마다 스크롤 위치 업데이트
+  }, [messages]);
 
   // 메시지 전송 함수
   const handleSendMessage = () => {
@@ -72,9 +72,9 @@ const ChatWindow = ({ roomId }) => {
 
     const messageObject = {
       message: newMessage,
-      fromUserId: 1, // 실제 사용자 ID로 대체해야 함
+      fromUserId: userDetailId, // 현재 로그인한 사용자 ID 사용
       roomId: roomId,
-      time: new Date().toISOString(), // ISO 8601 형식으로 전송
+      time: new Date().toISOString(),
     };
 
     // 메시지 전송
@@ -82,11 +82,10 @@ const ChatWindow = ({ roomId }) => {
     setNewMessage(''); // 입력 필드 초기화
   };
 
-  // 엔터 키로 메시지 전송 함수
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      handleSendMessage(); // 엔터 키가 눌리면 메시지 전송
-      event.preventDefault(); // 기본 엔터 키 동작 방지 (줄바꿈 등)
+      handleSendMessage();
+      event.preventDefault();
     }
   };
 
@@ -95,7 +94,7 @@ const ChatWindow = ({ roomId }) => {
     if (stompClient.current && stompClient.current.connected) {
       stompClient.current.disconnect(() => {
         console.log('Disconnected from WebSocket');
-        stompClient.current = null; // 연결 종료 후 참조 해제
+        stompClient.current = null;
       });
     }
   };
@@ -103,27 +102,37 @@ const ChatWindow = ({ roomId }) => {
   // 채팅방 나가기 및 페이지 새로고침 함수
   const handleLeaveAndRefresh = async () => {
     try {
-      // DELETE 요청을 통해 채팅방 나가기
       await axiosInstance.delete(`/chatrooms/${roomId}`);
       console.log('Successfully left the chat room.');
     } catch (error) {
       console.error('Failed to leave the chat room:', error);
     } finally {
-      disconnectWebSocket(); // WebSocket 연결 해제
-      window.location.reload(); // 페이지 새로고침
+      disconnectWebSocket();
+      onClose();
     }
   };
+
+  // 상대방의 닉네임을 구하기
+  const otherUserNickname = fromUserId === userDetailId ? toUserNickname : fromUserNickname;
 
   return (
       <ChatWindowContainer>
         <Header>
-          <h2>채팅방 {roomId}</h2>
-          <CloseButton onClick={handleLeaveAndRefresh}>채팅방 나가기</CloseButton> {/* 나가기 버튼 */}
+          <h2>{otherUserNickname}와의 채팅</h2> {/* 상대방의 닉네임으로 표시 */}
+          <CloseButton onClick={handleLeaveAndRefresh}>채팅방 나가기</CloseButton>
         </Header>
-        <MessageList ref={messageListRef}> {/* ref 추가 */}
+        <MessageList ref={messageListRef}>
           {messages.map((msg, index) => (
-              <MessageItem key={index}>
-                <strong>{msg.fromUserId}:</strong> {msg.message}
+              <MessageItem key={index} isOwnMessage={msg.fromUserId === userDetailId}>
+                <strong>
+                  {msg.fromUserId === userDetailId
+                      ? '나'
+                      : msg.fromUserId === fromUserId
+                          ? fromUserNickname // 발신자가 상대방일 경우
+                          : toUserNickname}
+                  :
+                </strong>{' '}
+                {msg.message}
               </MessageItem>
           ))}
         </MessageList>
@@ -133,7 +142,7 @@ const ChatWindow = ({ roomId }) => {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="메시지를 입력하세요..."
-              onKeyPress={handleKeyPress} // 엔터 키 입력 감지
+              onKeyPress={handleKeyPress}
           />
           <SendButton onClick={handleSendMessage}>보내기</SendButton>
         </MessageInputContainer>
@@ -186,8 +195,11 @@ const MessageList = styled.ul`
 const MessageItem = styled.li`
   padding: 10px;
   margin-bottom: 10px;
-  background-color: #f1f1f1;
+  background-color: ${(props) =>
+      props.isOwnMessage ? '#daf8e3' : '#f1f1f1'}; /* 발신자와 수신자의 배경색을 다르게 설정 */
   border-radius: 5px;
+  text-align: ${(props) =>
+      props.isOwnMessage ? 'right' : 'left'}; /* 발신자 메시지는 오른쪽 정렬 */
 `;
 
 const MessageInputContainer = styled.div`
