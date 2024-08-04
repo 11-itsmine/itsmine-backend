@@ -22,17 +22,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-//        registry.setApplicationDestinationPrefixes("/pub");       //클라이언트에서 보낸 메세지를 받을 prefix
-//        registry.enableSimpleBroker("/sub");    //해당 주소를 구독하고 있는 클라이언트들에게 메세지 전달
-//        registry.enableStompBrokerRelay("/exchange");
+        //배포 했을때 주석한 부분 해제
+//        registry.enableSimpleBroker("/topic", "/queue");
 //                .setRelayHost("b-58f9491d-c8de-422c-8b11-4a18f612ec43-1.mq.ap-northeast-2.amazonaws.com")
 //                .setClientLogin(activeUser)
 //                .setClientPasscode(activePwd)
 //                .setRelayPort(61614)
-//                .setRelayHost("localhost")
-//                .setRelayPort(61624)
-//                .setClientLogin("admin")
-//                .setClientPasscode("admin");
+
         registry.enableSimpleBroker("/topic", "/queue");
         registry.setApplicationDestinationPrefixes("/app");
     }
