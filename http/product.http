@@ -8,8 +8,9 @@ Content-Type: application/json
   "name":"{{name}}",
   "email":"{{email}}",
   "address": "화성시",
-  "nickname": "Jak213"
+  "nickname": "Jack21"
 }
+
 
 ### 로그인
 POST http://localhost:8080/users/login
@@ -20,9 +21,9 @@ Content-Type: application/json
   "password":"{{password}}"
 }
 > {%
-  client.log(response.body.data);
+  client.log(response.headers.valueOf("Authorization"));
   client.log(response.headers.valueOf("RefreshToken"));
-  client.global.set("Authorization", response.body.data);
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
   client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
 
@@ -44,7 +45,7 @@ Content-Type: application/json
 
 {
   "productCreateDto": {
-    "productName": "상품16",
+    "productName": "상품1",
     "description": "상품 설명입니다",
     "auctionNowPrice": 1000,
     "startPrice": 1000,
@@ -62,10 +63,6 @@ Content-Type: application/json
 }
 
 
-
-
-
-
 ### 특정 상품 조회하기
 GET http://localhost:8080/products/1
 Authorization: {{Authorization}}
@@ -73,8 +70,14 @@ Content-Type: application/json
 
 
 
-### 상품 조회 페이지네이션
-GET http://localhost:8080/products?page=0&size=5
+### 특정 유저 상품 조회 페이지네이션
+GET http://localhost:8080/products/user?page=0&size=5
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+
+### 모든 상품 조회 페이지네이션
+GET http://localhost:8080/products/all?page=0&size=5
 Authorization: {{Authorization}}
 Content-Type: application/json
 

@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
-import Item from "./Item";
-import SearchBar from "./SearchBar";
-import Banner from "./Banner";
-import Category from "./Category";
-import Price from "./Price";
-import SORT_LIST from "./SortListData";
-import BANNER_LIST from "../Data/bannerListData";
-import {CATEGORY_FILTER, PRICE_FILTER} from "../Data/categoryData";
-import ItemNotFound from "./ItemNotFound";
+import Item from './Item';
+import SearchBar from './SearchBar';
+import Banner from './Banner';
+import Category from './Category';
+import Price from './Price';
+import SORT_LIST from './SortListData';
+import BANNER_LIST from '../Data/bannerListData';
+import {CATEGORY_FILTER, PRICE_FILTER} from '../Data/categoryData';
+import ItemNotFound from './ItemNotFound';
 
 const ItemList = () => {
   const [productsList, setProductsList] = useState([]);
@@ -19,6 +19,8 @@ const ItemList = () => {
   const [limit] = useState(8); // Number of items per page
   const [page, setPage] = useState(0); // Current page number
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,6 +57,9 @@ const ItemList = () => {
           : '';
 
       try {
+        setLoading(true);
+        setError(null);
+
         const response = await fetch(
             `http://localhost:8080/products?page=${page}&size=${limit}${categoryString}${priceString}&search=${userInput}&sort=${optionValue}`,
             {
@@ -64,7 +69,8 @@ const ItemList = () => {
                 'Authorization': `Bearer ${localStorage.getItem(
                     'Authorization')}`,
               },
-            });
+            }
+        );
 
         if (!response.ok) {
           throw new Error('Failed to fetch');
@@ -75,7 +81,9 @@ const ItemList = () => {
             prevProducts => (page === 0 ? data.content : [...prevProducts,
               ...data.content]));
       } catch (error) {
-        console.error('Error fetching products:', error);
+        setError('Failed to fetch products');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -179,6 +187,8 @@ const ItemList = () => {
                 </Title>
               </SortingWrapper>
             </SearchOption>
+            {loading && <Loading>Loading...</Loading>}
+            {error && <Error>{error}</Error>}
             {productsList.length !== 0 ? (
                 <ItemWrapper>
                   <ItemsList>
@@ -187,23 +197,16 @@ const ItemList = () => {
                         id,
                         productName,
                         description,
-                        startPrice,
                         currentPrice,
-                        auctionNowPrice,
-                        dueDate,
-                        category,
-                        productImagesList,
-                        status,
-                        like
+                        getThumbnailUrl
                       } = product;
                       return (
                           <Item
                               key={id}
-                              eng_name={productName}
-                              kor_name={description}
+                              productName={productName}
+                              description={description}
                               price={currentPrice}
-                              thumbnail_url={productImagesList.length > 0
-                                  ? productImagesList[0] : ''}
+                              thumbnail_url={getThumbnailUrl()}
                               productId={id}
                           />
                       );
@@ -212,11 +215,11 @@ const ItemList = () => {
                   <LoadMore onClick={loadMore}>더보기</LoadMore>
                 </ItemWrapper>
             ) : (
-                <ItemNotFound/>
+                !loading && <ItemNotFound/>
             )}
           </ItemContainer>
         </Content>
-        {isScrolled && <GoToTopBtn onClick={handleGoToTop}>&uArr;</GoToTopBtn>}
+        {isScrolled && <GoToTopBtn onClick={handleGoToTop}>&uarr;</GoToTopBtn>}
       </ContentWrapper>
   );
 };
@@ -224,59 +227,70 @@ const ItemList = () => {
 export default ItemList;
 
 const ContentWrapper = styled.div`
-  ${props => props.theme.flex.flexBox('column')}
+  display: flex;
+  flex-direction: column;
 `;
 
 const BannerWrapper = styled.div`
   width: 72rem;
-  margin-top: ${props => props.theme.margins.xxxl};
+  margin-top: 2rem;
 `;
 
 const BannerList = styled.ul`
-  ${props => props.theme.flex.flexBox('_', '_', 'space-between')}
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 `;
 
 const Content = styled.div`
-  ${props => props.theme.flex.flexBox('_', 'start')}
-  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
   padding: 3rem 2.5rem;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 const SearchFilter = styled.div`
   width: 15rem;
-  margin-top: ${props => props.theme.margins.base};
+  margin-top: 1rem;
 `;
 
 const Filter = styled.div`
-  display: block;
   display: flex;
-  width: 100%;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
   margin-bottom: 1.5rem;
-  font-size: ${({theme}) => theme.fontSizes.xs};
-  font-weight: ${props => props.theme.fontWeights.semiBold};
-  padding-left: ${props => props.theme.paddings.base};
 `;
 
 const FilterStatus = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 1.25rem;
-  border: 1px solid black;
-  border-radius: 0.625rem;
+  height: 1.25rem;
   margin-left: 0.625rem;
-  text-align: center;
-  background-color: ${props => props.theme.colors.black};
+  border: 1px solid black;
+  border-radius: 50%;
+  background-color: black;
   color: white;
 `;
 
 const ItemContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-left: 3rem;
-  width: 60rem;
+  width: 100%;
 `;
 
 const FilterDelete = styled.div`
+  margin-left: auto;
+  cursor: pointer;
   color: gray;
   border-bottom: 1px solid gray;
-  padding-bottom: 0;
-  margin-left: 4.375rem;
 `;
 
 const SearchOption = styled.div`
@@ -291,56 +305,57 @@ const FilterCategorys = styled.div`
 `;
 
 const FilterCategory = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 0.313rem;
+  margin-left: 1rem;
   background-color: #f4f4f4;
   border: 1px solid #f4f4f4;
   border-radius: 0.625rem;
-  margin-left: ${props => props.theme.margins.large};
-  padding: 0.313rem;
 `;
 
 const DeleteButton = styled.button`
-  border-style: none;
+  border: none;
   background-color: #f4f4f4;
+  cursor: pointer;
 `;
 
 const SortingWrapper = styled.div`
-  ${props => props.theme.flex.flexBox('_', '_', 'right')}
+  display: flex;
+  align-items: center;
   padding: 1rem 0;
-  padding-right: 1rem;
 `;
 
 const Title = styled.select`
-  font-size: ${props => props.theme.fontSizes.small};
-  text-align: center;
+  font-size: 1rem;
   padding: 0.5rem 1rem;
-  margin-right: 0.1rem;
+  margin-right: 0.5rem;
 `;
 
 const ItemWrapper = styled.div`
-  ${props => props.theme.flex.flexBox('column')}
-  margin-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
 `;
 
 const ItemsList = styled.div`
   display: grid;
-  justify-items: center;
-  grid-template-columns: repeat(4, 1fr);
-  grid-column-gap: 1rem;
-  padding: ${props => props.theme.paddings.base};
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
 `;
 
 const LoadMore = styled.button`
-  width: 8rem;
-  background: none;
-  border: ${props => props.theme.borders.lightGray};
-  border-radius: 1.25rem;
-  font-weight: ${props => props.theme.fontWeights.thin};
-  font-size: ${props => props.theme.fontSizes.small};
-  padding: 0.9rem 1.5rem;
+  margin-top: 2rem;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  border: 1px solid gray;
+  border-radius: 1rem;
   cursor: pointer;
 
-  :hover {
-    background: ${props => props.theme.colors.lightGray};
+  &:hover {
+    background-color: lightgray;
   }
 `;
 
@@ -349,12 +364,23 @@ const GoToTopBtn = styled.button`
   bottom: 2.5rem;
   right: 2.5rem;
   border: 1px solid lightgray;
-  border-radius: 2.5rem;
-  padding: 0.9rem 1rem;
-  background: ${props => props.theme.colors.white};
+  border-radius: 50%;
+  padding: 0.5rem;
+  background-color: white;
   cursor: pointer;
 
-  :hover {
-    background: ${props => props.theme.colors.lightGray};
+  &:hover {
+    background-color: lightgray;
   }
+`;
+
+const Loading = styled.div`
+  text-align: center;
+  padding: 2rem;
+`;
+
+const Error = styled.div`
+  color: red;
+  text-align: center;
+  padding: 2rem;
 `;

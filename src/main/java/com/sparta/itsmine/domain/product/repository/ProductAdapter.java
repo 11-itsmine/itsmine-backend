@@ -60,11 +60,7 @@ public class ProductAdapter {
         return productRepository.findAllByUserIdAndDeletedAtIsNull(userId, pageable)
                 .map(ProductResponseDto::new);
     }
-
-    public Page<ProductResponseDto> findAllLikeProduct(Pageable pageable, Long userId) {
-        return productRepository.findAllByUserIdAndLikeTrueAndDeletedAtIsNull(userId, pageable)
-                .map(ProductResponseDto::new);
-    }
+    
 
     public Product getProduct(Long productId) {
         return productRepository.findActiveProductById(productId)

@@ -17,7 +17,4 @@ public interface CustomProductRepository {
     Optional<Product> findActiveProductById(@Param("productId") Long productId);
 
     Page<Product> findAllByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
-
-    Page<Product> findAllByUserIdAndLikeTrueAndDeletedAtIsNull(Long userId, Pageable pageable);
-
 }

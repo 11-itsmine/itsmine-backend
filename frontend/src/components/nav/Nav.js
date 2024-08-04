@@ -25,7 +25,10 @@ const Nav = () => {
       <Container>
         <Logo onClick={goToMain}>ITSMINE</Logo>
         <ButtonContainer>
-          <Button>SELL</Button>
+          <Button login
+                  onClick={() => {
+                    navigate('/products')
+                  }}>SELL</Button>
           <Button>ABOUT</Button>
           {isLogin ? (
               <>
