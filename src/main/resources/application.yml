@@ -14,18 +14,10 @@ spring:
     redis:
       host: ${REDIS_DOMAIN} # 로컬에서 할 때는 localhost
       port: ${REDIS_PORT}
-#  activemq:
-#    broker-url: ${ACTIVEMQ_BROKER}
-#    user: ${ACTIVEMQ_USER}
-#    password: ${ACTIVEMQ_PASSWORD}
-#    close-timeout: 10s
-#    packages:
-#      trust-all: true
-  #로컬용
   activemq:
-    broker-url: tcp://localhost:61626
-    user: admin
-    password: admin
+    broker-url: ${ACTIVEMQ_BROKER}
+    user: ${ACTIVEMQ_USER}
+    password: ${ACTIVEMQ_PASSWORD}
     close-timeout: 10s
     packages:
       trust-all: true
@@ -35,11 +27,12 @@ spring:
 #    username: ${DB_USER}
 #    password: ${DB_PASSWORD}
 #    driver-class-name: org.mariadb.jdbc.Driver
-# 로컬용
+
+  # 로컬용
   datasource:
-    url: jdbc:mysql://${MY_DB_URL}/itsmine
-    username: ${MY_DB_USER}
-    password: ${MY_DB_PASSWORD}
+    url: jdbc:mysql://${DB_URL}/itsmine
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
