@@ -23,6 +23,10 @@ const Profile = () => {
   const [likedProducts, setLikedProducts] = useState([]);
   const [likedError, setLikedError] = useState(null);
 
+  // 경매 목록 상태 관리
+  const [auctions, setAuctions] = useState([]);
+  const [auctionError, setAuctionError] = useState(null);
+
   // 사용자 프로필 데이터를 가져오는 함수
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -77,6 +81,25 @@ const Profile = () => {
     };
 
     fetchLikedProducts();
+  }, [page, size]);
+
+  // 경매 목록을 가져오는 함수
+  useEffect(() => {
+    const fetchAuctions = async () => {
+      try {
+        const response = await axiosInstance.get('/auctions', {
+          params: {
+            page,
+            size,
+          }
+        });
+        setAuctions(response.data.data.content);
+      } catch (err) {
+        setAuctionError(err.response ? err.response.data : "경매 목록을 가져오는 중 오류가 발생했습니다.");
+      }
+    };
+
+    fetchAuctions();
   }, [page, size]);
 
   // 파일 입력 변경 처리 함수
@@ -177,6 +200,21 @@ const Profile = () => {
                   <p><strong>시작 가격:</strong> {product.startPrice}원</p>
                   <p><strong>현재 가격:</strong> {product.currentPrice}원</p>
                   <p><strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}</p>
+                </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 경매 목록 영역 */}
+        <div style={contentStyle}>
+          <h2>경매 목록</h2>
+          {auctionError && <p style={{ color: 'red' }}>오류: {auctionError}</p>}
+          <div style={productListStyle}>
+            {auctions.map((auction) => (
+                <div key={auction.id} style={productItemStyle}>
+                  <h3>상품: {auction.productName}</h3>
+                  <p><strong>입찰자 이름:</strong> {auction.username}</p>
+                  <p><strong>입찰 가격:</strong> {auction.bidPrice}원</p>
                 </div>
             ))}
           </div>

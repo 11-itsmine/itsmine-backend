@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.product.repository;
 
 import static com.sparta.itsmine.domain.product.entity.QProduct.product;
+import static com.sparta.itsmine.domain.user.entity.QUser.user;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -85,15 +86,16 @@ public class ProductRepositoryImpl implements CustomProductRepository {
     }
 
     @Override
-    public Page<Product> findProducts(Pageable pageable, String category, String price,
-            String search, String sort) {
+    public Page<Product> findProducts(Pageable pageable, Long userid, String category, String price,
+            String search, String sort) {//Long userid 추가
         List<Product> products = queryFactory
                 .selectFrom(product)
+                .innerJoin(product.user, user)//user 이너조인
                 .where(
                         categoryEq(category),
                         priceEq(price),
                         productNameContains(search)
-                )
+                                .and(user.id.eq(userid)))//유저id 같은 거 추가
                 .orderBy(sort.equals("createdAt") ? product.createdAt.desc()
                         : product.createdAt.asc()) // Sorting logic
                 .offset(pageable.getOffset())

@@ -64,10 +64,10 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> getProductsWithPage(int page, int size, Long userId,
-            String category, String price, String search, String sort) {
+            String category, String price, String search, String sort) {//Long userId 이걸 씀
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Product> products = productRepository.findProducts(pageRequest, category, price,
-                search, sort);
+        Page<Product> products = productRepository.findProducts(pageRequest, userId, category,
+                price, search, sort);//userId 추가
         return products.map(ProductResponseDto::new);
     }
 
