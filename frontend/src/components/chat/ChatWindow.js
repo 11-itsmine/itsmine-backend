@@ -32,6 +32,7 @@ const ChatWindow = ({ room, onClose }) => {
     fetchMessages();
 
     // SockJS 및 STOMP 연결 설정
+    //배포시 이부분도 변경 해야함
     const socket = new SockJS('http://localhost:8080/ws');
     stompClient.current = Stomp.over(socket);
 
