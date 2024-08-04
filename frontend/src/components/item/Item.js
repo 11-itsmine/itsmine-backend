@@ -13,6 +13,7 @@ const Item = ({
 }) => {
   const [product, setProduct] = useState(null);
   const [error, setError] = useState("");
+  const [isEndingSoon, setIsEndingSoon] = useState(false);
   const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -20,7 +21,20 @@ const Item = ({
   const fetchProduct = async () => {
     try {
       const response = await axiosInstance.get(`/products/${productId}`);
-      setProduct(response.data.data);
+      const productData = response.data.data;
+      setProduct(productData);
+
+      const now = new Date();
+      const dueDateObj = new Date(dueDate);
+      const timeDifference = (dueDateObj.getTime() - now.getTime()) / (1000 * 60
+          * 60); // Time difference in hours
+
+      console.log('Current time:', now);
+      console.log('Due date:', dueDateObj);
+      console.log('Time difference in hours:', timeDifference);
+
+      // 3시간 이내이고 아직 마감되지 않은 경우
+      setIsEndingSoon(timeDifference <= 3 && timeDifference > 0);
     } catch (err) {
       setError("제품 정보를 가져오는데 실패했습니다.");
       console.error("Error fetching product data:", err);
@@ -39,7 +53,8 @@ const Item = ({
     e.stopPropagation();
     if (product && product.imagesUrl) {
       setCurrentImageIndex(
-          (prevIndex) => (prevIndex + 1) % product.imagesUrl.length);
+          (prevIndex) => (prevIndex + 1) % product.imagesUrl.length
+      );
     }
   };
 
@@ -67,6 +82,8 @@ const Item = ({
                     alt={`${productName} image`}
                 />
                 <Arrow onClick={nextImage}>&gt;</Arrow>
+                {isEndingSoon && <FireImage src="/images/banner/fire.gif"
+                                            alt="Ending Soon"/>}
               </>
           ) : (
               <ItemImg
@@ -139,6 +156,14 @@ const Arrow = styled.div`
   user-select: none;
 
   ${({left}) => (left ? `left: 10px;` : `right: 10px;`)}
+`;
+
+const FireImage = styled.img`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
 `;
 
 const ItemDetails = styled.div`

@@ -28,6 +28,16 @@ const BANNER_LIST = [
     id: 6,
     src: '/images/banner/babyAndKids.png',
     text: '유아용품',
+  },
+  {
+    id: 7,
+    src: "/images/banner/clothes.png",
+    text: '의류'
+  },
+  {
+    id: 8,
+    src: "/images/banner/shoes.png",
+    text: '신발'
   }
 ];
 
