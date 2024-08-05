@@ -1,10 +1,10 @@
-// ChatWindow.js
-
+// 클라이언트 측 ChatWindow.js
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import axiosInstance from '../../api/axiosInstance';
+import { v4 as uuidv4 } from 'uuid'; // UUID 생성 라이브러리
 
 const ChatWindow = ({ room, onClose }) => {
   const { roomId, userDetailId, fromUserId, fromUserNickname, toUserId, toUserNickname } = room;
@@ -32,7 +32,6 @@ const ChatWindow = ({ room, onClose }) => {
     fetchMessages();
 
     // SockJS 및 STOMP 연결 설정
-    //배포시 이부분도 변경 해야함
     const socket = new SockJS('http://localhost:8080/ws');
     stompClient.current = Stomp.over(socket);
 
@@ -72,6 +71,7 @@ const ChatWindow = ({ room, onClose }) => {
     if (newMessage.trim() === '') return;
 
     const messageObject = {
+      messageId: uuidv4(), // 고유 메시지 ID 생성
       message: newMessage,
       fromUserId: userDetailId, // 현재 로그인한 사용자 ID 사용
       roomId: roomId,
@@ -197,10 +197,10 @@ const MessageItem = styled.li`
   padding: 10px;
   margin-bottom: 10px;
   background-color: ${(props) =>
-      props.isOwnMessage ? '#daf8e3' : '#f1f1f1'}; /* 발신자와 수신자의 배경색을 다르게 설정 */
+    props.isOwnMessage ? '#daf8e3' : '#f1f1f1'}; /* 발신자와 수신자의 배경색을 다르게 설정 */
   border-radius: 5px;
   text-align: ${(props) =>
-      props.isOwnMessage ? 'right' : 'left'}; /* 발신자 메시지는 오른쪽 정렬 */
+    props.isOwnMessage ? 'right' : 'left'}; /* 발신자 메시지는 오른쪽 정렬 */
 `;
 
 const MessageInputContainer = styled.div`

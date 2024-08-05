@@ -11,6 +11,7 @@ import lombok.Getter;
 public class ProductResponseDto {
 
     private final Long id;
+    private final Long userId;
     private final String productName;
     private final String description;
     private final Integer auctionNowPrice;
@@ -22,6 +23,7 @@ public class ProductResponseDto {
 
     public ProductResponseDto(Product product) {
         this.id = product.getId();
+        this.userId = product.getUser().getId();
         this.productName = product.getProductName();
         this.description = product.getDescription();
         this.auctionNowPrice = product.getAuctionNowPrice();
@@ -34,6 +36,7 @@ public class ProductResponseDto {
 
     public ProductResponseDto(Product product, ProductImagesRequestDto productImagesRequestDto) {
         this.id = product.getId();
+        this.userId = product.getUser().getId();
         this.productName = product.getProductName();
         this.description = product.getDescription();
         this.auctionNowPrice = product.getAuctionNowPrice();
