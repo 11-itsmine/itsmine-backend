@@ -13,8 +13,8 @@ public class QAuctionProductResponseDto extends ConstructorExpression<AuctionPro
 
     private static final long serialVersionUID = -17399161L;
 
-    public QAuctionProductResponseDto(com.querydsl.core.types.Expression<Long> productId, com.querydsl.core.types.Expression<Integer> bidPrice, com.querydsl.core.types.Expression<Long> userId) {
-        super(AuctionProductResponseDto.class, new Class<?>[]{long.class, int.class, long.class}, productId, bidPrice, userId);
+    public QAuctionProductResponseDto(com.querydsl.core.types.Expression<String> username, com.querydsl.core.types.Expression<String> productName, com.querydsl.core.types.Expression<Integer> bidPrice) {
+        super(AuctionProductResponseDto.class, new Class<?>[]{String.class, String.class, int.class}, username, productName, bidPrice);
     }
 
 }
