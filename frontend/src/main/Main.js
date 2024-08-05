@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-
 import Carousel from "../components/carousel/Carousel";
 import ItemList from "../components/item/ItemList";
 import Board from "../components/chat/Board"

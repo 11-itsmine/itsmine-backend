@@ -1,38 +1,41 @@
-import React, {useState} from 'react';
+
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
-const Category = ({categorydata, selectPrice, filterSelect}) => {
+const Category = ({ categorydata, selectPrice, filterSelect }) => {
   const [isFilterTab, setIsFilterTab] = useState(true);
 
-  const {categoryList, categoryName} = categorydata;
+  const { categoryList, categoryName } = categorydata;
+
 
   const handelCategory = () => {
     setIsFilterTab(!isFilterTab);
   };
 
   return (
-      <CategoryWrapper>
-        <Title>
-          <CategoryTag>{categoryName}</CategoryTag>
-          <SeeMore onClick={handelCategory}>{isFilterTab ? '+' : '-'}</SeeMore>
-        </Title>
-        <List>
-          {categoryList.map(category => {
-            return (
-                <Hide key={category.id} isFilterTab={isFilterTab}>
-                  <SelectCategory onClick={() => selectPrice(category)}>
-                    <CheckBox
-                        type="checkBox"
-                        checked={filterSelect.name === category.name}
-                        readOnly
-                    />
-                    {category.name}
-                  </SelectCategory>
-                </Hide>
-            );
-          })}
-        </List>
-      </CategoryWrapper>
+
+    <CategoryWrapper>
+      <Title>
+        <CategoryTag>{categoryName}</CategoryTag>
+        <SeeMore onClick={handelCategory}>{isFilterTab ? '+' : '-'}</SeeMore>
+      </Title>
+      <List>
+        {categoryList.map(category => {
+          return (
+            <Hide key={category.id} isFilterTab={isFilterTab}>
+              <SelectCategory onClick={() => selectPrice(category)}>
+                <CheckBox
+                  type="checkBox"
+                  checked={filterSelect.name === category.name}
+                  readOnly
+                />
+                {category.name}
+              </SelectCategory>
+            </Hide>
+          );
+        })}
+      </List>
+    </CategoryWrapper>
   );
 };
 

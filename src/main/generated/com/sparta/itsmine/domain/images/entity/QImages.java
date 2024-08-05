@@ -11,18 +11,20 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QProductImages is a Querydsl query type for ProductImages
+ * QImages is a Querydsl query type for Images
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QProductImages extends EntityPathBase<ProductImages> {
+public class QImages extends EntityPathBase<Images> {
 
-    private static final long serialVersionUID = 1722596276L;
+    private static final long serialVersionUID = -541196578L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QProductImages productImages = new QProductImages("productImages");
+    public static final QImages images = new QImages("images");
 
     public final com.sparta.itsmine.global.common.QTimeStamp _super = new com.sparta.itsmine.global.common.QTimeStamp(this);
+
+    public final EnumPath<com.sparta.itsmine.domain.images.util.ImageType> contentType = createEnum("contentType", com.sparta.itsmine.domain.images.util.ImageType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
@@ -36,25 +38,28 @@ public class QProductImages extends EntityPathBase<ProductImages> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
-    public QProductImages(String variable) {
-        this(ProductImages.class, forVariable(variable), INITS);
+    public final com.sparta.itsmine.domain.user.entity.QUser user;
+
+    public QImages(String variable) {
+        this(Images.class, forVariable(variable), INITS);
     }
 
-    public QProductImages(Path<? extends ProductImages> path) {
+    public QImages(Path<? extends Images> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QProductImages(PathMetadata metadata) {
+    public QImages(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QProductImages(PathMetadata metadata, PathInits inits) {
-        this(ProductImages.class, metadata, inits);
+    public QImages(PathMetadata metadata, PathInits inits) {
+        this(Images.class, metadata, inits);
     }
 
-    public QProductImages(Class<? extends ProductImages> type, PathMetadata metadata, PathInits inits) {
+    public QImages(Class<? extends Images> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.product = inits.isInitialized("product") ? new com.sparta.itsmine.domain.product.entity.QProduct(forProperty("product"), inits.get("product")) : null;
+        this.user = inits.isInitialized("user") ? new com.sparta.itsmine.domain.user.entity.QUser(forProperty("user")) : null;
     }
 
 }

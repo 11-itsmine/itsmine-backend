@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Banner = ({ text, src }) => {
+
+const Banner = ({text, src}) => {
   return (
       <BannerItem>
-        <BannerImg src={src} />
+        <BannerImg src={src}/>
+
         <BannerText>{text}</BannerText>
       </BannerItem>
   );
@@ -23,5 +25,5 @@ const BannerImg = styled.img`
 `;
 
 const BannerText = styled.p`
-  font-size: ${props => props.theme.fontSizes.xs};
+  font-size: ${props => props.theme.fontSizes.small};
 `;
