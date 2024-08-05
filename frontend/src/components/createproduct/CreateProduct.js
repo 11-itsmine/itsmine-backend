@@ -53,7 +53,8 @@ const ProductCreatePage = () => {
     });
 
     try {
-      const response = await axiosInstance.post('http://localhost:8080/s3/upload',
+      const response = await axiosInstance.post(
+          'http://localhost:8080/s3/upload',
           formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -98,6 +99,7 @@ const ProductCreatePage = () => {
         }
       });
 
+      alert('상품 등록이 완료 되었습니다.\n홈 화면으로 이동합니다.');
       navigate('/itsmine'); // 상품 등록 후 홈 페이지로 이동
     } catch (error) {
       console.error('Error creating product:', error);
@@ -106,7 +108,7 @@ const ProductCreatePage = () => {
   };
 
   return (
-      <Container sx={{backgroundColor: '#f2f2f2', padding: 3, borderRadius: 2}}>
+      <Container>
         <Box component="form" onSubmit={handleSubmit} sx={{mt: 3}}>
           <Typography variant="h4" component="h1" gutterBottom>
             상품 등록
