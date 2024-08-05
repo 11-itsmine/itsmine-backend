@@ -1,10 +1,11 @@
 package com.sparta.itsmine.domain.product.service;
 
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_LIKE;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_REMOVE_LIKE;
-
 import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.category.entity.Category;
+import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
+import com.sparta.itsmine.domain.images.service.ImagesService;
+import com.sparta.itsmine.domain.like.entity.Like;
+import com.sparta.itsmine.domain.like.repository.LikeRepository;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
@@ -12,10 +13,7 @@ import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
-import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
-import com.sparta.itsmine.domain.images.service.ImagesService;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +35,7 @@ public class ProductService {
     private final AuctionService auctionService;
     private final ImagesService imagesService;
     private final MessageSenderService messageSenderService;
+    private final LikeRepository likeRepository;
     private final ProductRepository productRepository;
 
     @Transactional
@@ -63,8 +62,13 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponseDto> getProductsWithPage(int page, int size, Long userId,
-            String category, String price, String search, String sort) {
+    public Page<ProductResponseDto> getAllProductsWithPage(int page, int size, String category,
+            String price, String search, String sort) {
+
+        if (sort == null) {
+            sort = "createdAt"; // 기본 정렬 필드 설정
+        }
+
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Product> products = productRepository.findProducts(pageRequest, category, price,
                 search, sort);
@@ -72,9 +76,16 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public Page<ProductResponseDto> getUserProductsWithPage(int page, int size, Long userId) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.ASC, "createdAt"));
+        return adapter.findAllProducts(pageable, userId);
+    }
+
+    @Transactional(readOnly = true)
     public Page<ProductResponseDto> getLikeProductsWithPage(int page, int size, Long userId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.ASC, "createdAt"));
-        return adapter.findAllLikeProduct(pageable, userId);
+        Page<Like> likes = likeRepository.findAllByUserIdAndDeletedIsNull(userId, pageable);
+        return likes.map(like -> new ProductResponseDto(like.getProduct()));
     }
 
     @Transactional
@@ -94,13 +105,6 @@ public class ProductService {
         auctionService.avoidedAuction(productId);
     }
 
-    @Transactional
-    public ResponseCodeEnum toggleProductLike(Long productId) {
-        Product product = adapter.getProduct(productId);
-        boolean like = product.toggleLike();
-        adapter.saveProduct(product);
-        return like ? SUCCESS_TO_LIKE : SUCCESS_TO_REMOVE_LIKE;
-    }
 
     private void scheduleProductUpdate(Product product) {
         // 현재 시간

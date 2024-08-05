@@ -8,6 +8,7 @@ import com.sparta.itsmine.global.exception.DataNotFoundException;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,9 +41,9 @@ public class ImagesController {
 
     //프로필 업로드 엔드포인트
     @PostMapping("/upload/profile")
-    public ResponseEntity<ProfileImagesResponseDto> uploadProfile(@RequestParam("file") MultipartFile file, @RequestParam("userId") Long userId) {
+    public ResponseEntity<ProfileImagesResponseDto> uploadProfile(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam("file") MultipartFile file) {
         try {
-            UserDetailsImpl userDetails = new UserDetailsImpl(userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND)));
+            userRepository.findById(userDetails.getUser().getId()).orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND));
             ProfileImagesResponseDto response = imagesService.uploadProfile(file, userDetails);
             return ResponseEntity.ok(response); // 프로필 업로드 완료 메시지 반환
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.auction.entity;
 
 
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_DENIED_BID;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS;
 
@@ -63,7 +64,13 @@ public class Auction extends TimeStamp {
         this.status = status;
     }
 
-    public void checkBidPrice(Integer bidPrice) {
+    public void checkUser(User user, Product product) {
+        if (user.getId().equals(product.getUser().getId())) {
+            throw new DataDuplicatedException(AUCTION_DENIED_BID);
+        }
+    }
+
+    public void checkBidPrice(Integer bidPrice,Product product) {
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
         if (bidPrice <= product.getCurrentPrice()
                 || bidPrice > product.getAuctionNowPrice()) {

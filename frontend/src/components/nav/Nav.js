@@ -25,11 +25,18 @@ const Nav = () => {
       <Container>
         <Logo onClick={goToMain}>ITSMINE</Logo>
         <ButtonContainer>
-          <Button>SELL</Button>
+          <Button login
+                  onClick={() => {
+                    navigate('/products')
+                  }}>SELL</Button>
           <Button>ABOUT</Button>
           {isLogin ? (
               <>
-                <Button>MYPAGE</Button>
+                <Button login
+                        onClick={() => {
+                          navigate('/profile');
+                        }}
+                >MYPAGE</Button>
                 <Button logout onClick={logout}>
                   LOGOUT
                 </Button>

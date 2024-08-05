@@ -18,6 +18,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -34,7 +35,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "product")
+@Table(name = "product", indexes = {
+        @Index(name = "idx_user_product_name", columnList = "user_id, productName"),
+        @Index(name = "idx_product_deleted", columnList = "deletedAt")
+})
 @NoArgsConstructor
 public class Product extends TimeStamp {
 
@@ -45,11 +49,10 @@ public class Product extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String productName;
     @Column(nullable = false)
     private String description;
-    // TODO : 시작 가격을 명시해주고 추적하자
     @Column(nullable = false)
     private Integer startPrice;
     @Column
@@ -66,13 +69,9 @@ public class Product extends TimeStamp {
     private LocalDateTime dueDate;
     private LocalDateTime deletedAt;
 
-    @Column(name = "`like`", nullable = false)  // Use backticks in the annotation
-    private Boolean like;
-
     /**
      * 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
      */
-
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -104,7 +103,6 @@ public class Product extends TimeStamp {
 
         // set up initialized values
         this.status = BID;
-        this.like = false;
     }
 
     /**
@@ -147,11 +145,6 @@ public class Product extends TimeStamp {
         this.status = status;
     }
 
-    public Boolean toggleLike() {
-        this.like = !this.like; // 현재 값의 반대로 설정
-        return this.like;
-    }
-
     public void extendDueDateByHours(Integer hours) {
         this.dueDate = this.getDueDate().plusSeconds(hours);
     }
@@ -164,5 +157,12 @@ public class Product extends TimeStamp {
         return imagesList.stream()
                 .map(Images::getImagesUrl)
                 .collect(Collectors.toList());
+    }
+
+    public String getThumbnailUrl() {
+        if (!imagesList.isEmpty()) {
+            return imagesList.get(0).getImagesUrl();
+        }
+        return null; // or a default image URL
     }
 }
