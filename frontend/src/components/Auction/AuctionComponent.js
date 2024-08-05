@@ -9,7 +9,7 @@ const AuctionComponent = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태 추가
+  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태 초기화
 
   const navigate = useNavigate();
   const { productId } = useParams();
@@ -20,6 +20,7 @@ const AuctionComponent = () => {
       const response = await axiosInstance.get(`/products/${productId}`);
       setProduct(response.data.data);
     } catch (err) {
+      alert("제품 정보를 가져오는데 실패했습니다.");
       setError("제품 정보를 가져오는데 실패했습니다.");
       console.error("Error fetching product data:", err);
     }
@@ -37,7 +38,9 @@ const AuctionComponent = () => {
             },
           }
       );
-      setIsLiked(response.data.isLiked);
+
+      console.log("Like status response:", response.data); // 응답 데이터 로그 출력
+      setIsLiked(response.data.liked); // 서버에서 받아온 좋아요 상태로 설정
     } catch (err) {
       console.error("Error fetching like status:", err);
     }
@@ -56,8 +59,9 @@ const AuctionComponent = () => {
             },
           }
       );
-      setIsLiked(!isLiked); // 상태를 토글
+      setIsLiked((prevIsLiked) => !prevIsLiked); // 상태를 토글
     } catch (err) {
+      alert("좋아요 변경에 실패했습니다. 다시 시도하세요.");
       setError("좋아요 변경에 실패했습니다. 다시 시도하세요.");
       console.error("Error toggling like status:", err);
     }
@@ -89,12 +93,14 @@ const AuctionComponent = () => {
           }
       );
 
+      alert("입찰이 성공적으로 완료되었습니다.\n홈 화면으로 이동합니다.");
       setMessage("입찰이 성공적으로 완료되었습니다.");
-      setError("");
+      setError("입찰이 성공적으로 완료되었습니다.");
       navigate("/itsmine");
     } catch (err) {
+      alert("입찰에 실패했습니다. 다시 시도하세요.");
       setError("입찰에 실패했습니다. 다시 시도하세요.");
-      setMessage("");
+      setMessage("입찰에 실패했습니다. 다시 시도하세요.");
       console.error("Error creating auction:", err);
     }
   };
@@ -134,21 +140,25 @@ const AuctionComponent = () => {
 
   return (
       <Container>
-        <ImageSlider>
-          <Arrow left onClick={prevImage}>
-            &lt;
-          </Arrow>
-          <ProductImage
-              src={product.imagesUrl[currentImageIndex]}
-              alt={`Product ${currentImageIndex}`}
-          />
-          <Arrow onClick={nextImage}>&gt;</Arrow>
-        </ImageSlider>
-        <Indicator>
-          {product.imagesUrl.map((_, index) => (
-              <Dot key={index} isActive={index === currentImageIndex} />
-          ))}
-        </Indicator>
+        {product.imagesUrl && product.imagesUrl.length > 0 && (
+            <>
+              <ImageSlider>
+                <Arrow left onClick={prevImage}>
+                  &lt;
+                </Arrow>
+                <ProductImage
+                    src={product.imagesUrl[currentImageIndex]}
+                    alt={`Product ${currentImageIndex}`}
+                />
+                <Arrow onClick={nextImage}>&gt;</Arrow>
+              </ImageSlider>
+              <Indicator>
+                {product.imagesUrl.map((_, index) => (
+                    <Dot key={index} isActive={index === currentImageIndex} />
+                ))}
+              </Indicator>
+            </>
+        )}
         <Details>
           <Title>{product.productName}</Title>
           <LikeButton onClick={toggleLike} isLiked={isLiked}>
@@ -158,6 +168,7 @@ const AuctionComponent = () => {
         </Details>
         <AdditionalInfo>
           <InfoText>경매 시작가: {product.startPrice}원</InfoText>
+          <InfoText>마감일: {new Date(product.dueDate).toLocaleString()}</InfoText>
         </AdditionalInfo>
         <ButtonContainer>
           <PriceButton className="buy-btn" onClick={handleBuyNow}>
@@ -379,5 +390,4 @@ const LikeButton = styled.button`
   &:hover {
     color: ${({ isLiked }) => (isLiked ? "#c0392b" : "#888")};
   }
-`;
-
+`;//전

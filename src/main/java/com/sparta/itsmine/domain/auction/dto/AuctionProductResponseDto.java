@@ -9,15 +9,15 @@ import lombok.Setter;
 @Setter
 public class AuctionProductResponseDto {
 
-    private Long userId;
-    private Long productId;
+    private String username;
+    private String productName;
     private Integer bidPrice;
 
     @QueryProjection
-    public AuctionProductResponseDto(Long productId, Integer bidPrice, Long userId) {
-        this.productId = productId;
+    public AuctionProductResponseDto(String username, String productName, Integer bidPrice) {
+        this.username = username;
+        this.productName = productName;
         this.bidPrice = bidPrice;
-        this.userId = userId;
     }
 
 }

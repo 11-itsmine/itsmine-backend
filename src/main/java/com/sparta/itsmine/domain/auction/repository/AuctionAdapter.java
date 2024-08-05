@@ -16,14 +16,8 @@ public class AuctionAdapter {
     private final AuctionRepository auctionRepository;
 
     public Page<AuctionProductResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
-        Page<AuctionProductResponseDto> auctions = auctionRepository.findAuctionAllByUserid(userId,
-                pageable);
 
-        if (auctions.isEmpty()) {
-            throw new DataNotFoundException(AUCTION_NOT_FOUND);
-        }
-
-        return auctions;
+        return auctionRepository.findAuctionAllByUserid(userId, pageable);
     }
 
     public AuctionProductResponseDto findByUserIdAndProductId(Long userId, Long productId) {

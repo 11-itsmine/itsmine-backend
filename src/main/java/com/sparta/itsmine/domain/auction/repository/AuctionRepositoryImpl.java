@@ -30,7 +30,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     @Cacheable("AuctionAllPage")
     public Page<AuctionProductResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
         List<AuctionProductResponseDto> content = jpaQueryFactory
-                .select(new QAuctionProductResponseDto(product.id, auction.bidPrice.max(), user.id))
+                .select(new QAuctionProductResponseDto(user.username, product.productName, auction.bidPrice.max()))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
@@ -56,8 +56,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId,
             Long productId) {
         return Optional.ofNullable(jpaQueryFactory
-                .select(new QAuctionProductResponseDto(product.id, auction.bidPrice.max(),
-                        user.id))
+                .select(new QAuctionProductResponseDto(user.username, product.productName, auction.bidPrice.max()))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
