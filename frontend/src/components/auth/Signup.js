@@ -25,7 +25,7 @@ const SignUp = () => {
       await axiosInstance.post('/users', signupRequest);
 
       console.log('Signup successful!');
-      navigate('/login');
+      navigate('/itsmine/login');
     } catch (error) {
       console.error('Signup failed:', error);
       if (error.response && error.response.data) {

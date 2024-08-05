@@ -26,7 +26,7 @@ const SearchWrapper = styled.form`
   width: 90vw;
   ${props => props.theme.flex.flexBox()}
   padding: 3rem 0 2rem;
-  margin-top: 8rem;
+  margin-top: 6rem;
 `;
 
 const Input = styled.input`

@@ -23,10 +23,12 @@ const SignIn = ({onLogin}) => {
       // 응답 바디에서 토큰 추출
       const token = response.data.data;
       console.log('Login successful!', token);
-      console.log(response);
 
       // 토큰을 localStorage에 저장
       localStorage.setItem('Authorization', token);
+      console.log('Token stored in localStorage:',
+          localStorage.getItem('Authorization'));
+
       // 부모 컴포넌트에 로그인 상태 변경 알리기
       onLogin();
 

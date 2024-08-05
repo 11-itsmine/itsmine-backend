@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 const ItemNotFound = () => {
   return (
+
     <Wrapper>
       <MainText>검색하신 결과가 없습니다.</MainText>
       <SubText>
@@ -30,4 +31,5 @@ const SubText = styled.p`
 
 const SubSpan = styled.span`
   font-weight: ${props => props.theme.fontWeights.bold};
+
 `;
