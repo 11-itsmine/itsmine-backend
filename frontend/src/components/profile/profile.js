@@ -1,23 +1,24 @@
-
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Avatar,
   Box,
+  Button,
   Container,
   Grid,
-  Typography,
-  Paper,
-  Tabs,
-  Tab,
-  Button,
   IconButton,
+  Paper,
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import axiosInstance from '../../api/axiosInstance';
-
+import {useNavigate} from 'react-router-dom';
 
 const Profile = () => {
+  const navigate = useNavigate();
+
   // 사용자 프로필 상태 관리
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState(null);
@@ -46,7 +47,9 @@ const Profile = () => {
   const defaultProfileImageUrl = '/images/default-profile.png';
 
   // 프로필 이미지 URL 상태 관리
-  const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImageUrl);
+  const [profileImageUrl, setProfileImageUrl] = useState(
+      defaultProfileImageUrl
+  );
 
   // 사용자 프로필 데이터를 가져오는 함수
   useEffect(() => {
@@ -63,11 +66,12 @@ const Profile = () => {
           setProfileImageUrl(defaultProfileImageUrl); // 기본 이미지 사용
         }
       } catch (err) {
-        alert("프로필 정보를 가져오는 중 오류가 발생했습니다.");
+        alert('프로필 정보를 가져오는 중 오류가 발생했습니다.');
         setProfileError(
-            err.response ? err.response.data : '프로필 정보를 가져오는 중 오류가 발생했습니다.'
+            err.response
+                ? err.response.data
+                : '프로필 정보를 가져오는 중 오류가 발생했습니다.'
         );
-
       }
     };
 
@@ -86,10 +90,11 @@ const Profile = () => {
         });
         setProducts(response.data.data.content);
       } catch (err) {
-
-        alert("내 상품 목록을 가져오는 중 오류가 발생했습니다.");
+        alert('내 상품 목록을 가져오는 중 오류가 발생했습니다.');
         setProductError(
-            err.response ? err.response.data : '내 상품 목록을 가져오는 중 오류가 발생했습니다.'
+            err.response
+                ? err.response.data
+                : '내 상품 목록을 가져오는 중 오류가 발생했습니다.'
         );
       }
     };
@@ -109,9 +114,11 @@ const Profile = () => {
         });
         setLikedProducts(response.data.data.content);
       } catch (err) {
-        alert("좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.");
+        alert('좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.');
         setLikedError(
-            err.response ? err.response.data : '좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.'
+            err.response
+                ? err.response.data
+                : '좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.'
         );
       }
     };
@@ -131,9 +138,11 @@ const Profile = () => {
         });
         setAuctions(response.data.data.content);
       } catch (err) {
-        alert("경매 목록을 가져오는 중 오류가 발생했습니다.");
+        alert('경매 목록을 가져오는 중 오류가 발생했습니다.');
         setAuctionError(
-            err.response ? err.response.data : '경매 목록을 가져오는 중 오류가 발생했습니다.'
+            err.response
+                ? err.response.data
+                : '경매 목록을 가져오는 중 오류가 발생했습니다.'
         );
       }
     };
@@ -172,15 +181,19 @@ const Profile = () => {
         imagesUrl: response.data.imageUrl,
       }));
       setUploadError(null);
+      navigate(0); // 프로필 페이지로 리다이렉트하여 이미지 업데이트를 확인
     } catch (err) {
       if (err.response && err.response.status === 409) {
         setUploadError('이미 존재하는 이미지입니다.');
       } else {
         alert('프로필 업로드 중 오류가 발생했습니다.');
-        setUploadError(err.response ? err.response.data : '프로필 업로드 중 오류가 발생했습니다.');
+        setUploadError(
+            err.response
+                ? err.response.data
+                : '프로필 업로드 중 오류가 발생했습니다.'
+        );
       }
       setUploadSuccess(false);
-
     }
   };
 
@@ -190,8 +203,8 @@ const Profile = () => {
   };
 
   return (
-      <Container component="main" maxWidth="lg" sx={{ mt: 8 }}>
-        <Box sx={{ mt: 4, mb: 4 }}>
+      <Container component="main" maxWidth="lg" sx={{mt: 8}}>
+        <Box sx={{mt: 4, mb: 4}}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}>
               <Paper
@@ -209,29 +222,35 @@ const Profile = () => {
                     <>
                       <Avatar
                           src={profileImageUrl} // 변경된 프로필 이미지 URL 사용
-                          sx={{ width: 120, height: 120, bgcolor: 'grey.500' }}
+                          sx={{width: 120, height: 120, bgcolor: 'grey.500'}}
                       />
                       <IconButton
-                          sx={{ position: 'absolute', top: 10, right: 10, color: 'black' }}
+                          sx={{
+                            position: 'absolute',
+                            top: 10,
+                            right: 10,
+                            color: 'black',
+                          }}
                           onClick={handleProfileUpload}
                       >
-                        <EditIcon />
+                        <EditIcon/>
                       </IconButton>
-                      <Box sx={{ mt: 2 }}>
+                      <Box sx={{mt: 2}}>
                         <input
                             accept="image/*"
-                            style={{ display: 'none' }}
+                            style={{display: 'none'}}
                             id="profile-image-upload"
                             type="file"
                             onChange={handleFileChange}
                         />
                         <label htmlFor="profile-image-upload">
                           <IconButton color="primary" component="span">
-                            <PhotoCamera />
+                            <PhotoCamera/>
                           </IconButton>
                         </label>
                         {file && (
-                            <Button variant="contained" onClick={handleProfileUpload}>
+                            <Button variant="contained"
+                                    onClick={handleProfileUpload}>
                               업로드
                             </Button>
                         )}
@@ -251,8 +270,8 @@ const Profile = () => {
               </Paper>
             </Grid>
             <Grid item xs={12} md={8}>
-              <Paper sx={{ p: 2, height: '100%', position: 'relative' }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
+              <Paper sx={{p: 2, height: '100%', position: 'relative'}}>
+                <Typography variant="h6" sx={{mb: 2}}>
                   사용자 정보
                 </Typography>
                 {profileError && (
@@ -262,19 +281,19 @@ const Profile = () => {
                 )}
                 {profile ? (
                     <>
-                      <Typography variant="body1" sx={{ mb: 1 }}>
+                      <Typography variant="body1" sx={{mb: 1}}>
                         <strong>사용자 이름:</strong> {profile.username}
                       </Typography>
-                      <Typography variant="body1" sx={{ mb: 1 }}>
+                      <Typography variant="body1" sx={{mb: 1}}>
                         <strong>이름:</strong> {profile.name}
                       </Typography>
-                      <Typography variant="body1" sx={{ mb: 1 }}>
+                      <Typography variant="body1" sx={{mb: 1}}>
                         <strong>닉네임:</strong> {profile.nickname}
                       </Typography>
-                      <Typography variant="body1" sx={{ mb: 1 }}>
+                      <Typography variant="body1" sx={{mb: 1}}>
                         <strong>이메일:</strong> {profile.email}
                       </Typography>
-                      <Typography variant="body1" sx={{ mb: 1 }}>
+                      <Typography variant="body1" sx={{mb: 1}}>
                         <strong>주소:</strong> {profile.address}
                       </Typography>
                     </>
@@ -284,13 +303,13 @@ const Profile = () => {
               </Paper>
             </Grid>
           </Grid>
-          <Box sx={{ mt: 4 }}>
+          <Box sx={{mt: 4}}>
             <Tabs value={tabValue} onChange={handleChange} centered>
-              <Tab label="내 상품 목록" />
-              <Tab label="좋아하는 제품" />
-              <Tab label="경매 목록" />
+              <Tab label="내 상품 목록"/>
+              <Tab label="좋아하는 제품"/>
+              <Tab label="경매 목록"/>
             </Tabs>
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{mt: 2}}>
               {tabValue === 0 && (
                   <Grid container spacing={2}>
                     {productError && (
@@ -300,16 +319,19 @@ const Profile = () => {
                     )}
                     {products.map((product) => (
                         <Grid item xs={12} sm={6} md={4} key={product.id}>
-                          <Paper sx={{ p: 2 }}>
-                            {product.imagesUrl && product.imagesUrl.length > 0 && (
-                                <img
-                                    src={product.imagesUrl[0]}
-                                    alt={product.productName}
-                                    style={{ width: '100%', height: 'auto' }}
-                                />
-                            )}
-                            <Typography variant="h6">{product.productName}</Typography>
-                            <Typography variant="body2">{product.description}</Typography>
+                          <Paper sx={{p: 2}}>
+                            {product.imagesUrl && product.imagesUrl.length > 0
+                                && (
+                                    <img
+                                        src={product.imagesUrl[0]}
+                                        alt={product.productName}
+                                        style={{width: '100%', height: 'auto'}}
+                                    />
+                                )}
+                            <Typography
+                                variant="h6">{product.productName}</Typography>
+                            <Typography
+                                variant="body2">{product.description}</Typography>
                             <Typography variant="body2">
                               <strong>시작 가격:</strong> {product.startPrice}원
                             </Typography>
@@ -320,7 +342,8 @@ const Profile = () => {
                               <strong>즉시 구매가:</strong> {product.auctionNowPrice}원
                             </Typography>
                             <Typography variant="body2">
-                              <strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}
+                              <strong>마감일:</strong> {new Date(
+                                product.dueDate).toLocaleString()}
                             </Typography>
                           </Paper>
                         </Grid>
@@ -336,16 +359,19 @@ const Profile = () => {
                     )}
                     {likedProducts.map((product) => (
                         <Grid item xs={12} sm={6} md={4} key={product.id}>
-                          <Paper sx={{ p: 2 }}>
-                            {product.imagesUrl && product.imagesUrl.length > 0 && (
-                                <img
-                                    src={product.imagesUrl[0]}
-                                    alt={product.productName}
-                                    style={{ width: '100%', height: 'auto' }}
-                                />
-                            )}
-                            <Typography variant="h6">{product.productName}</Typography>
-                            <Typography variant="body2">{product.description}</Typography>
+                          <Paper sx={{p: 2}}>
+                            {product.imagesUrl && product.imagesUrl.length > 0
+                                && (
+                                    <img
+                                        src={product.imagesUrl[0]}
+                                        alt={product.productName}
+                                        style={{width: '100%', height: 'auto'}}
+                                    />
+                                )}
+                            <Typography
+                                variant="h6">{product.productName}</Typography>
+                            <Typography
+                                variant="body2">{product.description}</Typography>
                             <Typography variant="body2">
                               <strong>시작 가격:</strong> {product.startPrice}원
                             </Typography>
@@ -356,7 +382,8 @@ const Profile = () => {
                               <strong>즉시 구매가:</strong> {product.auctionNowPrice}원
                             </Typography>
                             <Typography variant="body2">
-                              <strong>마감일:</strong> {new Date(product.dueDate).toLocaleString()}
+                              <strong>마감일:</strong> {new Date(
+                                product.dueDate).toLocaleString()}
                             </Typography>
                           </Paper>
                         </Grid>
@@ -372,8 +399,9 @@ const Profile = () => {
                     )}
                     {auctions.map((auction) => (
                         <Grid item xs={12} sm={6} md={4} key={auction.id}>
-                          <Paper sx={{ p: 2 }}>
-                            <Typography variant="h6">상품: {auction.productName}</Typography>
+                          <Paper sx={{p: 2}}>
+                            <Typography
+                                variant="h6">상품: {auction.productName}</Typography>
                             <Typography variant="body2">
                               <strong>입찰자 이름:</strong> {auction.username}
                             </Typography>
@@ -389,7 +417,6 @@ const Profile = () => {
           </Box>
         </Box>
       </Container>
-
   );
 };
 
