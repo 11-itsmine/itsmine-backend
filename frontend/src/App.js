@@ -42,7 +42,7 @@ function App() {
             <Route path="/itsmine/login"
                    element={<SignIn isLoggedIn={isLoggedIn}
                                     onLogin={handleLogin}/>}/>
-            <Route path="/signup" element={<SignUp/>}/>
+            <Route path="/itsmine/signup" element={<SignUp/>}/>
             <Route path="/products" element={<CreateProduct/>}/>
             <Route path="/items" element={<ItemList/>}/>
             <Route path="/item" element={<Item/>}/>
