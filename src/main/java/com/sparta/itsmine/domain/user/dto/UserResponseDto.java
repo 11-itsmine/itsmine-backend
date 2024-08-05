@@ -1,7 +1,9 @@
 package com.sparta.itsmine.domain.user.dto;
 
+import com.sparta.itsmine.domain.images.dto.ProfileImagesResponseDto;
 import com.sparta.itsmine.domain.user.entity.User;
 
+import java.util.List;
 import lombok.Getter;
 
 @Getter
@@ -12,6 +14,7 @@ public class UserResponseDto {
 	private String nickname;
 	private String email;
 	private String address;
+	private List<String> imageUrls;
 
 	public UserResponseDto(User user) {
 		this.username = user.getUsername();
@@ -19,5 +22,6 @@ public class UserResponseDto {
 		this.nickname = user.getNickname();
 		this.email = user.getEmail();
 		this.address = user.getAddress();
+		this.imageUrls=user.getImageUrls();
 	}
 }

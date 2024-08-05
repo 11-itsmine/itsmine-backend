@@ -10,10 +10,12 @@ spring:
     virtual-host: ${RABBITMQ_VIRTUAL_HOST}
     ssl:
       enabled: true
+
   data:
     redis:
       host: ${REDIS_DOMAIN} # 로컬에서 할 때는 localhost
       port: ${REDIS_PORT}
+
   activemq:
     broker-url: ${ACTIVEMQ_BROKER}
     user: ${ACTIVEMQ_USER}
@@ -28,12 +30,12 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
-  ## 로컬용
-  #  datasource:
-  #    url: jdbc:mysql://${MY_DB_URL}/itsmine
-  #    username: ${MY_DB_USER}
-  #    password: ${MY_DB_PASSWORD}
-  #    driver-class-name: com.mysql.cj.jdbc.Driver
+# 로컬용
+#   datasource:
+#     url: jdbc:mysql://${DB_URL}/itsmine
+#     username: ${DB_USER}
+#     password: ${DB_PASSWORD}
+#     driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
     init:

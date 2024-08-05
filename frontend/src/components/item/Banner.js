@@ -3,10 +3,10 @@ import styled from 'styled-components';
 
 const Banner = ({ text, src }) => {
   return (
-      <BannerItem>
-        <BannerImg src={src} />
-        <BannerText>{text}</BannerText>
-      </BannerItem>
+    <BannerItem>
+      <BannerImg src={src} />
+      <BannerText>{text}</BannerText>
+    </BannerItem>
   );
 };
 

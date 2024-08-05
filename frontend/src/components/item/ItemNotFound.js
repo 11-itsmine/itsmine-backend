@@ -3,12 +3,12 @@ import styled from 'styled-components';
 
 const ItemNotFound = () => {
   return (
-      <Wrapper>
-        <MainText>검색하신 결과가 없습니다.</MainText>
-        <SubText>
-          상품 등록 요청은 <SubSpan>앱 1:1 문의하기</SubSpan>로 요청해주세요.
-        </SubText>
-      </Wrapper>
+    <Wrapper>
+      <MainText>검색하신 결과가 없습니다.</MainText>
+      <SubText>
+        상품 등록 요청은 <SubSpan>앱 1:1 문의하기</SubSpan>로 요청해주세요.
+      </SubText>
+    </Wrapper>
   );
 };
 

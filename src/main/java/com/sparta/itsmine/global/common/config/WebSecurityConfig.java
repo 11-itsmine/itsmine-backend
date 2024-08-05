@@ -4,8 +4,6 @@ import com.sparta.itsmine.global.security.JwtProvider;
 import com.sparta.itsmine.global.security.UserDetailsServiceImpl;
 import com.sparta.itsmine.global.security.filters.JwtAuthenticationFilter;
 import com.sparta.itsmine.global.security.filters.JwtAuthorizationFilter;
-
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -61,8 +59,6 @@ public class WebSecurityConfig {
         // CSRF 설정
         http.csrf(AbstractHttpConfigurer::disable);
 
-
-
         // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
         http.sessionManagement((sessionManagement) ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -72,8 +68,7 @@ public class WebSecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(HttpMethod.POST, "/users", "/users/login").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/users/resign/*").permitAll()
-                .requestMatchers(HttpMethod.GET, "/chatrooms").permitAll()
-                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
         );
 

@@ -26,6 +26,9 @@ public enum ResponseCodeEnum {
     SUCCESS_TO_LIKE(HttpStatus.OK, "좋아요가 완료 되었습니다"),
     SUCCESS_TO_REMOVE_LIKE(HttpStatus.OK, "좋아요가 취소 되었습니다."),
 
+    //Like
+    SUCCESS_PRODUCTS_LIKE(HttpStatus.OK, "좋아요를 누른 상품 조회가 완료되었습니다."),
+
     // 카테고리
     SUCCESS_TO_MAKE_NEW_CATEGORY(HttpStatus.OK, "새로운 카테고리를 만드셨습니다."),
     CATEGORY_SUCCESS_GET(HttpStatus.OK, "카테고리 목록 조회에 성공하셨습니다."),

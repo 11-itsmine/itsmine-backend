@@ -1,13 +1,15 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
 
-const Item = ({ eng_name, kor_name, price, thumbnail_url, productId }) => {
+const Item = ({
+  productName,
+  description,
+  currentPrice,
+  thumbnail_url,
+  productId
+}) => {
   const navigate = useNavigate();
-
-  const getRandomNumber = max => {
-    return (Math.random() * max).toFixed(1);
-  };
 
   const goToDetail = () => {
     navigate(`/products/${productId}`);
@@ -15,119 +17,61 @@ const Item = ({ eng_name, kor_name, price, thumbnail_url, productId }) => {
 
   return (
       <ItemComponent onClick={goToDetail}>
-        <ItemImg src={thumbnail_url} />
-        <ItemTitle>
-          <Description>
-            <ItemNameEn>{eng_name}</ItemNameEn>
-            <ItemNameKr>{kor_name}</ItemNameKr>
-          </Description>
-          <Amount>
-            <Price>{price}원</Price>
-            <PriceDescription>즉시 구매가</PriceDescription>
-          </Amount>
-        </ItemTitle>
-        <Interests>
-          <BookMark>
-            <BookMarkIcon src="/images/ItemList/bookmark.png" alt="icon" />
-            <BookMarkNum>{getRandomNumber(20)}만</BookMarkNum>
-          </BookMark>
-          <Likes>
-            <LikesIcon src="/images/ItemList/like.png" alt="icon" />
-            <LikesNum>{getRandomNumber(10)}만</LikesNum>
-          </Likes>
-        </Interests>
+        <ItemImg src={thumbnail_url} alt={`${productName} image`}/>
+        <ItemDetails>
+          <ItemName>{productName}</ItemName>
+          <ItemDescription>{description}</ItemDescription>
+          <ItemPrice>{currentPrice}원</ItemPrice>
+        </ItemDetails>
       </ItemComponent>
   );
 };
 
 export default Item;
 
-const getRandomColor = () => {
-  return backgroundColors[Math.floor(Math.random() * backgroundColors.length)];
-};
-
-const backgroundColors = [
-  'lavender',
-  'lavenderblush',
-  'linen',
-  'powderblue',
-  'thistle',
-];
-
 const ItemComponent = styled.div`
-  margin-bottom: ${props => props.theme.margins.xxxl};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
 `;
 
 const ItemImg = styled.img`
   width: 14rem;
   height: 14rem;
-  object-position: center;
-  object-fit: fill;
-  background-color: ${getRandomColor};
+  object-fit: cover;
   border-radius: 10px;
-  cursor: pointer;
+  background-color: #f0f0f0;
 `;
 
-const ItemTitle = styled.div`
-  margin-top: ${props => props.theme.margins.xl};
-  overflow: auto;
-  cursor: pointer;
+const ItemDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  text-align: center;
 `;
 
-const Description = styled.div`
-  margin-bottom: ${props => props.theme.margins.small};
-  font-size: ${props => props.theme.fontSizes.small};
+const ItemName = styled.div`
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 `;
 
-const ItemNameEn = styled.div``;
-
-const ItemNameKr = styled.div`
-  color: ${props => props.theme.colors.gray};
+const ItemDescription = styled.div`
+  font-size: 1rem;
+  color: gray;
+  margin-bottom: 0.5rem;
 `;
 
-const Amount = styled.div`
-  margin-bottom: ${props => props.theme.margins.base};
-`;
-
-const Price = styled.p`
-  font-size: ${props => props.theme.fontSizes.small};
-  font-weight: ${props => props.theme.fontWeights.semiBold};
-`;
-
-const PriceDescription = styled.p`
-  font-size: ${props => props.theme.fontSizes.xs};
-  color: ${props => props.theme.colors.gray};
-`;
-
-const Interests = styled.div`
-  ${props => props.theme.flex.flexBox('_', '_', 'left')}
-  font-size: ${props => props.theme.fontSizes.xs};
-`;
-
-const BookMark = styled.div`
-  margin-right: 1rem;
-  ${props => props.theme.flex.flexBox}
-`;
-
-const BookMarkIcon = styled.img`
-  width: 1rem;
-  cursor: pointer;
-`;
-
-const BookMarkNum = styled.span`
-  margin-left: ${props => props.theme.margins.small};
-`;
-
-const Likes = styled.div`
-  ${props => props.theme.flex.flexBox('_', 'baseline', '_')}
-  margin-left: ${props => props.theme.margins.small};
-`;
-
-const LikesIcon = styled.img`
-  width: 1rem;
-  cursor: pointer;
-`;
-
-const LikesNum = styled.span`
-  margin-left: ${props => props.theme.margins.small};
+const ItemPrice = styled.div`
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ff4500;
 `;

@@ -54,22 +54,32 @@ public class ProductController {
         return ResponseUtils.of(SUCCESS_TO_SEARCH_PRODUCTS, productService.getProduct(productId));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<HttpResponseDto> getAllProductsWithPage(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "price", required = false) String price,
             @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "sort", required = false) String sort,
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+            @RequestParam(value = "sort", required = false) String sort
     ) {
-        Page<ProductResponseDto> responseDto = productService.getProductsWithPage(page, size,
-                userDetails.getUser().getId(), category, price, search, sort);
+        Page<ProductResponseDto> responseDto = productService.getAllProductsWithPage(page, size,
+                category, price, search, sort);
         PageableResponse<ProductResponseDto> responseEntity = new PageableResponse<>(responseDto);
         return ResponseUtils.of(SUCCESS_TO_SEARCH_PRODUCTS, responseEntity);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<HttpResponseDto> getUserProductsWithPage(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        Page<ProductResponseDto> responseDto = productService.getUserProductsWithPage(page, size,
+                userDetails.getUser().getId());
+        PageableResponse<ProductResponseDto> responseEntity = new PageableResponse<>(responseDto);
+        return ResponseUtils.of(SUCCESS_TO_SEARCH_PRODUCTS, responseEntity);
+    }
 
     @GetMapping("/likes")
     public ResponseEntity<HttpResponseDto> getAllLikeProductsWithPage(
@@ -79,8 +89,7 @@ public class ProductController {
     ) {
         Page<ProductResponseDto> responseDto = productService.getLikeProductsWithPage(page, size,
                 userDetails.getUser().getId());
-        PageableResponse<ProductResponseDto> responseEntity = new PageableResponse<>(
-                responseDto);
+        PageableResponse<ProductResponseDto> responseEntity = new PageableResponse<>(responseDto);
         return ResponseUtils.of(SUCCESS_TO_SEARCH_PRODUCTS, responseEntity);
     }
 

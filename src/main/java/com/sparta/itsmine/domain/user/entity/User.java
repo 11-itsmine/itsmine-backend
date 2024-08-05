@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -95,5 +96,11 @@ public class User extends TimeStamp {
         this.email = requestDto.getEmail();
         this.nickname = requestDto.getNickname();
         this.address = requestDto.getAddress();
+    }
+
+    public List<String> getImageUrls() {
+        return imagesList.stream()
+                .map(Images::getImagesUrl)
+                .collect(Collectors.toList());
     }
 }
