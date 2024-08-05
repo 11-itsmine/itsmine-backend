@@ -9,7 +9,7 @@ const AuctionComponent = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태 추가
+  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태 초기화
 
   const navigate = useNavigate();
   const { productId } = useParams();
@@ -38,9 +38,10 @@ const AuctionComponent = () => {
             },
           }
       );
-      setIsLiked(response.data.isLiked);
+
+      console.log("Like status response:", response.data); // 응답 데이터 로그 출력
+      setIsLiked(response.data.liked); // 서버에서 받아온 좋아요 상태로 설정
     } catch (err) {
-      // alert("좋아요 상태를 불러오는데 실패했습니다.");
       console.error("Error fetching like status:", err);
     }
   };
@@ -58,7 +59,7 @@ const AuctionComponent = () => {
             },
           }
       );
-      setIsLiked(!isLiked); // 상태를 토글
+      setIsLiked((prevIsLiked) => !prevIsLiked); // 상태를 토글
     } catch (err) {
       alert("좋아요 변경에 실패했습니다. 다시 시도하세요.");
       setError("좋아요 변경에 실패했습니다. 다시 시도하세요.");
@@ -389,5 +390,4 @@ const LikeButton = styled.button`
   &:hover {
     color: ${({ isLiked }) => (isLiked ? "#c0392b" : "#888")};
   }
-`;
-
+`;//전

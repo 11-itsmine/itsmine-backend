@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.like.service;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_LIKE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_REMOVE_LIKE;
 
+import com.sparta.itsmine.domain.like.dto.LikeResponseDto;
 import com.sparta.itsmine.domain.like.entity.Like;
 import com.sparta.itsmine.domain.like.repository.LikeAdapter;
 import com.sparta.itsmine.domain.like.repository.LikeRepository;
@@ -36,5 +37,11 @@ public class LikeService {
                     likeRepository.save(new Like(product, user));
                     return SUCCESS_TO_LIKE;
                 });
+    }
+
+    public LikeResponseDto getLike(Long productId, User user) {
+        Like likeProduct = likeAdapter.getLike(productId, user.getId());
+        boolean isLike = likeAdapter.isUserLikedProduct(productId, user);
+        return new LikeResponseDto(likeProduct, isLike);
     }
 }
