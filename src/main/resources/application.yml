@@ -25,38 +25,33 @@ spring:
       trust-all: true
 
   datasource:
-    url: jdbc:mysql://${DB_URL}/itsmine
+    url: jdbc:mariadb://${DB_URL}/itsmine
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    # 주석을 활성화할 경우 아래를 사용
-    # datasource:
-    #   url: jdbc:mariadb://${DB_URL}/itsmine
-    #   username: ${DB_USER}
-    #   password: ${DB_PASSWORD}
-    #   driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: org.mariadb.jdbc.Driver
 
-  sql:
-    init:
-      encoding: UTF-8
+# 로컬용
+#  datasource:
+#    url: jdbc:mysql://${DB_URL}/itsmine
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+#    driver-class-name: com.mysql.cj.jdbc.Driver
 
-  jpa:
+sql:
+  init:
+    encoding: UTF-8
 
-    hibernate:
-      ddl-auto: update
-
+jpa:
+  hibernate:
+    ddl-auto: update
   properties:
     hibernate:
-      ddl-auto: update
-    properties:
-     hibernate:
-        show_sql: true
-        format_sql: true
-        connection:
-          CharSet: utf-8
-          characterEncoding: utf-8
-          useUnicode: true
-
+      show_sql: true
+      format_sql: true
+      connection:
+        CharSet: utf-8
+        characterEncoding: utf-8
+        useUnicode: true
 
 web:
   resources:
@@ -96,7 +91,6 @@ dynamodb:
   credentials:
     accessKey: ${CLOUD_AWS_DYNAMODB_ACCESSKEY}
     secretKey: ${CLOUD_AWS_DYNAMODB_SECRETKEY}
-
 
 activemq:
   queue:
