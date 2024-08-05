@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
+import ChatWindow from "../chat/ChatWindow"; // ChatWindow 컴포넌트 가져오기
+import Modal from "../chat/Modal"; // Modal 컴포넌트 가져오기
 
 const AuctionComponent = () => {
   const [product, setProduct] = useState(null);
@@ -10,6 +12,8 @@ const AuctionComponent = () => {
   const [error, setError] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false); // 좋아요 상태 초기화
+  const [isChatOpen, setIsChatOpen] = useState(false); // 채팅 창 상태 추가
+  const [chatRoomInfo, setChatRoomInfo] = useState(null); // 채팅방 정보 상태 추가
 
   const navigate = useNavigate();
   const { productId } = useParams();
@@ -129,6 +133,37 @@ const AuctionComponent = () => {
     setBidPrice(product.currentPrice);
   };
 
+  // 채팅 창 상태를 토글하는 함수
+  const toggleChatWindow = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
+  // 채팅 방을 생성하고 정보를 가져오는 함수
+  const handleStartChat = async () => {
+    try {
+      const token = localStorage.getItem("Authorization");
+      console.log(product.userId);
+      const response = await axiosInstance.post(
+          `/chatrooms`, // 채팅 방 생성 API 경로
+          {
+            userId: product.userId, // 상품 소유자의 ID를 사용
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+      );
+
+      // 채팅 방 정보 저장
+      setChatRoomInfo(response.data.data);
+      setIsChatOpen(true); // 채팅 창 열기
+    } catch (err) {
+      alert("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
+      console.error("Error creating chat room:", err);
+    }
+  };
+
   // 로딩 중 또는 에러 메시지 처리
   if (error) {
     return <ErrorText>{error}</ErrorText>;
@@ -191,6 +226,10 @@ const AuctionComponent = () => {
           {message && <SuccessText>{message}</SuccessText>}
           {error && <ErrorText>{error}</ErrorText>}
         </BidSection>
+        <ChatButton onClick={handleStartChat}>채팅으로 문의하기</ChatButton>
+        <Modal isOpen={isChatOpen} onClose={toggleChatWindow}>
+          {chatRoomInfo && <ChatWindow room={chatRoomInfo} onClose={toggleChatWindow} />}
+        </Modal>
       </Container>
   );
 };
@@ -390,4 +429,19 @@ const LikeButton = styled.button`
   &:hover {
     color: ${({ isLiked }) => (isLiked ? "#c0392b" : "#888")};
   }
-`;//전
+`;
+
+const ChatButton = styled.button`
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
