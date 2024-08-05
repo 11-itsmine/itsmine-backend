@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -6,11 +7,13 @@ const Category = ({ categorydata, selectPrice, filterSelect }) => {
 
   const { categoryList, categoryName } = categorydata;
 
+
   const handelCategory = () => {
     setIsFilterTab(!isFilterTab);
   };
 
   return (
+
     <CategoryWrapper>
       <Title>
         <CategoryTag>{categoryName}</CategoryTag>

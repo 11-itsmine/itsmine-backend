@@ -1,5 +1,7 @@
 package com.sparta.itsmine.global.common.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sparta.itsmine.domain.chat.dto.MessageRequestDto;
 import jakarta.jms.Queue;
 import org.apache.activemq.ActiveMQSslConnectionFactory;
@@ -48,15 +50,15 @@ public class ActiveMqConfig {
      * @return ActiveMQSslConnectionFactory 객체
      */
     @Bean
-    public ActiveMQSslConnectionFactory activeMQConnectionFactory() {
+    public ActiveMQSslConnectionFactory activeMQConnectionFactory() throws Exception {
         ActiveMQSslConnectionFactory factory = new ActiveMQSslConnectionFactory();
         factory.setBrokerURL(activemqBrokerUrl);
         factory.setUserName(activemqUsername);
         factory.setPassword(activemqPassword);
 
         // SSL 설정
-        //factory.setTrustStore("path/to/your/truststore.jks"); // TrustStore 경로를 설정하세요.
-        //factory.setTrustStorePassword("yourTrustStorePassword");
+//        factory.setTrustStore("src/main/resources/bootsecurity.p12"); // TrustStore 경로를 설정하세요.
+//        factory.setTrustStorePassword("skdmlcjs");
 
         return factory;
     }
@@ -67,7 +69,7 @@ public class ActiveMqConfig {
      * @return JmsTemplate 객체
      */
     @Bean
-    public JmsTemplate jmsTemplate() {
+    public JmsTemplate jmsTemplate() throws Exception {
         JmsTemplate jmsTemplate = new JmsTemplate(activeMQConnectionFactory());
         jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
         jmsTemplate.setExplicitQosEnabled(true);    // 메시지 전송 시 QOS을 설정
@@ -83,7 +85,7 @@ public class ActiveMqConfig {
      * @return JmsTemplate
      */
     @Bean
-    public JmsListenerContainerFactory<?> jmsListenerContainerFactory() {
+    public JmsListenerContainerFactory<?> jmsListenerContainerFactory() throws Exception {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(activeMQConnectionFactory());
         factory.setMessageConverter(jacksonJmsMessageConverter());
@@ -99,10 +101,13 @@ public class ActiveMqConfig {
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
-        converter.setTypeIdPropertyName("_typeId");
-        Map<String, Class<?>> typeIdMappings = new HashMap<>();
-        typeIdMappings.put("message", MessageRequestDto.class);
-        converter.setTypeIdMappings(typeIdMappings);
+        converter.setTypeIdPropertyName("_type");
+
+        // ObjectMapper 설정
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // JavaTimeModule 등록
+        converter.setObjectMapper(objectMapper);
+
         return converter;
     }
 }

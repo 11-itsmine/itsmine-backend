@@ -20,6 +20,9 @@ spring:
     broker-url: ${ACTIVEMQ_BROKER}
     user: ${ACTIVEMQ_USER}
     password: ${ACTIVEMQ_PASSWORD}
+    close-timeout: 10s
+    packages:
+      trust-all: true
 
   datasource:
     url: jdbc:mysql://${DB_URL}/itsmine
@@ -38,17 +41,22 @@ spring:
       encoding: UTF-8
 
   jpa:
+
     hibernate:
       ddl-auto: update
 
   properties:
     hibernate:
-      show_sql: true
-      format_sql: true
-      connection:
-        CharSet: utf-8
-        characterEncoding: utf-8
-        useUnicode: true
+      ddl-auto: update
+    properties:
+     hibernate:
+        show_sql: true
+        format_sql: true
+        connection:
+          CharSet: utf-8
+          characterEncoding: utf-8
+          useUnicode: true
+
 
 web:
   resources:
@@ -89,6 +97,8 @@ dynamodb:
     accessKey: ${CLOUD_AWS_DYNAMODB_ACCESSKEY}
     secretKey: ${CLOUD_AWS_DYNAMODB_SECRETKEY}
 
+
 activemq:
   queue:
     name: ${ACTIVEMQ_QNAME}
+  stomp-host: ${STOMP_HOST}

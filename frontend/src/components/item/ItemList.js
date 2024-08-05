@@ -9,6 +9,7 @@ import SORT_LIST from './SortListData';
 import BANNER_LIST from '../Data/bannerListData';
 import {CATEGORY_FILTER, PRICE_FILTER} from '../Data/categoryData';
 import ItemNotFound from './ItemNotFound';
+import axiosInstance from '../../api/axiosInstance';
 
 const ItemList = () => {
   const [productsList, setProductsList] = useState([]);
@@ -19,8 +20,6 @@ const ItemList = () => {
   const [limit] = useState(8); // Number of items per page
   const [page, setPage] = useState(0); // Current page number
   const [isScrolled, setIsScrolled] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,65 +38,55 @@ const ItemList = () => {
     });
   };
 
-  const handleInput = e => {
+  const handleInput = (e) => {
     e.preventDefault();
     setUserInput(e.target.search.value);
     setPage(0); // Reset page on new search
   };
 
   const loadMore = () => {
-    setPage(prevPage => prevPage + 1);
+    setPage((prevPage) => prevPage + 1);
   };
 
   useEffect(() => {
     const fetchProducts = async () => {
       const categoryString = selectCategory.query
-          ? `&category=${selectCategory.query}` : '';
+          ? `&category=${selectCategory.query}`
+          : '';
       const priceString = selectPrice.query ? `&price=${selectPrice.query}`
           : '';
 
       try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch(
-            `http://localhost:8080/products?page=${page}&size=${limit}${categoryString}${priceString}&search=${userInput}&sort=${optionValue}`,
-            {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem(
-                    'Authorization')}`,
-              },
-            }
+        const response = await axiosInstance.get(
+            `/products/all?page=${page}&size=${limit}${categoryString}${priceString}&search=${userInput}&sort=${optionValue}`
         );
 
-        if (!response.ok) {
+        if (!response.data.data.content) {
           throw new Error('Failed to fetch');
         }
 
-        const data = await response.json();
-        setProductsList(
-            prevProducts => (page === 0 ? data.content : [...prevProducts,
-              ...data.content]));
+        const data = response.data.data.content;
+        console.log('Fetched data:', data);  // 여기서 데이터가 제대로 오는지 확인
+        setProductsList((prevProducts) =>
+            page === 0 ? data : [...prevProducts, ...data]
+        );
       } catch (error) {
-        setError('Failed to fetch products');
-      } finally {
-        setLoading(false);
+        console.error('Error fetching products:', error);
       }
     };
 
     fetchProducts();
   }, [selectCategory, selectPrice, userInput, optionValue, page, limit]);
 
-  const handleCategory = category => {
-    setSelectCategory(
-        prevCategory => (prevCategory.name === category.name ? {} : category));
+  const handleCategory = (category) => {
+    setSelectCategory((prevCategory) =>
+        prevCategory.name === category.name ? {} : category
+    );
     setPage(0); // Reset page on filter change
   };
 
-  const handlePrice = price => {
-    setSelectPrice(prevPrice => (prevPrice.name === price.name ? {} : price));
+  const handlePrice = (price) => {
+    setSelectPrice((prevPrice) => (prevPrice.name === price.name ? {} : price));
     setPage(0); // Reset page on filter change
   };
 
@@ -107,7 +96,7 @@ const ItemList = () => {
     setPage(0); // Reset page on filter reset
   };
 
-  const deleteFilter = selectedCategory => {
+  const deleteFilter = (selectedCategory) => {
     if (selectCategory === selectedCategory) {
       setSelectCategory({});
     }
@@ -126,7 +115,7 @@ const ItemList = () => {
         <SearchBar handleInput={handleInput} userInput={userInput}/>
         <BannerWrapper>
           <BannerList>
-            {BANNER_LIST.map(banner => (
+            {BANNER_LIST.map((banner) => (
                 <Banner key={banner.id} src={banner.src} text={banner.text}/>
             ))}
           </BannerList>
@@ -143,16 +132,11 @@ const ItemList = () => {
                   </>
               )}
             </Filter>
-            <Category
-                categorydata={CATEGORY_FILTER}
-                selectCategory={handleCategory}
-                filterSelect={selectCategory}
-            />
-            <Price
-                categorydata={PRICE_FILTER}
-                selectPrice={handlePrice}
-                filterSelect={selectPrice}
-            />
+            <Category categorydata={CATEGORY_FILTER}
+                      selectCategory={handleCategory}
+                      filterSelect={selectCategory}/>
+            <Price categorydata={PRICE_FILTER} selectPrice={handlePrice}
+                   filterSelect={selectPrice}/>
           </SearchFilter>
           <ItemContainer>
             <SearchOption>
@@ -174,12 +158,12 @@ const ItemList = () => {
               </FilterCategorys>
               <SortingWrapper>
                 <Title
-                    onChange={e => {
+                    onChange={(e) => {
                       setOptionValue(e.target.value);
                       setPage(0); // Reset page on sort change
                     }}
                 >
-                  {SORT_LIST.map(title => (
+                  {SORT_LIST.map((title) => (
                       <option key={title.id} value={title.value}>
                         {title.title}
                       </option>
@@ -187,26 +171,28 @@ const ItemList = () => {
                 </Title>
               </SortingWrapper>
             </SearchOption>
-            {loading && <Loading>Loading...</Loading>}
-            {error && <Error>{error}</Error>}
-            {productsList.length !== 0 ? (
+            {Array.isArray(productsList) && productsList.length > 0 ? (
                 <ItemWrapper>
                   <ItemsList>
-                    {productsList.map(product => {
+                    {productsList.map((product) => {
                       const {
                         id,
                         productName,
                         description,
                         currentPrice,
-                        getThumbnailUrl
+                        auctionNowPrice,
+                        dueDate,
+                        imagesList,
                       } = product;
                       return (
                           <Item
                               key={id}
                               productName={productName}
                               description={description}
-                              price={currentPrice}
-                              thumbnail_url={getThumbnailUrl()}
+                              currentPrice={currentPrice}
+                              auctionNowPrice={auctionNowPrice}
+                              dueDate={dueDate}
+                              imagesList={imagesList}
                               productId={id}
                           />
                       );
@@ -215,11 +201,11 @@ const ItemList = () => {
                   <LoadMore onClick={loadMore}>더보기</LoadMore>
                 </ItemWrapper>
             ) : (
-                !loading && <ItemNotFound/>
+                <ItemNotFound/>
             )}
           </ItemContainer>
         </Content>
-        {isScrolled && <GoToTopBtn onClick={handleGoToTop}>&uarr;</GoToTopBtn>}
+        {isScrolled && <GoToTopBtn onClick={handleGoToTop}>&uArr;</GoToTopBtn>}
       </ContentWrapper>
   );
 };
@@ -227,70 +213,59 @@ const ItemList = () => {
 export default ItemList;
 
 const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${(props) => props.theme.flex.flexBox('column')}
 `;
 
 const BannerWrapper = styled.div`
   width: 72rem;
-  margin-top: 2rem;
+  margin-top: ${(props) => props.theme.margins.xxxl};
 `;
 
 const BannerList = styled.ul`
-  display: flex;
-  justify-content: space-between;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  ${(props) => props.theme.flex.flexBox('_', '_', 'space-between')}
 `;
 
 const Content = styled.div`
-  display: flex;
-  align-items: flex-start;
-  padding: 3rem 2.5rem;
-  width: 100%;
+  ${(props) => props.theme.flex.flexBox('_', 'start')}
   box-sizing: border-box;
+  padding: 3rem 2.5rem;
 `;
 
 const SearchFilter = styled.div`
   width: 15rem;
-  margin-top: 1rem;
+  margin-top: ${(props) => props.theme.margins.base};
 `;
 
 const Filter = styled.div`
+  display: block;
   display: flex;
-  align-items: center;
-  font-size: 1rem;
-  font-weight: 600;
+  width: 100%;
   margin-bottom: 1.5rem;
+  font-size: ${({theme}) => theme.fontSizes.xs};
+  font-weight: ${(props) => props.theme.fontWeights.semiBold};
+  padding-left: ${(props) => props.theme.paddings.base};
 `;
 
 const FilterStatus = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 1.25rem;
-  height: 1.25rem;
-  margin-left: 0.625rem;
   border: 1px solid black;
-  border-radius: 50%;
-  background-color: black;
+  border-radius: 0.625rem;
+  margin-left: 0.625rem;
+  text-align: center;
+  background-color: ${(props) => props.theme.colors.black};
   color: white;
 `;
 
 const ItemContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   margin-left: 3rem;
-  width: 100%;
+  width: 60rem;
 `;
 
 const FilterDelete = styled.div`
-  margin-left: auto;
-  cursor: pointer;
   color: gray;
   border-bottom: 1px solid gray;
+  padding-bottom: 0;
+  margin-left: 4.375rem;
 `;
 
 const SearchOption = styled.div`
@@ -305,57 +280,56 @@ const FilterCategorys = styled.div`
 `;
 
 const FilterCategory = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 0.313rem;
-  margin-left: 1rem;
   background-color: #f4f4f4;
   border: 1px solid #f4f4f4;
   border-radius: 0.625rem;
+  margin-left: ${(props) => props.theme.margins.large};
+  padding: 0.313rem;
 `;
 
 const DeleteButton = styled.button`
-  border: none;
+  border-style: none;
   background-color: #f4f4f4;
-  cursor: pointer;
 `;
 
 const SortingWrapper = styled.div`
-  display: flex;
-  align-items: center;
+  ${(props) => props.theme.flex.flexBox('_', '_', 'right')}
   padding: 1rem 0;
+  padding-right: 1rem;
 `;
 
 const Title = styled.select`
-  font-size: 1rem;
+  font-size: ${(props) => props.theme.fontSizes.small};
+  text-align: center;
   padding: 0.5rem 1rem;
-  margin-right: 0.5rem;
+  margin-right: 0.1rem;
 `;
 
 const ItemWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 2rem;
+  ${(props) => props.theme.flex.flexBox('column')}
+  margin-left: 1rem;
 `;
 
 const ItemsList = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  width: 100%;
+  justify-items: center;
+  grid-template-columns: repeat(4, 1fr);
+  grid-column-gap: 1rem;
+  padding: ${(props) => props.theme.paddings.base};
 `;
 
 const LoadMore = styled.button`
-  margin-top: 2rem;
-  padding: 0.5rem 1rem;
-  background-color: white;
-  border: 1px solid gray;
-  border-radius: 1rem;
+  width: 8rem;
+  background: none;
+  border: ${(props) => props.theme.borders.lightGray};
+  border-radius: 1.25rem;
+  font-weight: ${(props) => props.theme.fontWeights.thin};
+  font-size: ${(props) => props.theme.fontSizes.small};
+  padding: 0.9rem 1.5rem;
   cursor: pointer;
 
-  &:hover {
-    background-color: lightgray;
+  :hover {
+    background: ${(props) => props.theme.colors.lightGray};
   }
 `;
 
@@ -364,23 +338,12 @@ const GoToTopBtn = styled.button`
   bottom: 2.5rem;
   right: 2.5rem;
   border: 1px solid lightgray;
-  border-radius: 50%;
-  padding: 0.5rem;
-  background-color: white;
+  border-radius: 2.5rem;
+  padding: 0.9rem 1rem;
+  background: ${(props) => props.theme.colors.white};
   cursor: pointer;
 
-  &:hover {
-    background-color: lightgray;
+  :hover {
+    background: ${(props) => props.theme.colors.lightGray};
   }
-`;
-
-const Loading = styled.div`
-  text-align: center;
-  padding: 2rem;
-`;
-
-const Error = styled.div`
-  color: red;
-  text-align: center;
-  padding: 2rem;
 `;

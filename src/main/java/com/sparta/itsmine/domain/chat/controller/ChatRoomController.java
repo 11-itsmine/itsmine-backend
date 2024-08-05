@@ -15,6 +15,7 @@ import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,10 @@ public class ChatRoomController {
     ) {
         Long userId = userDetails.getUser().getId();
         List<RoomInfoResponseDto> responseDtos = chatService.findAllRoom(userId);
+
+        if (responseDtos == null) {
+            responseDtos = new ArrayList<>();
+        }
 
         return ResponseUtils.of(CHAT_GET_ROOM_LIST, responseDtos);
     }
