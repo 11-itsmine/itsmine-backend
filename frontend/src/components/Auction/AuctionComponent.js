@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import axiosInstance from "../../api/axiosInstance";
 import styled from "styled-components";
-import { useNavigate, useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 const AuctionComponent = () => {
   const [product, setProduct] = useState(null);
@@ -12,7 +12,7 @@ const AuctionComponent = () => {
   const [isLiked, setIsLiked] = useState(false); // 좋아요 상태 초기화
 
   const navigate = useNavigate();
-  const { productId } = useParams();
+  const {productId} = useParams();
 
   // 제품 정보를 가져오는 함수
   const fetchProduct = async () => {
@@ -40,7 +40,7 @@ const AuctionComponent = () => {
       );
 
       console.log("Like status response:", response.data); // 응답 데이터 로그 출력
-      setIsLiked(response.data.liked); // 서버에서 받아온 좋아요 상태로 설정
+      setIsLiked(response.data.data.isLiked); // 서버에서 받아온 좋아요 상태로 설정
     } catch (err) {
       console.error("Error fetching like status:", err);
     }
@@ -85,7 +85,7 @@ const AuctionComponent = () => {
     try {
       const response = await axiosInstance.post(
           `/products/${productId}/auctions`,
-          { bidPrice },
+          {bidPrice},
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -154,7 +154,7 @@ const AuctionComponent = () => {
               </ImageSlider>
               <Indicator>
                 {product.imagesUrl.map((_, index) => (
-                    <Dot key={index} isActive={index === currentImageIndex} />
+                    <Dot key={index} isActive={index === currentImageIndex}/>
                 ))}
               </Indicator>
             </>
@@ -245,11 +245,12 @@ const Arrow = styled.div`
   font-size: 1.5rem;
   user-select: none;
   color: #fff; /* 화살표 색상을 흰색으로 설정 */
+
   &:hover {
     background-color: rgba(255, 255, 255, 0.2); /* 호버 시 약간의 배경색 추가 */
   }
 
-  ${({ left }) => (left ? `left: 10px;` : `right: 10px;`)}
+  ${({left}) => (left ? `left: 10px;` : `right: 10px;`)}
 `;
 
 const Indicator = styled.div`
@@ -261,7 +262,7 @@ const Indicator = styled.div`
 const Dot = styled.div`
   width: 8px;
   height: 8px;
-  background-color: ${({ isActive }) => (isActive ? "#000" : "#bbb")};
+  background-color: ${({isActive}) => (isActive ? "#000" : "#bbb")};
   border-radius: 50%;
   margin: 0 5px;
   transition: background-color 0.3s ease;
@@ -355,6 +356,7 @@ const BidButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
+
   &:hover {
     background-color: #45a049;
   }
@@ -384,10 +386,11 @@ const LikeButton = styled.button`
   padding: 10px;
   font-size: 1.5rem;
   background-color: transparent;
-  color: ${({ isLiked }) => (isLiked ? "#e74c3c" : "#bbb")};
+  color: ${({isLiked}) => (isLiked ? "#e74c3c" : "#bbb")};
   border: none;
   cursor: pointer;
+
   &:hover {
-    color: ${({ isLiked }) => (isLiked ? "#c0392b" : "#888")};
+    color: ${({isLiked}) => (isLiked ? "#c0392b" : "#888")};
   }
-`;//전
+`;

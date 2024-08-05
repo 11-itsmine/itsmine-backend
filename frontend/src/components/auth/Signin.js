@@ -79,11 +79,7 @@ const SignIn = ({onLogin}) => {
             />
           </LoginForm>
           <FormControlLabel>
-            <Checkbox
-                type="checkbox"
-                value="remember"
-                color="primary"
-            />
+            <Checkbox type="checkbox" value="remember" color="primary"/>
             Remember me
           </FormControlLabel>
           {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
@@ -93,7 +89,7 @@ const SignIn = ({onLogin}) => {
               <Link href="#">Forgot password?</Link>
             </GridItem>
             <GridItem>
-              <Link href="/signup">Don't have an account? Sign Up</Link>
+              <Link href="/itsmine/signup">Don't have an account? Sign Up</Link>
             </GridItem>
           </GridContainer>
         </Form>

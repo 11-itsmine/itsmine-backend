@@ -114,11 +114,7 @@ const SignUp = () => {
             />
           </SignUpForm>
           <FormControlLabel>
-            <Checkbox
-                type="checkbox"
-                value="allowExtraEmails"
-                color="primary"
-            />
+            <Checkbox type="checkbox" value="allowExtraEmails" color="primary"/>
             I want to receive inspiration, marketing promotions and updates via
             email.
           </FormControlLabel>
