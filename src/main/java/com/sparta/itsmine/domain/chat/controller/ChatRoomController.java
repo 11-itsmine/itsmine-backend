@@ -80,7 +80,7 @@ public class ChatRoomController {
      * @param roomId 채팅방 정보
      */
     @GetMapping("/{roomId}")
-    public ResponseEntity<HttpResponseDto> getChat(@PathVariable String roomId) {
+    public ResponseEntity<HttpResponseDto> getChat(@PathVariable("roomId") String roomId) {
         List<Message> messageList = chatService.getMessageList(roomId);
         return ResponseUtils.of(CHAT_GET_MESSAGE_LIST, messageList);
     }
@@ -94,7 +94,7 @@ public class ChatRoomController {
     @DeleteMapping("/{roomId}")
     public ResponseEntity<HttpResponseDto> leaveUser(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable String roomId
+            @PathVariable("roomId") String roomId
     ) {
         User user = userDetails.getUser();
         chatService.leaveUser(user, roomId);

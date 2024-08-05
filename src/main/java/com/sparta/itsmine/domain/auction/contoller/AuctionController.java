@@ -33,7 +33,7 @@ public class AuctionController {
     @PostMapping("/products/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> createAuction(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long productId,
+            @PathVariable("productId") Long productId,
             @RequestBody AuctionRequestDto requestDto) {
         AuctionResponseDto responseDto = auctionService.createAuction(userDetails.getUser(),
                 productId,
