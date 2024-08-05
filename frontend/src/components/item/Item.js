@@ -1,3 +1,4 @@
+
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
@@ -103,11 +104,13 @@ const Item = ({
             <DetailText>마감 시간: {new Date(dueDate).toLocaleString()}</DetailText>
           </AuctionDetails>
         </ItemDetails>
+
       </ItemComponent>
   );
 };
 
 export default Item;
+
 
 const ItemComponent = styled.div`
   display: flex;
