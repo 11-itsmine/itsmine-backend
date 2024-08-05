@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import {
   Avatar,
@@ -14,6 +15,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import axiosInstance from '../../api/axiosInstance';
+
 
 const Profile = () => {
   // 사용자 프로필 상태 관리
@@ -65,6 +67,7 @@ const Profile = () => {
         setProfileError(
             err.response ? err.response.data : '프로필 정보를 가져오는 중 오류가 발생했습니다.'
         );
+
       }
     };
 
@@ -83,6 +86,7 @@ const Profile = () => {
         });
         setProducts(response.data.data.content);
       } catch (err) {
+
         alert("내 상품 목록을 가져오는 중 오류가 발생했습니다.");
         setProductError(
             err.response ? err.response.data : '내 상품 목록을 가져오는 중 오류가 발생했습니다.'
@@ -155,11 +159,12 @@ const Profile = () => {
     formData.append('file', file);
 
     try {
-      const response = await axiosInstance.post('/s3/upload/profile', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axiosInstance.post('/s3/upload/profile', formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
 
       setUploadSuccess(true);
       setProfile((prevProfile) => ({
@@ -175,6 +180,7 @@ const Profile = () => {
         setUploadError(err.response ? err.response.data : '프로필 업로드 중 오류가 발생했습니다.');
       }
       setUploadSuccess(false);
+
     }
   };
 
@@ -383,6 +389,7 @@ const Profile = () => {
           </Box>
         </Box>
       </Container>
+
   );
 };
 
