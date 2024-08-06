@@ -7,11 +7,11 @@ on:
   # 특정 브랜치에 푸시할 때 워크플로우를 트리거합니다.
   push:
     branches:
-      - cicdback
+      - backcicd
   # 특정 브랜치에 대한 PR이 닫힐 때 워크플로우를 트리거합니다.
   pull_request:
     branches:
-      - cicdback
+      - backcicd
     types:
       - closed
 
