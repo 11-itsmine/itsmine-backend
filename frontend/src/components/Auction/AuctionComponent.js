@@ -44,7 +44,7 @@ const AuctionComponent = () => {
       );
 
       console.log("Like status response:", response.data); // 응답 데이터 로그 출력
-      setIsLiked(response.data.liked); // 서버에서 받아온 좋아요 상태로 설정
+      setIsLiked(response.data.data.liked); // 서버에서 받아온 좋아요 상태로 설정
     } catch (err) {
       console.error("Error fetching like status:", err);
     }
