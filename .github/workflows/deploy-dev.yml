@@ -69,7 +69,7 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           # 이미지 태그를 커밋 SHA와 타임스탬프를 조합하여 생성합니다.
           IMAGE_TAG=${{ github.sha }}-$TIMESTAMP
-          docker tag itsmine:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$IMAGE_TAG
+          docker tag itsmine-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$IMAGE_TAG
           echo "::set-output name=IMAGE_TAG::$IMAGE_TAG"
 
       # Docker 이미지를 Amazon ECR에 푸시합니다.
