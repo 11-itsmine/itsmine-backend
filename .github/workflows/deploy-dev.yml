@@ -1,4 +1,4 @@
-name: Deploy to Dev
+name: Deploy Backend to Dev
 
 # 워크플로우 트리거 설정
 on:
