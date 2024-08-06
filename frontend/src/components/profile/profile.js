@@ -167,6 +167,7 @@ const Profile = () => {
         imagesUrl: response.data.imageUrl,
       }));
       setUploadError(null);
+
     } catch (err) {
       if (err.response && err.response.status === 409) {
         setUploadError('이미 존재하는 이미지입니다.');
@@ -176,6 +177,7 @@ const Profile = () => {
       }
       setUploadSuccess(false);
     }
+    window.location.reload();
   };
 
   // 탭 변경 핸들러
