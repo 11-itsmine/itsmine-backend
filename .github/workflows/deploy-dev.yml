@@ -50,7 +50,7 @@ jobs:
 
       # Docker 이미지를 빌드합니다.
       - name: Build Docker image
-        run: docker build -t itsmine .
+        run: docker build -t itsmine-backend .
 
       # Amazon ECR에 로그인합니다.
       - name: Log in to Amazon ECR
@@ -91,11 +91,11 @@ jobs:
             # ECR에서 Docker 이미지를 풀합니다.
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
             # 기존 컨테이너를 중지합니다. (실행 중인 경우)
-            docker stop itsmine || true
+            docker stop itsmine-backend || true
             # 기존 컨테이너를 삭제합니다. (존재하는 경우)
-            docker rm itsmine || true
+            docker rm itsmine-backend || true
             # 새로운 컨테이너를 실행합니다.
-            docker run -d --name itsmine -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
+            docker run -d --name itsmine-backend -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
               -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
               -e DB_URL=${{ secrets.DB_URL }} \
               -e DB_USER=${{ secrets.DB_USER }} \
