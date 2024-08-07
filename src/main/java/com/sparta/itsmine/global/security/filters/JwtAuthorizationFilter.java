@@ -37,7 +37,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
 		throws ServletException, IOException {
 
-		if (req.getRequestURI().equals("/users/login")) {
+		if (req.getRequestURI().equals("/v1/users/login")) {
 			filterChain.doFilter(req, res);
 			return;
 		}
