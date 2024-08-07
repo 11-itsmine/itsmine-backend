@@ -24,18 +24,18 @@ spring:
     packages:
       trust-all: true
 
-  datasource:
-    url: jdbc:mariadb://${DB_URL}/itsmine
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
+#  datasource:
+#    url: jdbc:mariadb://${DB_URL}/itsmine
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+#    driver-class-name: org.mariadb.jdbc.Driver
 
 # 로컬용
-#   datasource:
-#     url: jdbc:mysql://${DB_URL}/itsmine
-#     username: ${DB_USER}
-#     password: ${DB_PASSWORD}
-#     driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+     url: jdbc:mysql://${DB_URL}/itsmine
+     username: ${DB_USER}
+     password: ${DB_PASSWORD}
+     driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
     init:
@@ -102,3 +102,12 @@ activemq:
   queue:
     name: ${ACTIVEMQ_QNAME}
   stomp-host: ${STOMP_HOST}
+
+kakaopay:
+  api:
+    secret:
+      key: ${your-secret-key}
+cid: TC0ONETIME
+
+sample:
+  host: http://localhost:8080
