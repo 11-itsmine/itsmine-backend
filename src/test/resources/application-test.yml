@@ -15,7 +15,6 @@ spring:
     redis:
       host: ${REDIS_DOMAIN} # 로컬에서 할 때는 localhost
       port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
 
   activemq:
     broker-url: ${ACTIVEMQ_BROKER}
