@@ -64,6 +64,11 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> getAllProductsWithPage(int page, int size, String category,
             String price, String search, String sort) {
+
+        if (sort == null) {
+            sort = "createdAt"; // 기본 정렬 필드 설정
+        }
+
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Product> products = productRepository.findProducts(pageRequest, category, price,
                 search, sort);

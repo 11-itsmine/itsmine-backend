@@ -20,18 +20,22 @@ spring:
     broker-url: ${ACTIVEMQ_BROKER}
     user: ${ACTIVEMQ_USER}
     password: ${ACTIVEMQ_PASSWORD}
+    close-timeout: 10s
+    packages:
+      trust-all: true
 
   datasource:
-    url: jdbc:mysql://${DB_URL}/itsmine
+    url: jdbc:mariadb://${DB_URL}/itsmine
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    # 주석을 활성화할 경우 아래를 사용
-    # datasource:
-    #   url: jdbc:mariadb://${DB_URL}/itsmine
-    #   username: ${DB_USER}
-    #   password: ${DB_PASSWORD}
-    #   driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: org.mariadb.jdbc.Driver
+
+# 로컬용
+#   datasource:
+#     url: jdbc:mysql://${DB_URL}/itsmine
+#     username: ${DB_USER}
+#     password: ${DB_PASSWORD}
+#     driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
     init:
@@ -43,12 +47,16 @@ spring:
 
   properties:
     hibernate:
-      show_sql: true
-      format_sql: true
-      connection:
-        CharSet: utf-8
-        characterEncoding: utf-8
-        useUnicode: true
+      ddl-auto: update
+    properties:
+     hibernate:
+        show_sql: true
+        format_sql: true
+        connection:
+          CharSet: utf-8
+          characterEncoding: utf-8
+          useUnicode: true
+
 
 web:
   resources:
@@ -89,6 +97,8 @@ dynamodb:
     accessKey: ${CLOUD_AWS_DYNAMODB_ACCESSKEY}
     secretKey: ${CLOUD_AWS_DYNAMODB_SECRETKEY}
 
+
 activemq:
   queue:
     name: ${ACTIVEMQ_QNAME}
+  stomp-host: ${STOMP_HOST}

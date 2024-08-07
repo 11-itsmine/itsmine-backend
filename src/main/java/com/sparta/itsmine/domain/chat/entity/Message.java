@@ -14,14 +14,14 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 @DynamoDbBean
 public class Message {
 
-    private String id;
+    private UUID id;
     private String roomId;
     private Long fromUserId;
     private String message;
     private LocalDateTime time;
 
     public Message(MessageRequestDto requestDto) {
-        this.id = UUID.randomUUID().toString();
+        this.id = requestDto.getMessageId();
         this.roomId = requestDto.getRoomId();
         this.fromUserId = requestDto.getFromUserId();
         this.message = requestDto.getMessage();
@@ -29,11 +29,11 @@ public class Message {
     }
 
     @DynamoDbPartitionKey
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
