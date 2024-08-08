@@ -20,7 +20,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${spring.activemq.broker-url}")
     private String activeHost;
     @Value("${activemq.stomp-host}")
-    private String stompHost ;
+    private String stompHost;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         //배포 했을때 주석한 부분 해제
@@ -37,7 +38,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000","http://localhost:8080")
+                .setAllowedOrigins("http://localhost:3000", "http://localhost:8080",
+                        "http://52.79.213.8:8080")
                 .withSockJS();//SockJS 연결 주소
 
         // 주소 : ws://localhost:8080/ws

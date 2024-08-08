@@ -4,12 +4,18 @@ import com.sparta.itsmine.domain.images.entity.Images;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.TimeStamp;
-import jakarta.persistence.*;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -54,6 +60,8 @@ public class User extends TimeStamp {
     private String address;
 
     private LocalDateTime deletedAt;
+
+    private LocalDateTime blockedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Images> imagesList = new ArrayList<>();
@@ -103,4 +111,5 @@ public class User extends TimeStamp {
                 .map(Images::getImagesUrl)
                 .collect(Collectors.toList());
     }
+
 }

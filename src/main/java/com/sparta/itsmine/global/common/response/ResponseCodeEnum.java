@@ -58,7 +58,12 @@ public enum ResponseCodeEnum {
     CHAT_GET_ROOM_LIST(HttpStatus.OK, "채팅방 리스트 입니다."),
     CHAT_SUCCESS_ROOM_LEAVE(HttpStatus.OK, "채팅방에서 나갔습니다"),
     CHAT_BLACKLIST_USER_ADD(HttpStatus.CREATED, "블랙 리스트 추가 했습니다."),
-    CHAT_BLACKLIST_USER_CANCEL(HttpStatus.OK, "블랙 리스트 취소 했습니다.");
+    CHAT_BLACKLIST_USER_CANCEL(HttpStatus.OK, "블랙 리스트 취소 했습니다."),
+
+    //신고 관련
+    REPORT_SUCCESS_CREATE(HttpStatus.CREATED, "신고가 접수 되었습니다."),
+    REPORT_SUCCESS_UPDATE(HttpStatus.OK, "신고가 수정 되었습니다."),
+    REPORT_SUCCESS_DELETE(HttpStatus.CREATED, "신고가 삭제 되었습니다.");
 
 
     private final HttpStatus httpStatus;
