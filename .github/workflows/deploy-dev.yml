@@ -2,11 +2,11 @@ name: Deploy Application
 
 # 워크플로우 트리거 설정
 on:
-  workflow_dispatch:
-  push:
+  workflow_dispatch:  # 수동 트리거
+  push:  # 푸시 이벤트 트리거
     branches:
       - feature/backcicd
-  pull_request:
+  pull_request:  # PR 닫힘 이벤트 트리거
     branches:
       - feature/backcicd
     types:
@@ -14,80 +14,73 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 최신 우분투 이미지를 사용하여 작업 실행
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # 리포지토리 체크아웃
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew  # gradlew 실행 권한 부여
+
+      # 유닛 테스트를 실행합니다.
+      - name: Run unit tests
+        run: ./gradlew test  # 유닛 테스트 실행
+
+      # 빌드를 실행합니다.
+      - name: Build with Gradle
+        run: ./gradlew build  # 빌드 실행
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v2  # Docker Buildx 설정
 
       - name: Log in to Amazon ECR
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS 액세스 키 ID 설정
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS 비밀 액세스 키 설정
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com  # Amazon ECR 로그인
 
       - name: Build and push backend Docker image
         run: |
-          docker build -t itsmine-backend .
+          docker build -t itsmine-backend .  # 백엔드 Docker 이미지 빌드
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          BACKEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP
-          docker tag itsmine-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-backend:$BACKEND_IMAGE_TAG
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-backend:$BACKEND_IMAGE_TAG
-          echo "::set-output name=BACKEND_IMAGE_TAG::$BACKEND_IMAGE_TAG"
+          BACKEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP  # 이미지 태그 생성
+          docker tag itsmine-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-backend:$BACKEND_IMAGE_TAG  # 태그 설정
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-backend:$BACKEND_IMAGE_TAG  # 이미지 푸시
+          echo "::set-output name=BACKEND_IMAGE_TAG::$BACKEND_IMAGE_TAG"  # 백엔드 이미지 태그 출력
 
       - name: Build and push frontend Docker image
         run: |
           cd frontend
-          docker build -t itsmine-frontend .
+          docker build -t itsmine-frontend .  # 프론트엔드 Docker 이미지 빌드
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          FRONTEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP
-          docker tag itsmine-frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-frontend:$FRONTEND_IMAGE_TAG
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-frontend:$FRONTEND_IMAGE_TAG
-          echo "::set-output name=FRONTEND_IMAGE_TAG::$FRONTEND_IMAGE_TAG"
+          FRONTEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP  # 이미지 태그 생성
+          docker tag itsmine-frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-frontend:$FRONTEND_IMAGE_TAG  # 태그 설정
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-frontend:$FRONTEND_IMAGE_TAG  # 이미지 푸시
+          echo "::set-output name=FRONTEND_IMAGE_TAG::$FRONTEND_IMAGE_TAG"  # 프론트엔드 이미지 태그 출력
 
       - name: SSH into EC2 and deploy Docker containers
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ec2-user
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
+          host: ${{ secrets.SSH_HOST }}  # SSH 호스트 설정
+          username: ec2-user  # SSH 사용자 이름 설정
+          key: ${{ secrets.SSH_KEY }}  # SSH 키 설정
+          port: 22  # SSH 포트 설정
           script_stop: true
           script: |
+            # Amazon ECR에 로그인
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+            
+            # 최신 이미지를 풀링
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-backend:${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-frontend:${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}
-            scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY }} docker-compose.yml ec2-user@${{ secrets.SSH_HOST }}:/home/ec2-user/itsmine-backend/
-            # Create .env file with secrets on EC2 instance
-            echo "ACTIVEMQ_BROKER=${{ secrets.ACTIVEMQ_BROKER }}" >> .env
-            echo "ACTIVEMQ_PASSWORD=${{ secrets.ACTIVEMQ_PASSWORD }}" >> .env
-            echo "ACTIVEMQ_QNAME=${{ secrets.ACTIVEMQ_QNAME }}" >> .env
-            echo "ACTIVEMQ_USER=${{ secrets.ACTIVEMQ_USER }}" >> .env
-            echo "ADMIN_TOKEN=${{ secrets.ADMIN_TOKEN }}" >> .env
-            echo "CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }}" >> .env
-            echo "CLOUD_AWS_CREDENTIALS_SECRETKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }}" >> .env
-            echo "CLOUD_AWS_DYNAMODB_ACCESSKEY=${{ secrets.CLOUD_AWS_DYNAMODB_ACCESSKEY }}" >> .env
-            echo "CLOUD_AWS_DYNAMODB_SECRETKEY=${{ secrets.CLOUD_AWS_DYNAMODB_SECRETKEY }}" >> .env
-            echo "CLOUD_AWS_REGION_STATIC=${{ secrets.CLOUD_AWS_REGION_STATIC }}" >> .env
-            echo "CLOUD_AWS_S3_BUCKET=${{ secrets.CLOUD_AWS_S3_BUCKET }}" >> .env
-            echo "CLOUD_AWS_S3_DOMAIN=${{ secrets.CLOUD_AWS_S3_DOMAIN }}" >> .env
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-            echo "DB_URL=${{ secrets.DB_URL }}" >> .env
-            echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-            echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
-            echo "RABBITMQ_BROKER=${{ secrets.RABBITMQ_BROKER }}" >> .env
-            echo "RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}" >> .env
-            echo "RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }}" >> .env
-            echo "RABBITMQ_USERNAME=${{ secrets.RABBITMQ_USERNAME }}" >> .env
-            echo "RABBITMQ_VIRTUAL_HOST=${{ secrets.RABBITMQ_VIRTUAL_HOST }}" >> .env
-            echo "REDIS_DOMAIN=${{ secrets.REDIS_DOMAIN }}" >> .env
-            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
-            echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
-            echo "STOMP_HOST=${{ secrets.STOMP_HOST }}" >> .env
-            scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY }} .env ec2-user@${{ secrets.SSH_HOST }}:/home/ec2-user/itsmine-backend/
-            docker-compose -f /home/ec2-user/itsmine-backend/docker-compose.yml down
-            docker-compose -f /home/ec2-user/itsmine-backend/docker-compose.yml up -d
+            
+            echo "FRONTEND_IMAGE_TAG=${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}" > .env
+            echo "BACKEND_IMAGE_TAG=${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}" > .env
+
+            # 기존 컨테이너 중지 및 제거
+            docker-compose -f /docker-compose.yml down
+
+            # 새로운 컨테이너 시작
+            docker-compose --env-file /.env -f /docker-compose.yml up -d
