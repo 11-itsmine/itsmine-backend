@@ -13,7 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.itsmine.domain.refreshtoken.service.RefreshTokenService;
+import com.sparta.itsmine.domain.redis.RedisService;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.utils.UserRole;
@@ -25,13 +25,7 @@ import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -40,7 +34,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Autowired
     private UserAdapter userAdapter;
     @Autowired
-    private RefreshTokenService refreshTokenService;
+    private RedisService redisService;
 
     public JwtAuthenticationFilter(JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
@@ -90,8 +84,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 쿠키에 액세스 토큰 추가
         // jwtProvider.addJwtToCookie(accessToken, res);
 
-        // DB에 리프레시 토큰이 이미 있으면 수정, 없으면 저장
-        refreshTokenService.save(username, refreshToken);
+        // Redis에 RefreshToken 저장
+        redisService.saveRefreshToken(username, refreshToken);
 
         log.info("로그인 성공 : {}", username);
 

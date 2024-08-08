@@ -128,7 +128,6 @@ public class JwtProvider {
      * Refresh 토큰 검증
      */
     public boolean hasRefreshToken(String username) {
-        log.info("Refresh 토큰 검증");
         // redis에서 토큰에 맞는 키가 존재하면 true
         return Boolean.TRUE.equals(redisTemplate.hasKey(username));
     }
