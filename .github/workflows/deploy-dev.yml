@@ -54,6 +54,7 @@ jobs:
           BACKEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP  # 이미지 태그 생성
           docker tag itsmine-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$BACKEND_IMAGE_TAG  # 태그 설정
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$BACKEND_IMAGE_TAG  # 이미지 푸시
+          echo "BACKEND_IMAGE_TAG=${BACKEND_IMAGE_TAG}"  # 백엔드 이미지 태그 출력
           echo "::set-output name=BACKEND_IMAGE_TAG::$BACKEND_IMAGE_TAG"  # 백엔드 이미지 태그 출력
 
       - name: Build and push frontend Docker image
@@ -64,6 +65,7 @@ jobs:
           FRONTEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP  # 이미지 태그 생성
           docker tag itsmine-frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$FRONTEND_IMAGE_TAG  # 태그 설정
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$FRONTEND_IMAGE_TAG  # 이미지 푸시
+          echo "FRONTEND_IMAGE_TAG=${FRONTEND_IMAGE_TAG}"  # 프론트엔드 이미지 태그 출력
           echo "::set-output name=FRONTEND_IMAGE_TAG::$FRONTEND_IMAGE_TAG"  # 프론트엔드 이미지 태그 출력
 
       - name: SSH into EC2 and deploy Docker containers
