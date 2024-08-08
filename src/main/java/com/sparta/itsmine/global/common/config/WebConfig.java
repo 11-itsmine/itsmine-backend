@@ -25,7 +25,7 @@ public class WebConfig {
     }
     //로컬 테스트용
 
-    @Bean
+/*    @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
@@ -37,6 +37,6 @@ public class WebConfig {
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
-    }
+    }*/
 
 }
