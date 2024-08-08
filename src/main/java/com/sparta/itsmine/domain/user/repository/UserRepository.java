@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByIdAndDeletedAtIsNull(Long id);
 
     List<User> findAllByBlockedAtIsNotNull();
+
+    Optional<User> findByKakaoId(Long kakaoId);
 }

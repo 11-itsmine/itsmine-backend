@@ -38,7 +38,6 @@ public class ProductService {
     private final LikeRepository likeRepository;
     private final ProductRepository productRepository;
 
-    @Transactional
     public ProductResponseDto createProduct(ProductCreateDto createDto,
             ProductImagesRequestDto imagesRequestDto, Long userId) {
         User user = adapter.findByIdAndDeletedAtIsNull(userId);
