@@ -77,13 +77,20 @@ jobs:
           port: 22  # SSH 포트 설정
           script_stop: true
           script: |
+            # 환경 변수 확인
+            echo "DEBUG: FRONTEND_IMAGE_TAG=${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}"
+            echo "DEBUG: BACKEND_IMAGE_TAG=${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}"
+            
             # Amazon ECR에 로그인
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
             
             # 최신 이미지를 풀링
+            echo "Pulling backend image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}"
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}
+            echo "Pulling frontend image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}"
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}
             
+            # .env 파일 업데이트
             echo "FRONTEND_IMAGE_TAG=${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}" >> /.env
             echo "BACKEND_IMAGE_TAG=${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}" >> /.env
 
