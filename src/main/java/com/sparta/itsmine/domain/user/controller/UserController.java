@@ -1,27 +1,23 @@
 package com.sparta.itsmine.domain.user.controller;
 
 
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_LOGIN;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_LOGOUT;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_DELETE_SUCCESS;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_RESIGN_SUCCESS;
-import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_SUCCESS_GET;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_SUCCESS_GET;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_UPDATE_SUCCESS;
-import static com.sparta.itsmine.global.common.response.ResponseUtils.*;
+import static com.sparta.itsmine.global.common.response.ResponseUtils.of;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.itsmine.domain.social.kakao.service.KakaoService;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
-import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.security.JwtProvider;
-import com.sparta.itsmine.global.security.UserDetailsImpl;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
 import com.sparta.itsmine.domain.user.service.UserService;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import com.sparta.itsmine.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -77,7 +73,7 @@ public class UserController {
 
     @PutMapping("/resign/{userId}")
     public ResponseEntity<HttpResponseDto> resign(
-        @PathVariable Long userId
+        @PathVariable("userId") Long userId
     ) {
         userService.resign(userId);
         return of(USER_RESIGN_SUCCESS);
@@ -92,17 +88,9 @@ public class UserController {
         return of(USER_UPDATE_SUCCESS);
     }
 
-    @GetMapping("/user/kakao/callback")
-    public String kakakoLogin(@RequestParam String code, HttpServletResponse response)
+    @GetMapping("/oauth/kakao")
+    public ResponseEntity<HttpResponseDto> kakaoLogin(@RequestParam String code)
             throws JsonProcessingException {
-        String token = kakaoService.kakaoLogin(code); // jwt 반환
-
-        Cookie cookie = new Cookie(JwtProvider.AUTHORIZATION_HEADER, token.substring(7));
-
-        cookie.setPath("/");
-        response.addCookie(cookie); // 서블렛에 쿠리를 더해줍니다.
-
-        return "redirect:/";
-
+        return of(SUCCESS_LOGIN, kakaoService.kakaoLogin(code));
     }
 }

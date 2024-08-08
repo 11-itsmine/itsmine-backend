@@ -1,5 +1,5 @@
 ### 유저 회원 가입
-POST http://localhost:8080/users
+POST http://localhost:8080/v1/users
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 
 
 ### 로그인
-POST http://localhost:8080/users/login
+POST http://localhost:8080/v1/users/login
 Content-Type: application/json
 
 {
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 
 ### 카테고리 추가하기
-POST http://localhost:8080/categories
+POST http://localhost:8080/v1/categories
 Authorization: {{Authorization}}
 Content-Type: application/json
 
@@ -83,7 +83,7 @@ Content-Type: application/json
 
 
 ### 좋아요 누르기
-POST http://localhost:8080/users/products/1/likes
+POST http://localhost:8080/v1/users/products/1/likes
 Authorization: {{Authorization}}
 Content-Type: application/json
 

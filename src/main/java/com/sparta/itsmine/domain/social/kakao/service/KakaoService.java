@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.social.kakao.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.itsmine.domain.refreshtoken.service.RefreshTokenService;
 import com.sparta.itsmine.domain.user.dto.KakaoUserInfoDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
@@ -12,9 +13,12 @@ import java.net.URI;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -32,22 +36,32 @@ public class KakaoService {
     // restTemplate를 수동으로 등록해야합니다.
     private final RestTemplate restTemplate;
     private final JwtProvider jwtProvider;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     public String kakaoLogin(String code) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getToken(code);
+        String tokens = getToken(code);
+
+        String KakaoAccessToken = tokens.split(" ")[0];
 
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-        KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
+        KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(KakaoAccessToken);
 
         // 3. 필요 시 회원가입
         User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
         // 4. return jwt
-        return jwtProvider.createAccessToken(kakaoUser.getUsername(), kakaoUser.getUserRole());
+        String accessToken = jwtProvider.createAccessToken(kakaoUser.getUsername(), kakaoUser.getUserRole());
+        String refreshToken = jwtProvider.createRefreshToken(kakaoUser.getUsername(), kakaoUser.getUserRole());
+
+        refreshTokenService.save(kakaoUser.getUsername(), refreshToken);
+
+        return accessToken;
     }
 
-    private String getToken(String code) throws JsonProcessingException {
+    // 인가 코드 받는 메서드
+    public String getToken(String code) throws JsonProcessingException {
         // 요청 URL 만들기
         URI uri = UriComponentsBuilder
                 .fromUriString("https://kauth.kakao.com")
@@ -58,13 +72,14 @@ public class KakaoService {
 
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + code); // 토큰의 식별자
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "Authorization");
+        body.add("grant_type", "authorization_code");
         body.add("client_id", "08a46b304d568ef454241721bcb6b981");
-        body.add("redirect_uri", "http://localhost:3000/itsmine/account/sign-in/kakao/callback");
+        body.add("redirect_uri", "http://localhost:3000/oauth/callback/kakao");
         body.add("code", code); // 우리가 이전에 받아온 인가코드
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
@@ -81,7 +96,9 @@ public class KakaoService {
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
         // access_token 이라는 이름으로 되어 있는 토큰의 텍스트를 가져올 수 있습니다.
-        return jsonNode.get("access_token").asText();
+        String accessToken = jsonNode.get("access_token").asText();
+        String refreshToken = jsonNode.get("refresh_token").asText();
+        return accessToken + " " + refreshToken;
     }
 
     private KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
@@ -95,8 +112,8 @@ public class KakaoService {
 
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken); // 토큰의 식별자
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        headers.setBearerAuth(accessToken); // 토큰의 식별자
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
                 .post(uri)
@@ -112,13 +129,13 @@ public class KakaoService {
         // 추후에는 토큰 내역을 보고 가져 올 수 있다.
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
         Long id = jsonNode.get("id").asLong();
-        String nickname = jsonNode.get("properties")
+        String username = jsonNode.get("properties")
                 .get("nickname").asText();
         String email = jsonNode.get("kakao_account")
                 .get("email").asText();
 
-        log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
-        return new KakaoUserInfoDto(id, nickname, email);
+        log.info("카카오 사용자 정보: {}, {}, {}", id, username, email);
+        return new KakaoUserInfoDto(id, username, email);
     }
 
     private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
@@ -128,14 +145,13 @@ public class KakaoService {
 
         if (kakaoUser == null) {
             // 카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
-            // username을 통해서 로그인을 하기에 username으로 변경
             String kakaoUsername = kakaoUserInfo.getUsername();
             User sameUsernameUser = userRepository.findByUsername(kakaoUsername).orElse(null);
             if (sameUsernameUser != null) {
                 // 통합 과정
                 kakaoUser = sameUsernameUser;
                 // 기존 회원정보에 카카오 Id 추가
-                kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
+                kakaoUser.setKakaoId(kakaoId);
             } else {
                 // 신규 회원가입
                 // password: random UUID
@@ -147,8 +163,10 @@ public class KakaoService {
 
                 kakaoUser = User.builder()
                         .username(kakaoUsername)
+                        .name(kakaoUsername)
+                        .nickname(kakaoUsername)
                         .kakaoId(kakaoId)
-                        .role(UserRole.valueOf(UserRole.USER.getAuthority()))
+                        .role(UserRole.USER)
                         .encodedPassword(encodedPassword)
                         .email(email)
                         .address("")
