@@ -1,15 +1,12 @@
-name: Deploy Backend to Dev
+name: Deploy Application
 
 # 워크플로우 트리거 설정
 on:
-  # 수동으로 워크플로우를 트리거할 수 있습니다.
-  workflow_dispatch:
-  # 특정 브랜치에 푸시할 때 워크플로우를 트리거합니다.
-  push:
+  workflow_dispatch:  # 수동 트리거
+  push:  # 푸시 이벤트 트리거
     branches:
       - feature/backcicd
-  # 특정 브랜치에 대한 PR이 닫힐 때 워크플로우를 트리거합니다.
-  pull_request:
+  pull_request:  # PR 닫힘 이벤트 트리거
     branches:
       - feature/backcicd
     types:
@@ -17,112 +14,96 @@ on:
 
 jobs:
   deploy:
-    # 워크플로우가 실행될 환경을 설정합니다. 여기서는 최신 Ubuntu를 사용합니다.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 최신 우분투 이미지를 사용하여 작업 실행
 
     steps:
-      # 리포지토리의 코드를 체크아웃합니다.
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3  # 리포지토리 체크아웃
 
-      # JDK 17을 설정합니다.
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'temurin'
 
-      # gradlew 파일에 실행 권한을 부여합니다.
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x gradlew  # gradlew 실행 권한 부여
 
       # 유닛 테스트를 실행합니다.
       - name: Run unit tests
-        run: ./gradlew clean test
+        run: ./gradlew test  # 유닛 테스트 실행
 
-      # Spring Boot 애플리케이션의 JAR 파일을 빌드합니다.
-      - name: Build Jar
-        run: ./gradlew bootJar
+      # 빌드를 실행합니다.
+      - name: Build with Gradle
+        run: ./gradlew build  # 빌드 실행
 
-      # JAR 파일이 올바르게 생성되었는지 확인합니다.
-      - name: Verify Jar File
-        run: test -f build/libs/itsmine-0.0.1-SNAPSHOT.jar && echo "JAR file exists" || echo "JAR file does not exist"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2  # Docker Buildx 설정
 
-      # Docker 이미지를 빌드합니다.
-      - name: Build Docker image
-        run: docker build -t itsmine-backend .
-
-      # Amazon ECR에 로그인합니다.
       - name: Log in to Amazon ECR
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS 액세스 키 ID 설정
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS 비밀 액세스 키 설정
         run: |
-          # AWS CLI를 사용하여 ECR에 로그인합니다.
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com  # Amazon ECR 로그인
 
-      # Docker 이미지에 태그를 지정합니다.
-      - name: Tag Docker image
-        id: tag_image
+      - name: Build and push backend Docker image
+        id: backend  # ID 설정
         run: |
-          # 현재 시간을 타임스탬프로 저장합니다.
+          docker build -t itsmine-backend .  # 백엔드 Docker 이미지 빌드
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          # 이미지 태그를 커밋 SHA와 타임스탬프를 조합하여 생성합니다.
-          IMAGE_TAG=${{ github.sha }}-$TIMESTAMP
-          docker tag itsmine-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$IMAGE_TAG
-          echo "::set-output name=IMAGE_TAG::$IMAGE_TAG"
+          BACKEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP  # 이미지 태그 생성
+          docker tag itsmine-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$BACKEND_IMAGE_TAG  # 태그 설정
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$BACKEND_IMAGE_TAG  # 이미지 푸시
+          echo "BACKEND_IMAGE_TAG=${BACKEND_IMAGE_TAG}"  # 백엔드 이미지 태그 출력
+          echo "::set-output name=BACKEND_IMAGE_TAG::$BACKEND_IMAGE_TAG"  # 백엔드 이미지 태그 출력
 
-      # Docker 이미지를 Amazon ECR에 푸시합니다.
-      - name: Push Docker image to ECR
-        run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
+      - name: Build and push frontend Docker image
+        id: frontend  # ID 설정
+        run: |
+          cd frontend
+          docker build -t itsmine-frontend .  # 프론트엔드 Docker 이미지 빌드
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          FRONTEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP  # 이미지 태그 생성
+          docker tag itsmine-frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$FRONTEND_IMAGE_TAG  # 태그 설정
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$FRONTEND_IMAGE_TAG  # 이미지 푸시
+          echo "FRONTEND_IMAGE_TAG=${FRONTEND_IMAGE_TAG}"  # 프론트엔드 이미지 태그 출력
+          echo "::set-output name=FRONTEND_IMAGE_TAG::$FRONTEND_IMAGE_TAG"  # 프론트엔드 이미지 태그 출력
 
-      # Amazon EC2 인스턴스에 SSH로 접속하여 Docker 컨테이너를 배포합니다.
-      - name: SSH into EC2 and deploy Docker container
+      - name: Debug Output
+        run: |
+          echo "DEBUG: FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}"
+          echo "DEBUG: BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}"
+
+      - name: SSH into EC2 and deploy Docker containers
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ec2-user
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
+          host: ${{ secrets.SSH_HOST }}  # SSH 호스트 설정
+          username: ec2-user  # SSH 사용자 이름 설정
+          key: ${{ secrets.SSH_KEY }}  # SSH 키 설정
+          port: 22  # SSH 포트 설정
           script_stop: true
           script: |
-            # ECR에 로그인합니다.
+            # 환경 변수 확인
+            echo "DEBUG: FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}"
+            echo "DEBUG: BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}"
+            
+            # Amazon ECR에 로그인
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-            # ECR에서 Docker 이미지를 풀합니다.
-            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
-            # 기존 컨테이너를 중지합니다. (실행 중인 경우)
-            docker stop itsmine-backend || true
-            # 기존 컨테이너를 삭제합니다. (존재하는 경우)
-            docker rm itsmine-backend || true
-            # 새로운 컨테이너를 실행합니다.
-            docker run -d --name itsmine-backend -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
-              -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
-              -e DB_URL=${{ secrets.DB_URL }} \
-              -e DB_USER=${{ secrets.DB_USER }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e JWT_KEY=${{ secrets.JWT_KEY }} \
-              -e ADMIN_TOKEN=${{ secrets.ADMIN_TOKEN }} \
-              -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
-              -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
-              -e AWS_REGION=${{ secrets.AWS_REGION }} \
-              -e AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }} \
-              -e RABBITMQ_BROKER=${{ secrets.RABBITMQ_BROKER }} \
-              -e RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }} \
-              -e RABBITMQ_USERNAME=${{ secrets.RABBITMQ_USERNAME }} \
-              -e RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }} \
-              -e RABBITMQ_VIRTUAL_HOST=${{ secrets.RABBITMQ_VIRTUAL_HOST }} \
-              -e REDIS_DOMAIN=${{ secrets.REDIS_DOMAIN }} \
-              -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
-              -e ACTIVEMQ_BROKER=${{ secrets.ACTIVEMQ_BROKER }} \
-              -e ACTIVEMQ_USER=${{ secrets.ACTIVEMQ_USER }} \
-              -e ACTIVEMQ_PASSWORD=${{ secrets.ACTIVEMQ_PASSWORD }} \
-              -e CLOUD_AWS_S3_BUCKET=${{ secrets.CLOUD_AWS_S3_BUCKET }} \
-              -e CLOUD_AWS_S3_DOMAIN=${{ secrets.CLOUD_AWS_S3_DOMAIN }} \
-              -e CLOUD_AWS_REGION_STATIC=${{ secrets.CLOUD_AWS_REGION_STATIC }} \
-              -e CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }} \
-              -e CLOUD_AWS_CREDENTIALS_SECRETKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }} \
-              -e CLOUD_AWS_DYNAMODB_ACCESSKEY=${{ secrets.CLOUD_AWS_DYNAMODB_ACCESSKEY }} \
-              -e CLOUD_AWS_DYNAMODB_SECRETKEY=${{ secrets.CLOUD_AWS_DYNAMODB_SECRETKEY }} \
-              -e ACTIVEMQ_QNAME=${{ secrets.ACTIVEMQ_QNAME }} \
-              -e STOMP_HOST=${{ secrets.STOMP_HOST }} \
-              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.tag_image.outputs.IMAGE_TAG }}
+            
+            # 최신 이미지를 풀링
+            echo "Pulling backend image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}"
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}
+            echo "Pulling frontend image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}"
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}
+            
+            # .env 파일 업데이트
+            sudo sh -c "echo 'FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}' >> /.env"
+            sudo sh -c "echo 'BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}' >> /.env"
+
+            # 기존 컨테이너 중지 및 제거
+            docker stop $(docker ps -aq)
+            docker rm $(docker ps -aq)
+
+            # 새로운 컨테이너 시작
+            docker-compose --env-file /.env -f /docker-compose.yml up -d

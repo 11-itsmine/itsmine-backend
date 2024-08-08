@@ -16,5 +16,8 @@ ARG JAR_FILE=build/libs/itsmine-0.0.1-SNAPSHOT.jar
 # JAR 파일을 컨테이너 이미지의 루트 디렉토리에 app.jar 이름으로 추가합니다.
 ADD ${JAR_FILE} app.jar
 
+# redis-cli 설치
+RUN apk update && apk add redis
+
 # 컨테이너가 시작될 때 실행할 명령을 정의합니다. 여기서는 JAR 파일을 실행합니다.
 ENTRYPOINT ["java","-jar","/app.jar"]
