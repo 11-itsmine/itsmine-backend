@@ -65,7 +65,6 @@ const FooterLink = styled.a`
 `;
 
 const Contents = styled.span`
-  display: block;
   margin-top: ${props => props.theme.margins.xxxl};
   padding: ${props => props.theme.paddings.large};
   cursor: pointer;

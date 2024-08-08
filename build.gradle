@@ -52,6 +52,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.27.0'
+    testImplementation 'it.ozimov:embedded-redis:0.7.2'
     //Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -123,9 +125,13 @@ dependencies {
     implementation 'software.amazon.awssdk:auth:2.17.28'
     implementation 'software.amazon.awssdk:regions:2.17.28'
 
-    // Spring Boot Starter AMQP
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
-    
+    // kakaotalk login
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation platform('org.springframework.boot:spring-boot-dependencies:2.7.15')
+
+    // MAc DNS Resolution fix
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
+
     //카카오페이 관련
     implementation('commons-codec:commons-codec:1.13')
 }
