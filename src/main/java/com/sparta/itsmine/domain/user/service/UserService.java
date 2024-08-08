@@ -63,7 +63,6 @@ public class UserService {
 
     public void logout(String username) {
         redisTemplate.delete(username);
-        refreshTokenAdapter.deleteByUsername(username);
     }
 
     public UserResponseDto getUser(Long userId) {
