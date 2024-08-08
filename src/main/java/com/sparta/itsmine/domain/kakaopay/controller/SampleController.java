@@ -3,7 +3,10 @@ package com.sparta.itsmine.domain.kakaopay.controller;
 
 import com.sparta.itsmine.domain.kakaopay.dto.ReadyResponse;
 import com.sparta.itsmine.domain.kakaopay.service.SampleService;
+import com.sparta.itsmine.global.security.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 public class SampleController {
+
     @Autowired
     private SampleService sampleService;
 
@@ -23,9 +27,13 @@ public class SampleController {
         return "index";
     }
 
-    @GetMapping("/ready/{agent}/{openType}")//결재 요청
-    public String ready(@PathVariable("agent") String agent, @PathVariable("openType") String openType, Model model) {
-        ReadyResponse readyResponse = sampleService.ready(agent, openType);
+    @GetMapping("/ready/{agent}/{openType}/{productId}")//결재 요청
+    public String ready(@PathVariable("agent") String agent,
+            @PathVariable("openType") String openType, @PathVariable("productId") Long productId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            Model model) {
+        ReadyResponse readyResponse = sampleService.ready(agent, openType, productId,
+                userDetails.getUser());
 
         if (agent.equals("mobile")) {
             // 모바일은 결제대기 화면으로 redirect 한다.
@@ -36,7 +44,8 @@ public class SampleController {
         if (agent.equals("app")) {
             // 앱에서 결제대기 화면을 올리는 webview 스킴
             // In app, webview app scheme for payment stand-by screen
-            model.addAttribute("webviewUrl", "app://webview?url=" + readyResponse.getNext_redirect_app_url());
+            model.addAttribute("webviewUrl",
+                    "app://webview?url=" + readyResponse.getNext_redirect_app_url());
             return "app/webview/ready";
         }
 
@@ -46,14 +55,18 @@ public class SampleController {
     }
 
     @GetMapping("/approve/{agent}/{openType}")//결재 승인
-    public String approve(@PathVariable("agent") String agent, @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken, Model model) {
-        String approveResponse = sampleService.approve(pgToken);
+    public String approve(@PathVariable("agent") String agent,
+            @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken,
+            @PathVariable("productId") Long productId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
+        String approveResponse = sampleService.approve(pgToken, productId, userDetails.getUser());
         model.addAttribute("response", approveResponse);
         return agent + "/" + openType + "/approve";
     }
 
     @GetMapping("/cancel/{agent}/{openType}")//결재 취소
-    public String cancel(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
+    public String cancel(@PathVariable("agent") String agent,
+            @PathVariable("openType") String openType) {
         // 주문건이 진짜 취소되었는지 확인 후 취소 처리
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
@@ -62,7 +75,8 @@ public class SampleController {
     }
 
     @GetMapping("/fail/{agent}/{openType}")//결재 실패
-    public String fail(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
+    public String fail(@PathVariable("agent") String agent,
+            @PathVariable("openType") String openType) {
         // 주문건이 진짜 실패되었는지 확인 후 실패 처리
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,

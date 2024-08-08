@@ -12,7 +12,7 @@ import lombok.Getter;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ReadyRequest {
     private String cid;//가맹점 코드, 10자
-    private String partnerOrderId;//가맹점 주문번호, 최대 100자
+    private Long partnerOrderId;//가맹점 주문번호, 최대 100자
     private String partnerUserId;//가맹점 회원 id, 최대 100자
     private String itemName;//상품명, 최대 100자
     private Integer quantity;//상품 수량
