@@ -98,8 +98,8 @@ jobs:
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}
             
             # .env 파일 업데이트
-            echo "FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}" >> /.env
-            echo "BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}" >> /.env
+            sudo sh -c "echo 'FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}' >> /.env"
+            sudo sh -c "echo 'BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}' >> /.env"
 
             # 기존 컨테이너 중지 및 제거
             docker-compose -f /docker-compose.yml down
