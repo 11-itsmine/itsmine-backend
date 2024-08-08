@@ -10,7 +10,6 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
@@ -42,7 +41,6 @@ public class ChatController {
      *
      * @param requestDto 수신한 메시지를 담고 있는 DTO
      */
-    @Async
     @JmsListener(destination = "${activemq.queue.name}")
     public void receiveMessage(MessageRequestDto requestDto) {
         // 메시지를 데이터베이스에 저장하는 서비스 호출
