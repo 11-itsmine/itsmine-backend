@@ -55,6 +55,8 @@ public class User extends TimeStamp {
 
     private LocalDateTime deletedAt;
 
+    private Long kakaoId;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Images> imagesList = new ArrayList<>();
 
@@ -66,7 +68,18 @@ public class User extends TimeStamp {
      */
     @Builder
     public User(String username, String encodedPassword, String name, String nickname, String email,
-            UserRole role, String address) {
+            UserRole role, String address, Long kakaoId) {
+        this.username = username;
+        this.password = encodedPassword;
+        this.name = name;
+        this.nickname = nickname;
+        this.email = email;
+        this.userRole = role;
+        this.address = address;
+        this.kakaoId = kakaoId;
+    }
+
+    public User(String username, String encodedPassword, String name, String nickname, String email, UserRole role, String address) {
         this.username = username;
         this.password = encodedPassword;
         this.name = name;
@@ -102,5 +115,10 @@ public class User extends TimeStamp {
         return imagesList.stream()
                 .map(Images::getImagesUrl)
                 .collect(Collectors.toList());
+    }
+
+    public User kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
     }
 }

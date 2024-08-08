@@ -23,10 +23,5 @@ public class WebConfig {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
-    // cors 는 6개만 가져올 수 있다.
-    // 노출헤더라는 것을 넣어서 가져가야 하는 헤더를 열어줘야 한다.
-    // 보안상 헤더 키를 등록하는 느낌
-
-    // FE 에서는 헤더와 쿠키를 관리 ㄴㄴ
 
 }

@@ -16,7 +16,7 @@ spring:
       host: ${REDIS_HOST} # 로컬에서 할 때는 localhost
       port: ${REDIS_PORT}
       repositories:
-        enabled : false # JPA Repository 중복 방지
+        enabled: false
 
   activemq:
     broker-url: ${ACTIVEMQ_BROKER}
