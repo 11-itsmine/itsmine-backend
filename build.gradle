@@ -105,6 +105,9 @@ dependencies {
     // kakaotalk login
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation platform('org.springframework.boot:spring-boot-dependencies:2.7.15')
+
+    // MAc DNS Resolution fix
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
 }
 
 tasks.named('test') {
