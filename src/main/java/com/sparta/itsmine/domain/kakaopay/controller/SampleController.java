@@ -5,6 +5,7 @@ import com.sparta.itsmine.domain.kakaopay.dto.ReadyResponse;
 import com.sparta.itsmine.domain.kakaopay.service.SampleService;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -12,15 +13,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by kakaopay
  */
 @Controller
+@RequiredArgsConstructor
 public class SampleController {
 
-    @Autowired
-    private SampleService sampleService;
+    private final SampleService sampleService;
 
     @GetMapping("/")
     public String index() {
@@ -30,7 +32,7 @@ public class SampleController {
     @GetMapping("/ready/{agent}/{openType}/{productId}")//결재 요청
     public String ready(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType, @PathVariable("productId") Long productId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,//사용자를 식별할 수 있는 번호
             Model model) {
         ReadyResponse readyResponse = sampleService.ready(agent, openType, productId,
                 userDetails.getUser());
@@ -54,12 +56,11 @@ public class SampleController {
         return agent + "/" + openType + "/ready";
     }
 
-    @GetMapping("/approve/{agent}/{openType}")//결재 승인
+    @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}")//결재 승인
     public String approve(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken,
-            @PathVariable("productId") Long productId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
-        String approveResponse = sampleService.approve(pgToken, productId, userDetails.getUser());
+            @PathVariable("productId") Long productId, @PathVariable("userId") Long userId, Model model) {
+        String approveResponse = sampleService.approve(pgToken, productId, userId);
         model.addAttribute("response", approveResponse);
         return agent + "/" + openType + "/approve";
     }

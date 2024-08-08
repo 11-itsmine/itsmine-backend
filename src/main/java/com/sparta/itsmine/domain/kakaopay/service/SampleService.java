@@ -7,6 +7,7 @@ import com.sparta.itsmine.domain.kakaopay.dto.ReadyResponse;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -36,6 +37,7 @@ public class SampleService {
     private String tid;
 
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
 
     public ReadyResponse ready(String agent, String openType, Long productId, User user) {
@@ -57,7 +59,10 @@ public class SampleService {
                 .taxFreeAmount(0)//상품 비과세 금액
                 .vatAmount(100)//상품 부가세 금액
                 .approvalUrl(sampleHost + "/approve/" + agent + "/"
-                        + openType)//결제 성공 시 redirect url, 최대 255자
+                        + openType + "/" + product.getId() + "/"
+                        + user.getId())//결제 성공 시 redirect url, 최대 255자 ,
+                // 여기다 유저정보를 덧붙여서 호출
+                // "/approve" + "?productId="+productId+"&userId="+userId
                 .cancelUrl(sampleHost + "/cancel/" + agent + "/"
                         + openType)//결제 취소 시 redirect url, 최대 255자
                 .failUrl(sampleHost + "/fail/" + agent + "/"
@@ -66,6 +71,9 @@ public class SampleService {
 
         // Send reqeust
         HttpEntity<ReadyRequest> entityMap = new HttpEntity<>(readyRequest, headers);
+
+        //헤더 jwt 토큰 추가
+
         ResponseEntity<ReadyResponse> response = new RestTemplate().postForEntity(
                 "https://open-api.kakaopay.com/online/v1/payment/ready",
                 entityMap,
@@ -79,7 +87,7 @@ public class SampleService {
         return readyResponse;
     }
 
-    public String approve(String pgToken, Long productId, User user) {
+    public String approve(String pgToken, Long productId, Long userId) {
         // ready할 때 저장해놓은 TID로 승인 요청
         // Call “Execute approved payment” API by pg_token, TID mapping to the current payment transaction and other parameters.
         HttpHeaders headers = new HttpHeaders();
@@ -87,6 +95,7 @@ public class SampleService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Product product = productRepository.findById(productId).orElseThrow();
+        User user=userRepository.findById(userId).orElseThrow();
 
         // Request param
         ApproveRequest approveRequest = ApproveRequest.builder()
@@ -94,7 +103,8 @@ public class SampleService {
                 .tid(tid)//결제 고유번호, 결제 준비 API 응답에 포함
                 .partnerOrderId(product.getId())//가맹점 주문번호, 결제 준비 API 요청과 일치해야 함
                 .partnerUserId(user.getUsername())//가맹점 회원 id, 결제 준비 API 요청과 일치해야 함
-                .pgToken(pgToken)//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
+                .pgToken(
+                        pgToken)//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
                 .build();
 
         // Send Request
