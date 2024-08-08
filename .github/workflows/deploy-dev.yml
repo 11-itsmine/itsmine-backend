@@ -48,6 +48,7 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com  # Amazon ECR 로그인
 
       - name: Build and push backend Docker image
+        id: backend  # ID 설정
         run: |
           docker build -t itsmine-backend .  # 백엔드 Docker 이미지 빌드
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
@@ -58,6 +59,7 @@ jobs:
           echo "::set-output name=BACKEND_IMAGE_TAG::$BACKEND_IMAGE_TAG"  # 백엔드 이미지 태그 출력
 
       - name: Build and push frontend Docker image
+        id: frontend  # ID 설정
         run: |
           cd frontend
           docker build -t itsmine-frontend .  # 프론트엔드 Docker 이미지 빌드
@@ -67,6 +69,11 @@ jobs:
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$FRONTEND_IMAGE_TAG  # 이미지 푸시
           echo "FRONTEND_IMAGE_TAG=${FRONTEND_IMAGE_TAG}"  # 프론트엔드 이미지 태그 출력
           echo "::set-output name=FRONTEND_IMAGE_TAG::$FRONTEND_IMAGE_TAG"  # 프론트엔드 이미지 태그 출력
+
+      - name: Debug Output
+        run: |
+          echo "DEBUG: FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}"
+          echo "DEBUG: BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}"
 
       - name: SSH into EC2 and deploy Docker containers
         uses: appleboy/ssh-action@v0.1.6
@@ -78,21 +85,21 @@ jobs:
           script_stop: true
           script: |
             # 환경 변수 확인
-            echo "DEBUG: FRONTEND_IMAGE_TAG=${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}"
-            echo "DEBUG: BACKEND_IMAGE_TAG=${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}"
+            echo "DEBUG: FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}"
+            echo "DEBUG: BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}"
             
             # Amazon ECR에 로그인
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
             
             # 최신 이미지를 풀링
-            echo "Pulling backend image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}"
-            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}
-            echo "Pulling frontend image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}"
-            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}
+            echo "Pulling backend image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}"
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}
+            echo "Pulling frontend image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}"
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}
             
             # .env 파일 업데이트
-            echo "FRONTEND_IMAGE_TAG=${{ steps.deploy.outputs.FRONTEND_IMAGE_TAG }}" >> /.env
-            echo "BACKEND_IMAGE_TAG=${{ steps.deploy.outputs.BACKEND_IMAGE_TAG }}" >> /.env
+            echo "FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}" >> /.env
+            echo "BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}" >> /.env
 
             # 기존 컨테이너 중지 및 제거
             docker-compose -f /docker-compose.yml down
