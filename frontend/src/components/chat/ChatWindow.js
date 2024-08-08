@@ -32,7 +32,7 @@ const ChatWindow = ({ room, onClose }) => {
     fetchMessages();
 
     // SockJS 및 STOMP 연결 설정
-    const socket = new SockJS('http://52.79.213.8/ws');
+    const socket = new SockJS('http://52.79.213.8:8080/ws');
     stompClient.current = Stomp.over(socket);
 
     stompClient.current.connect(

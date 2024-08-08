@@ -46,7 +46,7 @@ function App() {
             <Route path="/products" element={<CreateProduct/>}/>
             <Route path="/items" element={<ItemList/>}/>
             <Route path="/item" element={<Item/>}/>
-            <Route path="/products/:productId" element={<AuctionComponent/>}/>
+            <Route path="/v1/products/:productId" element={<AuctionComponent/>}/>
             <Route path="/profile" element={<Profile/>}/>
           </Routes>
           <Footer/>
