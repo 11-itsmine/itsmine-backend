@@ -21,7 +21,7 @@ const AuctionComponent = () => {
   // 제품 정보를 가져오는 함수
   const fetchProduct = async () => {
     try {
-      const response = await axiosInstance.get(`/products/${productId}`);
+      const response = await axiosInstance.get(`/v1/products/${productId}`);
       setProduct(response.data.data);
     } catch (err) {
       alert("제품 정보를 가져오는데 실패했습니다.");
@@ -35,7 +35,7 @@ const AuctionComponent = () => {
     try {
       const token = localStorage.getItem("Authorization");
       const response = await axiosInstance.get(
-          `/users/products/${productId}/likes`,
+          `/v1/users/products/${productId}/likes`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -55,7 +55,7 @@ const AuctionComponent = () => {
     try {
       const token = localStorage.getItem("Authorization");
       await axiosInstance.post(
-          `/users/products/${productId}/likes`,
+          `/v1/users/products/${productId}/likes`,
           {},
           {
             headers: {
@@ -88,7 +88,7 @@ const AuctionComponent = () => {
 
     try {
       const response = await axiosInstance.post(
-          `/products/${productId}/auctions`,
+          `/v1/products/${productId}/auctions`,
           { bidPrice },
           {
             headers: {
@@ -144,7 +144,7 @@ const AuctionComponent = () => {
       const token = localStorage.getItem("Authorization");
       console.log(product.userId);
       const response = await axiosInstance.post(
-          `/chatrooms`, // 채팅 방 생성 API 경로
+          `/v1/chatrooms`, // 채팅 방 생성 API 경로
           {
             userId: product.userId, // 상품 소유자의 ID를 사용
           },
