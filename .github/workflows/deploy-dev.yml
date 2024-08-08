@@ -102,7 +102,8 @@ jobs:
             sudo sh -c "echo 'BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}' >> /.env"
 
             # 기존 컨테이너 중지 및 제거
-            docker-compose -f /docker-compose.yml down
+            docker stop $(docker ps -aq)
+            docker rm $(docker ps -aq)
 
             # 새로운 컨테이너 시작
             docker-compose --env-file /.env -f /docker-compose.yml up -d
