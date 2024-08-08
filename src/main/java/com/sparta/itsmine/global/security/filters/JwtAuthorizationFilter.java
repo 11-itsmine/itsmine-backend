@@ -49,18 +49,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			if (jwtProvider.validateAccessToken(accessToken)) {
 				log.info("액세스 토큰 검증 성공");
 				updateToken(accessToken, username, res);
-			} else if (Boolean.TRUE.equals(redisTemplate.hasKey(username))) {
-				log.info("액세스 토큰 만료, 리프레시 토큰 검증 시도");
+			} else if (jwtProvider.hasRefreshToken(username)) {
 				String refreshToken = jwtProvider.substringToken(redisTemplate.opsForValue().get(username));
-				if (jwtProvider.hasRefreshToken(username)) {
-					log.info("리프레시 토큰 검증 성공 & 새로운 액세스 토큰 발급");
 					updateToken(refreshToken, username, res);
-					log.info("토큰발급 성공");
-				} else {
-					log.error("리프레시 토큰 검증 실패");
-					jwtExceptionHandler(res, HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh 토큰입니다.");
-					return;
-				}
+					log.info("토큰 Refresh 성공");
 			} else {
 				jwtExceptionHandler(res, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 				return;

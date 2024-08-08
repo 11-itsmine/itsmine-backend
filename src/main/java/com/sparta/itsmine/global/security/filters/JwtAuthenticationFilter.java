@@ -4,7 +4,7 @@ import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADE
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.itsmine.domain.refreshtoken.service.RefreshTokenService;
+import com.sparta.itsmine.domain.redis.RedisService;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.utils.UserRole;
@@ -25,6 +25,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -33,7 +37,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Autowired
     private UserAdapter userAdapter;
     @Autowired
-    private RefreshTokenService refreshTokenService;
+    private RedisService redisService;
 
     public JwtAuthenticationFilter(JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
@@ -61,10 +65,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
-        String username = userDetails.getUsername();
-        UserRole role = userDetails.getUser().getUserRole();
+    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res,
+            FilterChain chain, Authentication authResult) throws IOException {
+        log.info("인증 성공 및 JWT 생성");
+        String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
+        UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getUserRole();
 
         if (userAdapter.isDeleted(username)) {
             throw new UserDeletedException(ResponseExceptionEnum.USER_DELETED);
@@ -74,7 +79,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtProvider.createRefreshToken(username, role);
 
         res.setHeader(AUTHORIZATION_HEADER, accessToken);
-        refreshTokenService.save(username, refreshToken);
+        // Redis에 RefreshToken 저장
+        redisService.saveRefreshToken(username, refreshToken);
 
         res.setStatus(SC_OK);
         res.setCharacterEncoding("UTF-8");
