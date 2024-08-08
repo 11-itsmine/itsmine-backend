@@ -23,7 +23,7 @@ public class SampleController {
         return "index";
     }
 
-    @GetMapping("/ready/{agent}/{openType}")
+    @GetMapping("/ready/{agent}/{openType}")//결재 요청
     public String ready(@PathVariable("agent") String agent, @PathVariable("openType") String openType, Model model) {
         ReadyResponse readyResponse = sampleService.ready(agent, openType);
 
@@ -45,14 +45,14 @@ public class SampleController {
         return agent + "/" + openType + "/ready";
     }
 
-    @GetMapping("/approve/{agent}/{openType}")
+    @GetMapping("/approve/{agent}/{openType}")//결재 승인
     public String approve(@PathVariable("agent") String agent, @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken, Model model) {
         String approveResponse = sampleService.approve(pgToken);
         model.addAttribute("response", approveResponse);
         return agent + "/" + openType + "/approve";
     }
 
-    @GetMapping("/cancel/{agent}/{openType}")
+    @GetMapping("/cancel/{agent}/{openType}")//결재 취소
     public String cancel(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
         // 주문건이 진짜 취소되었는지 확인 후 취소 처리
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
@@ -61,7 +61,7 @@ public class SampleController {
         return agent + "/" + openType + "/cancel";
     }
 
-    @GetMapping("/fail/{agent}/{openType}")
+    @GetMapping("/fail/{agent}/{openType}")//결재 실패
     public String fail(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
         // 주문건이 진짜 실패되었는지 확인 후 실패 처리
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.

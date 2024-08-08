@@ -37,17 +37,17 @@ public class SampleService {
 
         // Request param
         ReadyRequest readyRequest = ReadyRequest.builder()
-                .cid(cid)
-                .partnerOrderId("1")
-                .partnerUserId("1")
-                .itemName("상품명")
-                .quantity(1)
-                .totalAmount(1100)
-                .taxFreeAmount(0)
-                .vatAmount(100)
-                .approvalUrl(sampleHost + "/approve/" + agent + "/" + openType)
-                .cancelUrl(sampleHost + "/cancel/" + agent + "/" + openType)
-                .failUrl(sampleHost + "/fail/" + agent + "/" + openType)
+                .cid(cid)//가맹점 코드, 10자
+                .partnerOrderId("1")//가맹점 주문번호, 최대 100자
+                .partnerUserId("1")//가맹점 회원 id, 최대 100자
+                .itemName("좆소고양이")//상품명, 최대 100자
+                .quantity(1)//상품 수량
+                .totalAmount(1100)//상품 총액
+                .taxFreeAmount(0)//상품 비과세 금액
+                .vatAmount(100)//상품 부가세 금액
+                .approvalUrl(sampleHost + "/approve/" + agent + "/" + openType)//결제 성공 시 redirect url, 최대 255자
+                .cancelUrl(sampleHost + "/cancel/" + agent + "/" + openType)//결제 취소 시 redirect url, 최대 255자
+                .failUrl(sampleHost + "/fail/" + agent + "/" + openType)//결제 실패 시 redirect url, 최대 255자
                 .build();
 
         // Send reqeust
