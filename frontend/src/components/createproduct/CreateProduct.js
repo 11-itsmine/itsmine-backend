@@ -100,6 +100,7 @@ const ProductCreatePage = () => {
     }
 
     try {
+      const token = localStorage.getItem('Authorization');
       const productData = {
         productCreateDto: {
           productName,
@@ -114,18 +115,16 @@ const ProductCreatePage = () => {
         }
       };
 
-      const response = await axiosInstance.post(`/v1/products`, productData);
-      // 응답 바디에서 토큰 추출
-      const token = response.data.data;
-      console.log('Login successful!', token);
+      await axiosInstance.post(`/v1/products`, productData, {
+        headers: {
+          Authorization: token ? `Bearer ${token.trim()}` : '' // Authorization 헤더 추가
+        }
+      });
 
-      // 토큰을 localStorage에 저장
-      localStorage.setItem('Authorization', token);
-      console.log('Token stored in localStorage:', localStorage.getItem('Authorization'));
       alert('상품 등록이 완료 되었습니다.\n홈 화면으로 이동합니다.');
       navigate('/itsmine');
     } catch (error) {
-      console.error('Error creating product:', error);
+      console.error('Error creating product:', error.response ? error.response.data : error.message);
       alert("상품 등록이 불가능합니다. 해당 상품의 이름과 정보를 다시 한번 확인해주세요.");
     }
   };

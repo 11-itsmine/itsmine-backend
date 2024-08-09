@@ -12,7 +12,7 @@ const KakaoCallback = ({ onLogin }) => {
       const handleKakaoLogin = async (code) => {
         try {
           const response = await axiosInstance.get(`/v1/users/oauth/kakao?code=${code}`);
-          const token = response.headers.authorization;  // Get token from headers
+          const token = response.data.data;  // Get token from headers
           if (token) {
             localStorage.setItem('Authorization', token);
             onLogin();
