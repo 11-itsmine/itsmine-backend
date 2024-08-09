@@ -78,7 +78,6 @@ jobs:
           port: 22  # SSH 포트 설정
           script_stop: true
           script: |
-            
             # Amazon ECR에 로그인
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
             
@@ -90,7 +89,7 @@ jobs:
             sudo sed -i '/^FRONTEND_IMAGE_TAG=/d' /.env
             sudo sed -i '/^BACKEND_IMAGE_TAG=/d' /.env
 
-           # .env 파일에 새로운 이미지 태그 덮어쓰기
+            # .env 파일에 새로운 이미지 태그 덮어쓰기
             sudo sh -c "echo 'FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}' >> /.env"
             sudo sh -c "echo 'BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}' >> /.env"
 
