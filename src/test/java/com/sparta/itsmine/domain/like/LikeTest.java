@@ -1,47 +1,41 @@
-package com.sparta.itsmine.domain.auction;
+package com.sparta.itsmine.domain.like;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
-import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
-import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.category.repository.CategoryRepository;
+import com.sparta.itsmine.domain.like.entity.Like;
+import com.sparta.itsmine.domain.like.repository.LikeRepository;
+import com.sparta.itsmine.domain.like.service.LikeService;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 
-import redis.embedded.RedisServer;
-
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ActiveProfiles("test")
-public class AuctionTest {
-	private static final String LOCK_KEY = "testLock";
+public class LikeTest {
 	private static final int THREAD_COUNT = 100;
 
 	@Autowired
@@ -53,24 +47,30 @@ public class AuctionTest {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 
-	private static User seller;
-	private static User buyer;
-	private static Product product;
-	private static Category category;
 	@Autowired
-	private UserRepository userRepository;
+	LikeService likeService;
+
 	@Autowired
-	private ProductRepository productRepository;
+	CategoryRepository categoryRepository;
+
 	@Autowired
-	private CategoryRepository categoryRepository;
+	UserRepository userRepository;
+
 	@Autowired
-	private AuctionRepository auctionRepository;
+	ProductRepository productRepository;
+
+	@Autowired
+	AuctionRepository auctionRepository;
+
+	private User seller;
+	private User buyer;
+	private Product product;
+	private Category category;
+	@Autowired
+	private LikeRepository likeRepository;
 
 	@BeforeAll
-	static void setup(@Autowired CategoryRepository categoryRepository,
-		@Autowired UserRepository userRepository,
-		@Autowired ProductRepository productRepository,
-		@Autowired PasswordEncoder passwordEncoder) {
+	void setup() {
 		category = Category.builder()
 			.categoryName("testCategory")
 			.build();
@@ -111,31 +111,30 @@ public class AuctionTest {
 	}
 
 	@AfterAll
-	static void drop(@Autowired AuctionRepository auctionRepository,
-		@Autowired ProductRepository productRepository,
-		@Autowired CategoryRepository categoryRepository,
-		@Autowired UserRepository userRepository) {
-		List<Auction> auctions = auctionRepository.findAllByProductId(product.getId());
-		auctionRepository.deleteAll(auctions);
+	void drop() {
+		List<Like> like = likeRepository.findAllByProductIdAndUserId(product.getId(), buyer.getId());
+		if (like != null) {
+			likeRepository.deleteAll(like);
+		}
 		productRepository.delete(product);
 		categoryRepository.delete(category);
 		userRepository.delete(seller);
 		userRepository.delete(buyer);
 	}
 
-	// 테스트 시 입찰가격 exception 두 군데를 주석처리해야함.
 	@Test
-	@DisplayName("입찰 분산락 테스트")
+	@DisplayName("좋아요 분산락 테스트")
 	public void test1() {
+		long startTime = System.currentTimeMillis();
 		IntStream.range(0, THREAD_COUNT).parallel().forEach(i -> {
-				AuctionRequestDto requestDto = new AuctionRequestDto();
-				requestDto.setBidPrice(i * 10);
-				System.out.println("입찰시도 " + i);
-				AuctionResponseDto response = auctionService.createAuction(buyer, product.getId(), requestDto);
-				System.out.println("현재가격 : " + response.getBidPrice());
-				System.out.println("입찰 카운트 : " + auctionRepository.countByProductId(product.getId()));
+			System.out.println("시도 횟수 : " + i);
+			likeService.createLike(product.getId(), buyer);
+			System.out.println("현재 좋아요 수 : " + productRepository.findById(product.getId()).get().getLikeCount());
 		});
-
-		assertEquals(auctionRepository.countByProductId(product.getId()), THREAD_COUNT);
+		long endTime = System.currentTimeMillis();
+		Product updatedProduct = productRepository.findById(product.getId()).get();
+		System.out.println("테스트 실행 시간: " + (endTime - startTime) + "ms");
+		assertEquals(updatedProduct.getLikeCount(), THREAD_COUNT % 2);
 	}
 }
+
