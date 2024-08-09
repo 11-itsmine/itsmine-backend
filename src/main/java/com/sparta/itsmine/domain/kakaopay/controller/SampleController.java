@@ -24,11 +24,6 @@ public class SampleController {
 
     private final SampleService sampleService;
 
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
-
     @GetMapping("/ready/{agent}/{openType}/{productId}")//결재 요청
     public String ready(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType, @PathVariable("productId") Long productId,
