@@ -14,7 +14,7 @@ import AuctionComponent from "./components/Auction/AuctionComponent";
 import Profile from "./components/profile/profile";
 import Item from "./components/item/Item";
 import KakaoCallback from "./api/KakaoCallback";
-import AdminPage from "./components/backOffice/AdminPage";
+import AdminPage from "./components/backOffice/AdminPage"; // 관리자 페이지 컴포넌트 추가
 import axiosInstance from './api/axiosInstance'; // axiosInstance 가져오기
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
     const token = localStorage.getItem('Authorization');
     if (token) {
       setIsLoggedIn(true);
-      fetchUserRole(token);
+      fetchUserRole(token); // 사용자 역할을 가져오는 함수 호출
     }
   }, []);
 
@@ -48,7 +48,7 @@ function App() {
     setIsLoggedIn(true);
     const token = localStorage.getItem('Authorization');
     if (token) {
-      fetchUserRole(token);
+      fetchUserRole(token); // 로그인 후 사용자 역할을 다시 가져옴
     }
   };
 
@@ -78,7 +78,7 @@ function App() {
                    element={<AuctionComponent/>}/>
             <Route path="/profile" element={<Profile/>}/>
             {userRole === 'MANAGER' && (
-                <Route path="/admin" element={<AdminPage/>}/>
+                <Route path="/admin" element={<AdminPage/>}/> // 관리자 페이지 접근 제어
             )}
           </Routes>
           <Footer/>
