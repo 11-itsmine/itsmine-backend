@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
 
+    private static final Logger log = LoggerFactory.getLogger(ReportService.class);
     private final ReportRepository reportRepository;
     private final UserAdapter userAdapter;
 
@@ -87,13 +90,15 @@ public class ReportService {
         return new ReportResponseDto(report);
     }
 
+    @Transactional
     public void blockUser(User user, BlockRequestDto requestDto) {
-        if (!user.getId().equals(requestDto.getUserId())) {
+        if (user.getId().equals(requestDto.getUserId())) {
             throw new DataDuplicatedException(ResponseExceptionEnum.SELF_NOT_BLOCK);
         }
         LocalDateTime blockDate = LocalDateTime.now().plusDays(requestDto.getBlockPlusDate());
+        log.info("BLOCK userID : {} ", requestDto.getUserId());
         User blockUser = userAdapter.findById(requestDto.getUserId());
-        blockUser.setBlockedAt(blockDate);
+        blockUser.block(blockDate, requestDto.getBenReason());
     }
 
 //    public List<> reportFarthing(User user, String reportType) {

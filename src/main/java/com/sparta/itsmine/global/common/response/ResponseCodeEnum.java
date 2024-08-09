@@ -17,6 +17,7 @@ public enum ResponseCodeEnum {
     USER_UPDATE_SUCCESS(HttpStatus.OK, "유저 정보 수정을 완료했습니다."),
     USER_SUCCESS_SIGNUP(HttpStatus.OK, "님의 회원가입을 완료 했습니다."),
     REISSUE_ACCESS_TOKEN(HttpStatus.OK, "억세스 토큰 재발급을 완료했습니다."),
+    USER_SUCCESS_LIST(HttpStatus.OK, "유저 리스트 입니다."),
 
     // 상품
     SUCCESS_SAVE_PRODUCT(HttpStatus.OK, "성공적으로 상품을 등록했습니다."),

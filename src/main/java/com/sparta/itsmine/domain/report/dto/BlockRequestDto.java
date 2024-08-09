@@ -7,4 +7,5 @@ public class BlockRequestDto {
 
     private Long userId;
     private Long blockPlusDate;
+    private String benReason;
 }

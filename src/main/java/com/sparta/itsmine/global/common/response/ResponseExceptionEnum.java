@@ -19,6 +19,7 @@ public enum ResponseExceptionEnum {
     FAIL_TO_CHANGE_ROLE(HttpStatus.BAD_REQUEST, "Role 변경을 실패했습니다."),
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
     USER_ERROR(HttpStatus.BAD_REQUEST, "유저 오류 발생"),
+    USER_BEN(HttpStatus.BAD_REQUEST, "벤당한 유저 입니다"),
 
 
     // 상품
@@ -54,6 +55,7 @@ public enum ResponseExceptionEnum {
     CHAT_ROOM_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 나간 유저 입니다."),
     CHAT_NOT_ONE_TO_ONE(HttpStatus.NOT_FOUND, "나간 유저가 존재하여 채팅이 불가능 합니다."),
     CHAT_BLACKLIST_USER(HttpStatus.NOT_FOUND, "블랙 리스트에 등록된 유저 입니다."),
+    CHAT_ROOM_SELF_CREATE(HttpStatus.NOT_FOUND, "혼자서 채팅방을 생성할수 없습니다."),
 
     // 상품 이미지
     INVALID_URL_EXCEPTION(HttpStatus.OK, "유효하지 않은 URL 경로입니다. 올바른 URL 을 입력해주세요."),

@@ -28,6 +28,7 @@ public class ReportSchedule {
                 .filter(user -> today.equals(user.getBlockedAt().toLocalDate()))
                 .forEach(user -> {
                     user.setBlockedAt(null);
+                    user.setBenReason(null);
                 });
     }
 

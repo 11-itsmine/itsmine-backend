@@ -39,9 +39,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOrigins("*")
-//                .setAllowedOrigins("http://localhost:3000", "http://localhost:8080",
-//                        "http://52.79.213.8",
-//                        "https://b-58f9491d-c8de-422c-8b11-4a18f612ec43-1.mq.ap-northeast-2.amazonaws.com")
+                .setAllowedOrigins("http://localhost:3000", "http://localhost:8080",
+                        "http://52.79.213.8",
+                        "https://b-58f9491d-c8de-422c-8b11-4a18f612ec43-1.mq.ap-northeast-2.amazonaws.com")
                 .withSockJS();//SockJS 연결 주소
 
         // 주소 : ws://localhost:8080/ws
