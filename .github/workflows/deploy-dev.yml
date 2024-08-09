@@ -90,6 +90,10 @@ jobs:
             sudo sed -i '/^FRONTEND_IMAGE_TAG=/d' /.env
             sudo sed -i '/^BACKEND_IMAGE_TAG=/d' /.env
             
+            # 사용하지 않는 이미지 및 볼륨 정리
+            docker image prune -af
+            docker volume prune -f
+            
             # .env 파일 업데이트
             sudo sh -c "echo 'FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}' >> /.env"
             sudo sh -c "echo 'BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}' >> /.env"
