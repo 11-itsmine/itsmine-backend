@@ -58,7 +58,7 @@ public class AuctionService {
 		if (bidPrice.equals(product.getAuctionNowPrice())) {
 			successfulAuction(productId);
 			auction.updateStatus(SUCCESS_BID);
-		} else {
+		auctionRepository.save(auction);} else {
 			scheduleMessage(productId, product.getDueDate());
 		}
 
@@ -87,7 +87,6 @@ public class AuctionService {
 			- System.currentTimeMillis();
 	}
 
-	@Transactional
 	public void successfulAuction(Long productId) {
 		List<Auction> failedBids = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
 		auctionRepository.deleteAll(failedBids);

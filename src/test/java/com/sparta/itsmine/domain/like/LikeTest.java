@@ -137,4 +137,3 @@ public class LikeTest {
 		assertEquals(updatedProduct.getLikeCount(), THREAD_COUNT % 2);
 	}
 }
-

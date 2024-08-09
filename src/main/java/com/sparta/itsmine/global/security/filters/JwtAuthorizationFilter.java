@@ -37,7 +37,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
 		throws ServletException, IOException {
 
-		if (req.getRequestURI().equals("/v1/users/login")) {
+		if (req.getRequestURI().equals("/v1/users/login") || req.getRequestURI().startsWith("/v1/users/oauth/kakao")) {
 			filterChain.doFilter(req, res);
 			return;
 		}

@@ -35,3 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+.env
+
+# Dependency directories
+node_modules/
+jspm_packages/

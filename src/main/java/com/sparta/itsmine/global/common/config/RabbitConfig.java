@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -112,6 +113,7 @@ public class RabbitConfig {
         final SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(jsonMessageConverter());
+        factory.setAcknowledgeMode(AcknowledgeMode.AUTO); // 자동 처리 메세지 삭제 설정
         return factory;
     }
 

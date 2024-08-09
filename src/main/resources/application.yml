@@ -15,6 +15,8 @@ spring:
     redis:
       host: ${REDIS_HOST} # 로컬에서 할 때는 localhost
       port: ${REDIS_PORT}
+      repositories:
+        enabled: false
 
   activemq:
     broker-url: ${ACTIVEMQ_BROKER}
@@ -31,7 +33,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
 
 # 로컬용
-#   datasource:
+#  datasource:
 #     url: jdbc:mysql://${DB_URL}/itsmine
 #     username: ${DB_USER}
 #     password: ${DB_PASSWORD}
@@ -102,3 +104,12 @@ activemq:
   queue:
     name: ${ACTIVEMQ_QNAME}
   stomp-host: ${STOMP_HOST}
+
+kakaopay:
+  api:
+    secret:
+      key: ${KAKAOPAY_SECRET_KEY}
+cid: TC0ONETIME
+
+sample:
+  host: http://localhost:8080
