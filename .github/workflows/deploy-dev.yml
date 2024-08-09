@@ -5,10 +5,10 @@ on:
   workflow_dispatch:  # 수동 트리거
   push:  # 푸시 이벤트 트리거
     branches:
-      - dev
+      - deploy
   pull_request:  # PR 닫힘 이벤트 트리거
     branches:
-      - dev
+      - deploy
     types:
       - closed
 
