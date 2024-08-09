@@ -5,10 +5,10 @@ on:
   workflow_dispatch:  # 수동 트리거
   push:  # 푸시 이벤트 트리거
     branches:
-      - deploy
-  pull_request:  # PR 닫힘 이벤트 트리거
+      - dev  # dev 브랜치로 푸시가 발생할 때 트리거
+  pull_request:  # PR 닫힘 이벤트 트리거 (머지될 때)
     branches:
-      - deploy
+      - dev  # dev 브랜치로의 PR이 닫힐 때 (병합될 때) 트리거
     types:
       - closed
 
