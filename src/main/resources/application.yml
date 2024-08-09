@@ -13,7 +13,7 @@ spring:
 
   data:
     redis:
-      host: localhost #${REDIS_HOST} # 로컬에서 할 때는 localhost
+      host: ${REDIS_HOST} # 로컬에서 할 때는 localhost
       port: ${REDIS_PORT}
       repositories:
         enabled: false
@@ -32,12 +32,12 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
-  # 로컬용
-  #   datasource:
-  #     url: jdbc:mysql://${DB_URL}/itsmine
-  #     username: ${DB_USER}
-  #     password: ${DB_PASSWORD}
-  #     driver-class-name: com.mysql.cj.jdbc.Driver
+# 로컬용
+#   datasource:
+#     url: jdbc:mysql://${DB_URL}/itsmine
+#     username: ${DB_USER}
+#     password: ${DB_PASSWORD}
+#     driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
     init:
@@ -46,12 +46,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+  properties:
+    hibernate:
+      ddl-auto: update
     properties:
-      hibernate:
-        ddl-auto: update
-      properties:
-        hibernate:
-          show_sql: true
+     hibernate:
+        show_sql: true
         format_sql: true
         connection:
           CharSet: utf-8
@@ -103,3 +104,12 @@ activemq:
   queue:
     name: ${ACTIVEMQ_QNAME}
   stomp-host: ${STOMP_HOST}
+
+kakaopay:
+  api:
+    secret:
+      key: ${KAKAOPAY_SECRET_KEY}
+cid: TC0ONETIME
+
+sample:
+  host: http://localhost:8080

@@ -1,11 +1,30 @@
+buildscript {
+    ext {
+        lombokVersion = '1.18.26'
+    }
+    repositories {
+        mavenCentral()
+    }
+}
+
 plugins {
     id 'java'
+    id 'idea'
+    id 'jacoco'
     id 'org.springframework.boot' version '3.3.0'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.asciidoctor.jvm.convert' version "3.3.2"
 }
+
 
 group = 'com.sparta'
 version = '0.0.1-SNAPSHOT'
+
+jar {
+    archiveVersion = '0.0.1-SNAPSHOT'
+    archiveBaseName = 'kakaopay-sample-master'
+}
+
 
 java {
     toolchain {
@@ -58,6 +77,8 @@ dependencies {
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    implementation("org.projectlombok:lombok:1.18.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.22")
     // QueryDSL
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
@@ -110,6 +131,9 @@ dependencies {
 
     // MAc DNS Resolution fix
     runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
+
+    //카카오페이 관련
+    implementation('commons-codec:commons-codec:1.13')
 }
 
 tasks.named('test') {
