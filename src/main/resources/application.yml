@@ -108,7 +108,7 @@ activemq:
 kakaopay:
   api:
     secret:
-      key: ${your-secret-key}
+      key: ${KAKAOPAY_SECRET_KEY}
 cid: TC0ONETIME
 
 sample:
