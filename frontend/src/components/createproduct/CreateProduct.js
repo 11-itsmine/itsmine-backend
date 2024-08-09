@@ -12,6 +12,7 @@ import {
   Typography
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axiosInstance from "../../api/axiosInstance";
 
