@@ -53,13 +53,11 @@ const ProductCreatePage = () => {
     });
 
     try {
-      const response = await axiosInstance.post(
-          'http://localhost:8080/v1/s3/upload',
-          formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
+      const response = await axiosInstance.post('/v1/s3/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       const newImageUrls = [...imageUrls, ...response.data.imagesUrl];
       setImageUrls(newImageUrls.slice(0, 5)); // 최대 5개 이미지 저장
     } catch (error) {
@@ -73,8 +71,6 @@ const ProductCreatePage = () => {
     newImageUrls.splice(index, 1);
     setImageUrls(newImageUrls);
   };
-
-  const token = localStorage.getItem('Authorization');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,11 +89,7 @@ const ProductCreatePage = () => {
         }
       };
 
-      await axiosInstance.post('http://localhost:8080/v1/products', productData, {
-        headers: {
-          Authorization: token
-        }
-      });
+      await axiosInstance.post('/v1/products', productData);
 
       alert('상품 등록이 완료 되었습니다.\n홈 화면으로 이동합니다.');
       navigate('/itsmine'); // 상품 등록 후 홈 페이지로 이동
