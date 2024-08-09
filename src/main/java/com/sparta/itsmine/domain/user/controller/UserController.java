@@ -22,6 +22,7 @@ import com.sparta.itsmine.domain.user.service.UserService;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -97,9 +98,9 @@ public class UserController {
     }
 
     @GetMapping("/oauth/kakao")
-    public ResponseEntity<HttpResponseDto> kakaoLogin(@RequestParam String code)
+    public ResponseEntity<HttpResponseDto> kakaoLogin(@RequestParam String code, HttpServletResponse res)
             throws JsonProcessingException {
-        return of(SUCCESS_LOGIN, kakaoService.kakaoLogin(code));
+        return of(SUCCESS_LOGIN, kakaoService.kakaoLogin(code, res));
     }
 
     @GetMapping("/list")
