@@ -1,6 +1,9 @@
 package com.sparta.itsmine.domain.kakaopay.service;
 
 
+import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
+import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
+import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.kakaopay.dto.ApproveRequest;
 import com.sparta.itsmine.domain.kakaopay.dto.ReadyRequest;
 import com.sparta.itsmine.domain.kakaopay.dto.ReadyResponse;
@@ -38,9 +41,10 @@ public class SampleService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final AuctionService auctionService;
 
 
-    public ReadyResponse ready(String agent, String openType, Long productId, User user) {
+    public ReadyResponse ready(Long productId, User user, AuctionRequestDto requestDto) {
         // Request header
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
@@ -55,18 +59,16 @@ public class SampleService {
                 .partnerUserId(user.getUsername())//가맹점 회원 id, 최대 100자
                 .itemName(product.getProductName())//상품명, 최대 100자
                 .quantity(1)//상품 수량
-                .totalAmount(product.getCurrentPrice())//상품 총액
+                .totalAmount(requestDto.getBidPrice())//상품 총액
                 .taxFreeAmount(0)//상품 비과세 금액
-                .vatAmount(100)//상품 부가세 금액
-                .approvalUrl(sampleHost + "/approve/" + agent + "/"
-                        + openType + "/" + product.getId() + "/"
+                .vatAmount(0)//상품 부가세 금액
+                .approvalUrl(sampleHost + "/approve/pc/layer/" + product.getId() + "/"
                         + user.getId())//결제 성공 시 redirect url, 최대 255자 ,
                 // 여기다 유저정보를 덧붙여서 호출
                 // "/approve" + "?productId="+productId+"&userId="+userId
-                .cancelUrl(sampleHost + "/cancel/" + agent + "/"
-                        + openType)//결제 취소 시 redirect url, 최대 255자
-                .failUrl(sampleHost + "/fail/" + agent + "/"
-                        + openType)//결제 실패 시 redirect url, 최대 255자
+                //여기에 경매ID 추가
+                .cancelUrl(sampleHost + "/cancel/pc/layer")//결제 취소 시 redirect url, 최대 255자
+                .failUrl(sampleHost + "/fail/pc/layer")//결제 실패 시 redirect url, 최대 255자
                 .build();
 
         // Send reqeust
@@ -118,8 +120,12 @@ public class SampleService {
 
             // 승인 결과를 저장한다.
             // save the result of approval
-            String approveResponse = response.getBody();
-            return approveResponse;
+//            String approveResponse = response.getBody();
+//            return approveResponse;
+
+            //입찰 생성 서비스를 여기서 호출하면 AuctionRequestDto는 어떻게 받아오지?
+            return null;
+
         } catch (HttpStatusCodeException ex) {
             return ex.getResponseBodyAsString();
         }

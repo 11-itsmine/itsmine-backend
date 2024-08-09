@@ -32,9 +32,7 @@ public class AuctionController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long productId,
             @RequestBody AuctionRequestDto requestDto) {
-        AuctionResponseDto responseDto = auctionService.createAuction(userDetails.getUser(),
-                productId,
-                requestDto);
+        AuctionResponseDto responseDto = auctionService.createAuction(userDetails.getUser(), productId, requestDto);
         return ResponseUtils.of(
                 responseDto.getStatus().equals(SUCCESS_BID) ? AUCTION_SUCCESSFUL_BID
                         : AUCTION_SUCCESS_CREATE, responseDto);

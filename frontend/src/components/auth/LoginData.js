@@ -1,4 +1,4 @@
-export const REDIRECT_URI = 'http://52.79.213.8/oauth/callback/kakao';
+export const REDIRECT_URI = 'http://localhost:3000/oauth/callback/kakao';
 
 export const REACT_APP_REST_API_KEY = '08a46b304d568ef454241721bcb6b981';
 
