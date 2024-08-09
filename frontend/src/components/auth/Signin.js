@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../api/axiosInstance'; // 경로 수정
+import axiosInstance from '../../api/axiosInstance';
 import styled from 'styled-components';
 import Link from '@mui/material/Link';
 import { KAKAO_AUTH_URL } from "./LoginData";
@@ -21,22 +21,11 @@ const SignIn = ({ onLogin }) => {
 
     try {
       const response = await axiosInstance.post('/v1/users/login', loginRequest);
-
-      // 응답 바디에서 토큰 추출
       const token = response.data.data;
-      console.log('Login successful!', token);
-
-      // 토큰을 localStorage에 저장
-      localStorage.setItem('Authorization', token);
-      console.log('Token stored in localStorage:', localStorage.getItem('Authorization'));
-
-      // 부모 컴포넌트에 로그인 상태 변경 알리기
+      localStorage.setItem('Authorization', `Bearer ${token}`);
       onLogin();
-
-      // 페이지를 리다이렉트하거나 상태를 업데이트할 수 있습니다.
       navigate('/itsmine');
     } catch (error) {
-      // 로그인 실패 시 처리 로직
       console.error('Login failed:', error);
       if (error.response && error.response.data) {
         setErrorMessage(error.response.data.message);
@@ -196,11 +185,10 @@ const KakaoBtn = styled.button`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 3.375rem; // Login button height
+  height: 3.375rem;
   margin-bottom: 1rem;
   border: ${props => props.theme.borders.lightGray};
   background: #ffe501;
-  text-decoration: none;
   cursor: pointer;
   border-radius: 10px;
 `;
