@@ -56,7 +56,7 @@ jobs:
           BACKEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP  # 이미지 태그 생성
           docker tag itsmine-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$BACKEND_IMAGE_TAG  # 태그 설정
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$BACKEND_IMAGE_TAG  # 이미지 푸시
-          echo "::set-output name=BACKEND_IMAGE_TAG::$BACKEND_IMAGE_TAG"
+          echo "::set-output name=BACKEND_IMAGE_TAG::$BACKEND_IMAGE_TAG"  # 백엔드 이미지 태그 출력
 
       - name: Build and push frontend Docker image
         id: frontend  # ID 설정
@@ -67,7 +67,7 @@ jobs:
           FRONTEND_IMAGE_TAG=${{ github.sha }}-$TIMESTAMP  # 이미지 태그 생성
           docker tag itsmine-frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$FRONTEND_IMAGE_TAG  # 태그 설정
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:$FRONTEND_IMAGE_TAG  # 이미지 푸시
-          echo "::set-output name=FRONTEND_IMAGE_TAG::$FRONTEND_IMAGE_TAG"
+          echo "::set-output name=FRONTEND_IMAGE_TAG::$FRONTEND_IMAGE_TAG"  # 프론트엔드 이미지 태그 출력
 
       - name: SSH into EC2 and deploy Docker containers
         uses: appleboy/ssh-action@v0.1.6
@@ -78,6 +78,7 @@ jobs:
           port: 22  # SSH 포트 설정
           script_stop: true
           script: |
+            
             # Amazon ECR에 로그인
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
             
@@ -85,19 +86,13 @@ jobs:
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/itsmine-repository:${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}
             
-            # 기존 .env 파일에서 이전 이미지 태그들 제거
-            sudo sed -i '/^FRONTEND_IMAGE_TAG=/d' /.env
-            sudo sed -i '/^BACKEND_IMAGE_TAG=/d' /.env
-
-            # .env 파일에 새로운 이미지 태그 덮어쓰기
+            # .env 파일 업데이트
             sudo sh -c "echo 'FRONTEND_IMAGE_TAG=${{ steps.frontend.outputs.FRONTEND_IMAGE_TAG }}' >> /.env"
             sudo sh -c "echo 'BACKEND_IMAGE_TAG=${{ steps.backend.outputs.BACKEND_IMAGE_TAG }}' >> /.env"
 
-            # 기존 컨테이너가 실행 중인 경우 중지 및 제거
-            if [ "$(docker ps -q)" ]; then
-              docker stop $(docker ps -aq)
-              docker rm $(docker ps -aq)
-            else
-              echo "No running containers to stop. Starting new containers."
-              docker-compose --env-file /.env -f /docker-compose.yml up -d
-            fi
+            # 기존 컨테이너 중지 및 제거
+            docker stop $(docker ps -aq)
+            docker rm $(docker ps -aq)
+
+            # 새로운 컨테이너 시작
+            docker-compose --env-file /.env -f /docker-compose.yml up -d
