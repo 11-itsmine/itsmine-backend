@@ -73,20 +73,15 @@ public class SampleService {
                 .totalAmount(bidPrice)//상품 총액
                 .taxFreeAmount(0)//상품 비과세 금액
                 .vatAmount(0)//상품 부가세 금액
-                .approvalUrl(sampleHost + "/approve/pc/layer/" + product.getId() + "/"
+                .approvalUrl(sampleHost + "/approve/pc/popup/" + product.getId() + "/"
                         + user.getId() + "/"
                         + createAuction.getId())//결제 성공 시 redirect url, 최대 255자 ,
-                // 여기다 유저정보를 덧붙여서 호출
-                // "/approve" + "?productId="+productId+"&userId="+userId
-                //여기에 경매ID 추가
-                .cancelUrl(sampleHost + "/cancel/pc/layer")//결제 취소 시 redirect url, 최대 255자
-                .failUrl(sampleHost + "/fail/pc/layer")//결제 실패 시 redirect url, 최대 255자
+                .cancelUrl(sampleHost + "/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
+                .failUrl(sampleHost + "/fail/pc/popup")//결제 실패 시 redirect url, 최대 255자
                 .build();
 
         // Send reqeust
         HttpEntity<ReadyRequest> entityMap = new HttpEntity<>(readyRequest, headers);
-
-        //헤더 jwt 토큰 추가
 
         ResponseEntity<ReadyResponse> response = new RestTemplate().postForEntity(
                 "https://open-api.kakaopay.com/online/v1/payment/ready",
@@ -125,10 +120,12 @@ public class SampleService {
         if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
             auctionService.successfulAuction(productId);
             auction.updateStatus(SUCCESS_BID);
+            auctionService.currentPriceUpdate(auction.getBidPrice(),product);
             auctionRepository.save(auction);
         } else {
             auction.updateStatus(BID);
             auctionRepository.save(auction);
+            auctionService.currentPriceUpdate(auction.getBidPrice(),product);
             auctionService.scheduleMessage(productId, product.getDueDate());
         }
 

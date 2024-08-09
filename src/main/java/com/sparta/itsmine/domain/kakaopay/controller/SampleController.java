@@ -32,7 +32,6 @@ public class SampleController {
             @RequestBody AuctionRequestDto requestDto) {
         ReadyResponse readyResponse = sampleService.ready(productId, userDetails.getUser(),
                 requestDto);
-        //여기서 값을 받고? 필터처리
         return readyResponse;
     }
 
@@ -41,8 +40,8 @@ public class SampleController {
             @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken,
             @PathVariable("productId") Long productId, @PathVariable("userId") Long userId,
             @PathVariable("auctionId") Long auctionId) {
-        String approveResponse = sampleService.approve(pgToken, productId, userId,auctionId);
-        return agent + "/" + openType + "/approve";
+        sampleService.approve(pgToken, productId, userId, auctionId);
+        return "결재 완료";
     }
 
     @GetMapping("/cancel/{agent}/{openType}")//결재 취소
@@ -52,7 +51,7 @@ public class SampleController {
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
         // the “show payment status” API is called and then check if the status is QUIT_PAYMENT before suspending the payment
-        return agent + "/" + openType + "/cancel";
+        return "결재 취소 및 환불";
     }
 
     @GetMapping("/fail/{agent}/{openType}")//결재 실패
