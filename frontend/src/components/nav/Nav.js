@@ -27,7 +27,7 @@ const Nav = () => {
         <ButtonContainer>
           <Button login
                   onClick={() => {
-                    navigate('/products')
+                    navigate('/v1/products')
                   }}>SELL</Button>
           <Button>ABOUT</Button>
           {isLogin ? (
