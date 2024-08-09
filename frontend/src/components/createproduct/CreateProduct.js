@@ -114,7 +114,14 @@ const ProductCreatePage = () => {
         }
       };
 
-      await axiosInstance.post('/v1/products', productData);
+      const response = await axiosInstance.post(`/v1/products`, productData);
+      // 응답 바디에서 토큰 추출
+      const token = response.data.data;
+      console.log('Login successful!', token);
+
+      // 토큰을 localStorage에 저장
+      localStorage.setItem('Authorization', token);
+      console.log('Token stored in localStorage:', localStorage.getItem('Authorization'));
       alert('상품 등록이 완료 되었습니다.\n홈 화면으로 이동합니다.');
       navigate('/itsmine');
     } catch (error) {
