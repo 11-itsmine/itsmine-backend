@@ -10,6 +10,8 @@ import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.kakaopay.dto.ApproveRequest;
+import com.sparta.itsmine.domain.kakaopay.dto.ApproveResponse;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoCancelResponse;
 import com.sparta.itsmine.domain.kakaopay.dto.ReadyRequest;
 import com.sparta.itsmine.domain.kakaopay.dto.ReadyResponse;
 import com.sparta.itsmine.domain.product.entity.Product;
@@ -17,6 +19,8 @@ import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -96,7 +100,7 @@ public class SampleService {
         return readyResponse;
     }
 
-    public String approve(String pgToken, Long productId, Long userId, Long auctionId) {
+    public ResponseEntity<ApproveResponse>  approve(String pgToken, Long productId, Long userId, Long auctionId) {
         // ready할 때 저장해놓은 TID로 승인 요청
         // Call “Execute approved payment” API by pg_token, TID mapping to the current payment transaction and other parameters.
         HttpHeaders headers = new HttpHeaders();
@@ -131,20 +135,48 @@ public class SampleService {
 
         // Send Request
         HttpEntity<ApproveRequest> entityMap = new HttpEntity<>(approveRequest, headers);
-        try {
-            ResponseEntity<String> response = new RestTemplate().postForEntity(
+
+            ResponseEntity<ApproveResponse> response = new RestTemplate().postForEntity(
                     "https://open-api.kakaopay.com/online/v1/payment/approve",
                     entityMap,
-                    String.class
+                    ApproveResponse.class
             );
 
-            // 승인 결과를 저장한다.
-            // save the result of approval
-            String approveResponse = response.getBody();
-            return approveResponse;
-
-        } catch (HttpStatusCodeException ex) {
-            return ex.getResponseBodyAsString();
-        }
+            return response;
     }
+
+    public KakaoCancelResponse kakaoCancel(String tid) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 카카오페이 요청
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("cid", cid);
+        parameters.put("tid", tid);
+        parameters.put("cancel_amount", "2200");
+        parameters.put("cancel_tax_free_amount", "0");
+        parameters.put("cancel_vat_amount", "0");
+
+        // 파라미터, 헤더
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
+
+        // 외부에 보낼 url
+        RestTemplate restTemplate = new RestTemplate();
+
+        KakaoCancelResponse cancelResponse = restTemplate.postForObject(
+                "https://open-api.kakaopay.com/online/v1/payment/cancel",
+                requestEntity,
+                KakaoCancelResponse.class);
+
+        System.out.println();
+        System.out.println();
+        System.out.println(cancelResponse);
+        System.out.println();
+        System.out.println();
+
+        return cancelResponse;
+    }
+
 }

@@ -63,15 +63,7 @@ public class AuctionService {
 
                 checkAuctionValidity(auction, product, bidPrice, user);
 
-//                currentPriceUpdate(bidPrice, product);
                 auctionRepository.save(auction);
-//                if (bidPrice.equals(product.getAuctionNowPrice())) {
-//                    successfulAuction(productId);
-//                    auction.updateStatus(SUCCESS_BID);
-//                    auctionRepository.save(auction);
-//                } else {
-//                    scheduleMessage(productId, product.getDueDate());
-//                }
             } finally {
                 lock.unlock();
             }
@@ -106,8 +98,6 @@ public class AuctionService {
     }
 
     public void successfulAuction(Long productId) {
-//        List<Auction> failedBids = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
-//        auctionRepository.deleteAll(failedBids);
         messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
     }
 
