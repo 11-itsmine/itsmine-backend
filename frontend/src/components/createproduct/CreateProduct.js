@@ -5,7 +5,6 @@ import {
   Container,
   FormControl,
   Grid,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -85,7 +84,9 @@ const ProductCreatePage = () => {
 
   const handleDueDateChange = (e) => {
     const value = Math.max(0, Number(e.target.value) || 0);
-    setDueDate(value);
+    const dueDate = new Date();
+    dueDate.setHours(dueDate.getHours() + value);
+    setDueDate(dueDate.toISOString());  // ISO 형식으로 서버에 전달
   };
 
   const handleSubmit = async (e) => {
@@ -104,7 +105,7 @@ const ProductCreatePage = () => {
           description,
           auctionNowPrice: Number(auctionNowPrice),
           startPrice: Number(startPrice),
-          dueDate: Number(dueDate),
+          dueDate,  // 클라이언트에서 계산된 ISO 형식의 날짜를 전송
           categoryName
         },
         productImagesRequestDto: {
@@ -202,7 +203,6 @@ const ProductCreatePage = () => {
                   fullWidth
                   label="경매 진행 시간 (시간 단위)"
                   type="number"
-                  value={dueDate}
                   onChange={handleDueDateChange}
                   required
               />
