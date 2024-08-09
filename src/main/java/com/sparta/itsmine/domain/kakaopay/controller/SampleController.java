@@ -28,17 +28,20 @@ public class SampleController {
 
     @GetMapping("/ready/{productId}")//결재 요청
     public ReadyResponse ready(@PathVariable("productId") Long productId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails,@RequestBody AuctionRequestDto requestDto) {
-        ReadyResponse readyResponse = sampleService.ready(productId, userDetails.getUser(),requestDto);
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody AuctionRequestDto requestDto) {
+        ReadyResponse readyResponse = sampleService.ready(productId, userDetails.getUser(),
+                requestDto);
         //여기서 값을 받고? 필터처리
         return readyResponse;
     }
 
-    @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}")//결재 승인,옥션 결재상태 확인
+    @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}/{auctionId}")//결재 승인,옥션 결재상태 확인
     public String approve(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken,
-            @PathVariable("productId") Long productId, @PathVariable("userId") Long userId) {
-        String approveResponse = sampleService.approve(pgToken, productId, userId);
+            @PathVariable("productId") Long productId, @PathVariable("userId") Long userId,
+            @PathVariable("auctionId") Long auctionId) {
+        String approveResponse = sampleService.approve(pgToken, productId, userId,auctionId);
         return agent + "/" + openType + "/approve";
     }
 

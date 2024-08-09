@@ -1,13 +1,19 @@
 package com.sparta.itsmine.domain.kakaopay.service;
 
 
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
+
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
+import com.sparta.itsmine.domain.auction.entity.Auction;
+import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.kakaopay.dto.ApproveRequest;
 import com.sparta.itsmine.domain.kakaopay.dto.ReadyRequest;
 import com.sparta.itsmine.domain.kakaopay.dto.ReadyResponse;
 import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
@@ -39,9 +45,11 @@ public class SampleService {
 
     private String tid;
 
+    private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final AuctionService auctionService;
+    private final ProductAdapter productAdapter;
 
 
     public ReadyResponse ready(Long productId, User user, AuctionRequestDto requestDto) {
@@ -50,8 +58,11 @@ public class SampleService {
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Product product = productRepository.findById(productId).orElseThrow();
+        Product product = productAdapter.getProduct(productId);
+        Integer bidPrice = requestDto.getBidPrice();
 
+        AuctionResponseDto createAuction = auctionService.createAuction(user, productId,
+                requestDto);
         // Request param
         ReadyRequest readyRequest = ReadyRequest.builder()
                 .cid(cid)//가맹점 코드, 10자
@@ -59,11 +70,12 @@ public class SampleService {
                 .partnerUserId(user.getUsername())//가맹점 회원 id, 최대 100자
                 .itemName(product.getProductName())//상품명, 최대 100자
                 .quantity(1)//상품 수량
-                .totalAmount(requestDto.getBidPrice())//상품 총액
+                .totalAmount(bidPrice)//상품 총액
                 .taxFreeAmount(0)//상품 비과세 금액
                 .vatAmount(0)//상품 부가세 금액
                 .approvalUrl(sampleHost + "/approve/pc/layer/" + product.getId() + "/"
-                        + user.getId())//결제 성공 시 redirect url, 최대 255자 ,
+                        + user.getId() + "/"
+                        + createAuction.getId())//결제 성공 시 redirect url, 최대 255자 ,
                 // 여기다 유저정보를 덧붙여서 호출
                 // "/approve" + "?productId="+productId+"&userId="+userId
                 //여기에 경매ID 추가
@@ -89,15 +101,16 @@ public class SampleService {
         return readyResponse;
     }
 
-    public String approve(String pgToken, Long productId, Long userId) {
+    public String approve(String pgToken, Long productId, Long userId, Long auctionId) {
         // ready할 때 저장해놓은 TID로 승인 요청
         // Call “Execute approved payment” API by pg_token, TID mapping to the current payment transaction and other parameters.
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        Auction auction = auctionRepository.findById(auctionId).orElseThrow();
         Product product = productRepository.findById(productId).orElseThrow();
-        User user=userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow();
 
         // Request param
         ApproveRequest approveRequest = ApproveRequest.builder()
@@ -108,6 +121,16 @@ public class SampleService {
                 .pgToken(
                         pgToken)//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
                 .build();
+
+        if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
+            auctionService.successfulAuction(productId);
+            auction.updateStatus(SUCCESS_BID);
+            auctionRepository.save(auction);
+        } else {
+            auction.updateStatus(BID);
+            auctionRepository.save(auction);
+            auctionService.scheduleMessage(productId, product.getDueDate());
+        }
 
         // Send Request
         HttpEntity<ApproveRequest> entityMap = new HttpEntity<>(approveRequest, headers);
@@ -120,12 +143,9 @@ public class SampleService {
 
             // 승인 결과를 저장한다.
             // save the result of approval
-//            String approveResponse = response.getBody();
-//            return approveResponse;
-
-            //입찰 생성 서비스를 여기서 호출하면 AuctionRequestDto는 어떻게 받아오지?
             String approveResponse = response.getBody();
             return approveResponse;
+
         } catch (HttpStatusCodeException ex) {
             return ex.getResponseBodyAsString();
         }
