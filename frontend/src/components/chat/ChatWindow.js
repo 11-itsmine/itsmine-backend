@@ -38,7 +38,7 @@ const ChatWindow = ({room, onClose}) => {
 
     // 표준 WebSocket 및 STOMP 설정
     const socket = new WebSocket(
-        'ws://ec2-52-79-213-8.ap-northeast-2.compute.amazonaws.com:8080/ws');
+        'ws://52.79.213.8:8080/ws');
     stompClient.current = Stomp.over(socket);
 
     stompClient.current.connect(
