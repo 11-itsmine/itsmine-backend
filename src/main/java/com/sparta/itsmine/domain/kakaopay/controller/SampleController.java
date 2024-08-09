@@ -34,7 +34,7 @@ public class SampleController {
         return readyResponse;
     }
 
-    @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}/{auctionId}")//결재 승인,옥션 결재상태 확인
+    @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}")//결재 승인,옥션 결재상태 확인
     public String approve(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken,
             @PathVariable("productId") Long productId, @PathVariable("userId") Long userId) {

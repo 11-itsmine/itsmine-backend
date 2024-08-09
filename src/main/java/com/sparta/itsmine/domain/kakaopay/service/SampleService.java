@@ -124,8 +124,8 @@ public class SampleService {
 //            return approveResponse;
 
             //입찰 생성 서비스를 여기서 호출하면 AuctionRequestDto는 어떻게 받아오지?
-            return null;
-
+            String approveResponse = response.getBody();
+            return approveResponse;
         } catch (HttpStatusCodeException ex) {
             return ex.getResponseBodyAsString();
         }
