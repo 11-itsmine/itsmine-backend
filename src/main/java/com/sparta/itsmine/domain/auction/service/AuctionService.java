@@ -46,12 +46,10 @@ public class AuctionService {
     private final AuctionAdapter adapter;
     private final ProductAdapter productAdapter;
     private final RedissonClient redissonClient;
-//    private final KakaoPayService kakaoPayService;
-//    private final KakaoPayRepository kakaoPayRepository;
     private static final String LOCK_KEY = "auctionLock";
 
     public AuctionResponseDto createAuction(User user, Long productId,
-            AuctionRequestDto requestDto) {
+            AuctionRequestDto requestDto, Integer totalAmount) {
         RLock lock = redissonClient.getFairLock(LOCK_KEY);
         Auction auction = null;
         try {
@@ -65,10 +63,9 @@ public class AuctionService {
                 Integer bidPrice = requestDto.getBidPrice();
                 ProductStatus status = ProductStatus.NEED_PAY;
 
-                auction = createAuctionEntity(user, product, bidPrice, status);
+                auction = createAuctionEntity(user, product, bidPrice, status, totalAmount);
 
                 checkAuctionValidity(auction, product, bidPrice, user);
-
                 auctionRepository.save(auction);
             } finally {
                 lock.unlock();
@@ -81,8 +78,8 @@ public class AuctionService {
     }
 
     private Auction createAuctionEntity(User user, Product product, Integer bidPrice,
-            ProductStatus status) {
-        return new Auction(user, product, bidPrice, status);
+            ProductStatus status, Integer totalAmount) {
+        return new Auction(user, product, bidPrice, status, totalAmount);
     }
 
     private void checkAuctionValidity(Auction auction, Product product, Integer bidPrice,
@@ -102,23 +99,6 @@ public class AuctionService {
         return dueDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 - System.currentTimeMillis();
     }
-
-//    public void successfulAuction(Long productId) {
-//        List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
-//
-//        for (Auction auction : auctions) {
-//            if (auction.getStatus().equals(BID)) {
-//                KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuction(auction);
-//                kakaoPayService.kakaoCancel(kakaoPayTid.getTid());
-//                auctionRepository.delete(auction);
-//            }
-//            else{
-//                auctionRepository.delete(auction);
-//            }
-//        }
-//
-//        messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
-//    }
 
     public void allDeleteBid(Long productId) {
         auctionRepository.deleteAllByProductId(productId);

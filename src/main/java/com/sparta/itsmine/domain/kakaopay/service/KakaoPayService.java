@@ -76,7 +76,7 @@ public class KakaoPayService {
         }
 
         AuctionResponseDto createAuction = auctionService.createAuction(user, productId,
-                requestDto);
+                requestDto,bidPrice);
         // Request param
         KakaoPayReadyRequestDtd kakaoPayReadyRequestDtd = KakaoPayReadyRequestDtd.builder()
                 .cid(cid)//가맹점 코드, 10자
@@ -141,7 +141,7 @@ public class KakaoPayService {
             auction.updateStatus(SUCCESS_BID);
             auctionRepository.save(auction);
             auctionService.currentPriceUpdate(auction.getBidPrice(), product);
-            successfulAuction(productId);
+            deleteWithOutSuccessfulAuction(productId);
         } else {
             auction.updateStatus(BID);
             auctionRepository.save(auction);
@@ -173,7 +173,7 @@ public class KakaoPayService {
         KakaoPayCancelRequestDto kakaoPayCancelRequestDto = KakaoPayCancelRequestDto.builder()
                 .cid(kakaoPayTid.getCid())//가맹점 코드, 10자
                 .tid(tid)//결제 고유번호, 20자
-                .cancel_amount(kakaoPayTid.getAuction().getBidPrice())//취소 금액
+                .cancel_amount(kakaoPayTid.getAuction().getTotalAmount())//취소 금액
                 .cancel_tax_free_amount(0)//취소 비과세 금액
                 .cancel_vat_amount(0)//취소 부가세 금액
                 .build();
@@ -191,7 +191,7 @@ public class KakaoPayService {
         return response;
     }
 
-    public void successfulAuction(Long productId) {
+    public void deleteWithOutSuccessfulAuction(Long productId) {
         List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
 
         for (Auction auction : auctions) {

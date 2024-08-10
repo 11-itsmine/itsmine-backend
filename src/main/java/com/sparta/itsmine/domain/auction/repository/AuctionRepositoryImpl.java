@@ -74,6 +74,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     where product_id=2 and bid_price != (select max(bid_price) from auctions where product_id=2);
     */
     //해당 상품에 대한 모든 입찰가를 찾기(최댓값 빼고)
+    @Cacheable("WithOutSuccessfulAuction")
     public List<Auction> findAllByProductIdWithOutMaxPrice(Long productId) {
 
         JPQLQuery<Integer> maxBidPriceSubQuery = JPAExpressions
