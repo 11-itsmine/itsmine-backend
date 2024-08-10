@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class KakaoCancelResponse {
+public class KakaoPayCancelResponseDto {
 
     private String aid; // 요청 고유 번호
     private String tid; // 결제 고유 번호

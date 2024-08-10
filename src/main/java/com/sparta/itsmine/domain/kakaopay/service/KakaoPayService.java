@@ -9,11 +9,11 @@ import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
-import com.sparta.itsmine.domain.kakaopay.dto.ApproveRequest;
-import com.sparta.itsmine.domain.kakaopay.dto.ApproveResponse;
-import com.sparta.itsmine.domain.kakaopay.dto.KakaoCancelResponse;
-import com.sparta.itsmine.domain.kakaopay.dto.ReadyRequest;
-import com.sparta.itsmine.domain.kakaopay.dto.ReadyResponse;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayApproveRequestDto;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayApproveResponseDto;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayCancelResponseDto;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyRequestDtd;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
@@ -28,7 +28,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -36,7 +35,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @Service
 @RequiredArgsConstructor
-public class SampleService {
+public class KakaoPayService {
 
     @Value("${kakaopay.api.secret.key}")
     private String kakaopaySecretKey;
@@ -45,7 +44,7 @@ public class SampleService {
     private String cid;
 
     @Value("${sample.host}")
-    private String sampleHost;
+    private String kakaopayHost;
 
     private String tid;
 
@@ -56,7 +55,7 @@ public class SampleService {
     private final ProductAdapter productAdapter;
 
 
-    public ReadyResponse ready(Long productId, User user, AuctionRequestDto requestDto) {
+    public KakaoPayReadyResponseDto ready(Long productId, User user, AuctionRequestDto requestDto) {
         // Request header
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
@@ -68,7 +67,7 @@ public class SampleService {
         AuctionResponseDto createAuction = auctionService.createAuction(user, productId,
                 requestDto);
         // Request param
-        ReadyRequest readyRequest = ReadyRequest.builder()
+        KakaoPayReadyRequestDtd kakaoPayReadyRequestDtd = KakaoPayReadyRequestDtd.builder()
                 .cid(cid)//가맹점 코드, 10자
                 .partnerOrderId(product.getId())//가맹점 주문번호, 최대 100자
                 .partnerUserId(user.getUsername())//가맹점 회원 id, 최대 100자
@@ -77,30 +76,30 @@ public class SampleService {
                 .totalAmount(bidPrice)//상품 총액
                 .taxFreeAmount(0)//상품 비과세 금액
                 .vatAmount(0)//상품 부가세 금액
-                .approvalUrl(sampleHost + "/approve/pc/popup/" + product.getId() + "/"
+                .approvalUrl(kakaopayHost + "/approve/pc/popup/" + product.getId() + "/"
                         + user.getId() + "/"
                         + createAuction.getId())//결제 성공 시 redirect url, 최대 255자 ,
-                .cancelUrl(sampleHost + "/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
-                .failUrl(sampleHost + "/fail/pc/popup")//결제 실패 시 redirect url, 최대 255자
+                .cancelUrl(kakaopayHost + "/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
+                .failUrl(kakaopayHost + "/fail/pc/popup")//결제 실패 시 redirect url, 최대 255자
                 .build();
 
         // Send reqeust
-        HttpEntity<ReadyRequest> entityMap = new HttpEntity<>(readyRequest, headers);
+        HttpEntity<KakaoPayReadyRequestDtd> entityMap = new HttpEntity<>(kakaoPayReadyRequestDtd, headers);
 
-        ResponseEntity<ReadyResponse> response = new RestTemplate().postForEntity(
+        ResponseEntity<KakaoPayReadyResponseDto> response = new RestTemplate().postForEntity(
                 "https://open-api.kakaopay.com/online/v1/payment/ready",
                 entityMap,
-                ReadyResponse.class
+                KakaoPayReadyResponseDto.class
         );
-        ReadyResponse readyResponse = response.getBody();
+        KakaoPayReadyResponseDto kakaoPayReadyResponseDto = response.getBody();
 
         // 주문번호와 TID를 매핑해서 저장해놓는다.
         // Mapping TID with partner_order_id then save it to use for approval request.
-        this.tid = readyResponse.getTid();
-        return readyResponse;
+        this.tid = kakaoPayReadyResponseDto.getTid();
+        return kakaoPayReadyResponseDto;
     }
 
-    public ResponseEntity<ApproveResponse>  approve(String pgToken, Long productId, Long userId, Long auctionId) {
+    public ResponseEntity<KakaoPayApproveResponseDto> approve(String pgToken, Long productId, Long userId, Long auctionId) {
         // ready할 때 저장해놓은 TID로 승인 요청
         // Call “Execute approved payment” API by pg_token, TID mapping to the current payment transaction and other parameters.
         HttpHeaders headers = new HttpHeaders();
@@ -112,7 +111,7 @@ public class SampleService {
         User user = userRepository.findById(userId).orElseThrow();
 
         // Request param
-        ApproveRequest approveRequest = ApproveRequest.builder()
+        KakaoPayApproveRequestDto kakaoPayApproveRequestDto = KakaoPayApproveRequestDto.builder()
                 .cid(cid)//가맹점 코드, 10자
                 .tid(tid)//결제 고유번호, 결제 준비 API 응답에 포함
                 .partnerOrderId(product.getId())//가맹점 주문번호, 결제 준비 API 요청과 일치해야 함
@@ -134,18 +133,19 @@ public class SampleService {
         }
 
         // Send Request
-        HttpEntity<ApproveRequest> entityMap = new HttpEntity<>(approveRequest, headers);
+        HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
+                kakaoPayApproveRequestDto, headers);
 
-            ResponseEntity<ApproveResponse> response = new RestTemplate().postForEntity(
+            ResponseEntity<KakaoPayApproveResponseDto> response = new RestTemplate().postForEntity(
                     "https://open-api.kakaopay.com/online/v1/payment/approve",
                     entityMap,
-                    ApproveResponse.class
+                    KakaoPayApproveResponseDto.class
             );
 
             return response;
     }
 
-    public KakaoCancelResponse kakaoCancel(String tid) {
+    public KakaoPayCancelResponseDto kakaoCancel(String tid) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
@@ -165,10 +165,10 @@ public class SampleService {
         // 외부에 보낼 url
         RestTemplate restTemplate = new RestTemplate();
 
-        KakaoCancelResponse cancelResponse = restTemplate.postForObject(
+        KakaoPayCancelResponseDto cancelResponse = restTemplate.postForObject(
                 "https://open-api.kakaopay.com/online/v1/payment/cancel",
                 requestEntity,
-                KakaoCancelResponse.class);
+                KakaoPayCancelResponseDto.class);
 
         System.out.println();
         System.out.println();

@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ReadyResponse {
+public class KakaoPayReadyResponseDto {
     private String tid;//결제 고유 번호, 20자
     private Boolean tms_result;
     private String created_at;//결제 준비 요청 시간
