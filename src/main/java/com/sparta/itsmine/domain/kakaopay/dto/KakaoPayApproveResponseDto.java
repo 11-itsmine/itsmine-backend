@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.kakaopay.dto;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
@@ -45,7 +46,7 @@ public class KakaoPayApproveResponseDto {
     private String item_name;//상품 이름, 최대 100자
     private String item_code;//상품 코드, 최대 100자
     private Integer quantity;//상품 수량
-    private DateTime created_at;//결제 준비 요청 시각
-    private DateTime approved_at;//결제 승인 시각
+    private LocalDateTime created_at;//결제 준비 요청 시각
+    private LocalDateTime approved_at;//결제 승인 시각
     private String payload;//결제 승인 요청에 대해 저장한 값, 요청 시 전달된 내용
 }

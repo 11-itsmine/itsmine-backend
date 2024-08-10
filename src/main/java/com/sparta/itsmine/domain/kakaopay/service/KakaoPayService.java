@@ -11,6 +11,7 @@ import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
 import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayApproveRequestDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayApproveResponseDto;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayCancelRequestDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayCancelResponseDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyRequestDtd;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyResponseDto;
@@ -84,7 +85,8 @@ public class KakaoPayService {
                 .build();
 
         // Send reqeust
-        HttpEntity<KakaoPayReadyRequestDtd> entityMap = new HttpEntity<>(kakaoPayReadyRequestDtd, headers);
+        HttpEntity<KakaoPayReadyRequestDtd> entityMap = new HttpEntity<>(kakaoPayReadyRequestDtd,
+                headers);
 
         ResponseEntity<KakaoPayReadyResponseDto> response = new RestTemplate().postForEntity(
                 "https://open-api.kakaopay.com/online/v1/payment/ready",
@@ -99,7 +101,8 @@ public class KakaoPayService {
         return kakaoPayReadyResponseDto;
     }
 
-    public ResponseEntity<KakaoPayApproveResponseDto> approve(String pgToken, Long productId, Long userId, Long auctionId) {
+    public ResponseEntity<KakaoPayApproveResponseDto> approve(String pgToken, Long productId,
+            Long userId, Long auctionId) {
         // ready할 때 저장해놓은 TID로 승인 요청
         // Call “Execute approved payment” API by pg_token, TID mapping to the current payment transaction and other parameters.
         HttpHeaders headers = new HttpHeaders();
@@ -123,26 +126,25 @@ public class KakaoPayService {
         if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
             auctionService.successfulAuction(productId);
             auction.updateStatus(SUCCESS_BID);
-            auctionService.currentPriceUpdate(auction.getBidPrice(),product);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
             auctionRepository.save(auction);
         } else {
             auction.updateStatus(BID);
             auctionRepository.save(auction);
-            auctionService.currentPriceUpdate(auction.getBidPrice(),product);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
             auctionService.scheduleMessage(productId, product.getDueDate());
         }
 
         // Send Request
-        HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
-                kakaoPayApproveRequestDto, headers);
+        HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(kakaoPayApproveRequestDto, headers);
 
-            ResponseEntity<KakaoPayApproveResponseDto> response = new RestTemplate().postForEntity(
-                    "https://open-api.kakaopay.com/online/v1/payment/approve",
-                    entityMap,
-                    KakaoPayApproveResponseDto.class
-            );
+        ResponseEntity<KakaoPayApproveResponseDto> response = new RestTemplate().postForEntity(
+                "https://open-api.kakaopay.com/online/v1/payment/approve",
+                entityMap,
+                KakaoPayApproveResponseDto.class
+        );
 
-            return response;
+        return response;
     }
 
     public KakaoPayCancelResponseDto kakaoCancel(String tid) {
@@ -152,31 +154,38 @@ public class KakaoPayService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // 카카오페이 요청
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("cid", cid);
-        parameters.put("tid", tid);
-        parameters.put("cancel_amount", "2200");
-        parameters.put("cancel_tax_free_amount", "0");
-        parameters.put("cancel_vat_amount", "0");
+//        Map<String, String> parameters = new HashMap<>();
+//        parameters.put("cid", cid);
+//        parameters.put("tid", tid);
+//        parameters.put("cancel_amount", "2200");
+//        parameters.put("cancel_tax_free_amount", "0");
+//        parameters.put("cancel_vat_amount", "0");
+
+        // Request param
+        KakaoPayCancelRequestDto kakaoPayCancelRequestDto = KakaoPayCancelRequestDto.builder()
+                .cid(cid)
+                .tid(tid)
+                .cancel_amount(1200)
+                .cancel_tax_free_amount(0)
+                .cancel_vat_amount(0)
+                .build();
 
         // 파라미터, 헤더
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
+//        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
+
+        // Send Request
+        HttpEntity<KakaoPayCancelRequestDto> entityMap = new HttpEntity<>(kakaoPayCancelRequestDto, headers);
 
         // 외부에 보낼 url
-        RestTemplate restTemplate = new RestTemplate();
+//        RestTemplate restTemplate = new RestTemplate();
 
-        KakaoPayCancelResponseDto cancelResponse = restTemplate.postForObject(
+        KakaoPayCancelResponseDto response = new RestTemplate().postForObject(
                 "https://open-api.kakaopay.com/online/v1/payment/cancel",
-                requestEntity,
+                entityMap,
                 KakaoPayCancelResponseDto.class);
 
-        System.out.println();
-        System.out.println();
-        System.out.println(cancelResponse);
-        System.out.println();
-        System.out.println();
 
-        return cancelResponse;
+        return response;
     }
 
 }
