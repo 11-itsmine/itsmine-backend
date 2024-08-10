@@ -2,6 +2,8 @@ package com.sparta.itsmine.domain.auction.repository;
 
 import static com.sparta.itsmine.domain.auction.entity.QAuction.auction;
 import static com.sparta.itsmine.domain.product.entity.QProduct.product;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
 import static com.sparta.itsmine.domain.user.entity.QUser.user;
 
 import com.querydsl.core.types.SubQueryExpression;
@@ -30,7 +32,8 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     @Cacheable("AuctionAllPage")
     public Page<AuctionProductResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
         List<AuctionProductResponseDto> content = jpaQueryFactory
-                .select(new QAuctionProductResponseDto(user.username, product.productName, auction.bidPrice.max()))
+                .select(new QAuctionProductResponseDto(user.username, product.productName,
+                        auction.bidPrice.max()))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
@@ -56,7 +59,8 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId,
             Long productId) {
         return Optional.ofNullable(jpaQueryFactory
-                .select(new QAuctionProductResponseDto(user.username, product.productName, auction.bidPrice.max()))
+                .select(new QAuctionProductResponseDto(user.username, product.productName,
+                        auction.bidPrice.max()))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
@@ -68,7 +72,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     select *
     from auctions
     where product_id=2 and bid_price != (select max(bid_price) from auctions where product_id=2);
-*/
+    */
     //해당 상품에 대한 모든 입찰가를 찾기(최댓값 빼고)
     public List<Auction> findAllByProductIdWithOutMaxPrice(Long productId) {
 
@@ -84,6 +88,30 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .innerJoin(auction.product, product)
                 .where(product.id.eq(productId)
                         .and(auction.bidPrice.ne(maxBidPriceSubQuery)))
+                .fetch();
+    }
+
+    /*
+    select *
+    from auctions
+    where product_id=1 and status='NEED_PAY';
+    */
+    public List<Auction> findAllByProductIdAndNeedPay(Long productId) {
+        return jpaQueryFactory.select(auction)
+                .from(auction)
+                .where(product.id.eq(productId).and(auction.status.eq(NEED_PAY)))
+                .fetch();
+    }
+
+    /*
+    select *
+    from auctions
+    where product_id=1 and status='BID';
+    */
+    public List<Auction> findAllByProductIdAndBid(Long productId) {
+        return jpaQueryFactory.select(auction)
+                .from(auction)
+                .where(product.id.eq(productId).and(auction.status.eq(BID)))
                 .fetch();
     }
 }

@@ -64,6 +64,10 @@ public class KakaoPayService {
 
         Product product = productAdapter.getProduct(productId);
         Integer bidPrice = requestDto.getBidPrice();
+        //즉시구매가와 같이 않으면 1/10만 보증금으로 결재
+        if (!bidPrice.equals(product.getAuctionNowPrice())) {
+            bidPrice = requestDto.getBidPrice() / 10;
+        }
 
         AuctionResponseDto createAuction = auctionService.createAuction(user, productId,
                 requestDto);
@@ -124,10 +128,10 @@ public class KakaoPayService {
                 .build();
 
         if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
-            auctionService.successfulAuction(productId);
             auction.updateStatus(SUCCESS_BID);
-            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
             auctionRepository.save(auction);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
+            auctionService.successfulAuction(productId);
         } else {
             auction.updateStatus(BID);
             auctionRepository.save(auction);
@@ -136,7 +140,8 @@ public class KakaoPayService {
         }
 
         // Send Request
-        HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(kakaoPayApproveRequestDto, headers);
+        HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
+                kakaoPayApproveRequestDto, headers);
 
         ResponseEntity<KakaoPayApproveResponseDto> response = new RestTemplate().postForEntity(
                 "https://open-api.kakaopay.com/online/v1/payment/approve",
@@ -153,37 +158,23 @@ public class KakaoPayService {
         headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // 카카오페이 요청
-//        Map<String, String> parameters = new HashMap<>();
-//        parameters.put("cid", cid);
-//        parameters.put("tid", tid);
-//        parameters.put("cancel_amount", "2200");
-//        parameters.put("cancel_tax_free_amount", "0");
-//        parameters.put("cancel_vat_amount", "0");
-
         // Request param
         KakaoPayCancelRequestDto kakaoPayCancelRequestDto = KakaoPayCancelRequestDto.builder()
-                .cid(cid)
-                .tid(tid)
-                .cancel_amount(1200)
-                .cancel_tax_free_amount(0)
-                .cancel_vat_amount(0)
+                .cid(cid)//가맹점 코드, 10자
+                .tid(tid)//결제 고유번호, 20자
+                .cancel_amount(1200)//취소 금액
+                .cancel_tax_free_amount(0)//취소 비과세 금액
+                .cancel_vat_amount(0)//취소 부가세 금액
                 .build();
 
-        // 파라미터, 헤더
-//        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
-
         // Send Request
-        HttpEntity<KakaoPayCancelRequestDto> entityMap = new HttpEntity<>(kakaoPayCancelRequestDto, headers);
-
-        // 외부에 보낼 url
-//        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<KakaoPayCancelRequestDto> entityMap = new HttpEntity<>(kakaoPayCancelRequestDto,
+                headers);
 
         KakaoPayCancelResponseDto response = new RestTemplate().postForObject(
                 "https://open-api.kakaopay.com/online/v1/payment/cancel",
                 entityMap,
                 KakaoPayCancelResponseDto.class);
-
 
         return response;
     }

@@ -98,6 +98,8 @@ public class AuctionService {
     }
 
     public void successfulAuction(Long productId) {
+        List<Auction> auction = auctionRepository.findAllByProductIdAndNeedPay(productId);
+        auctionRepository.deleteAll(auction);
         messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
     }
 

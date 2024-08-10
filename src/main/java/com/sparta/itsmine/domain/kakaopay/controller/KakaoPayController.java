@@ -1,11 +1,15 @@
 package com.sparta.itsmine.domain.kakaopay.controller;
 
 
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.KAKAOPAY_READY;
+
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayApproveResponseDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayCancelResponseDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyResponseDto;
 import com.sparta.itsmine.domain.kakaopay.service.KakaoPayService;
+import com.sparta.itsmine.global.common.response.HttpResponseDto;
+import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,12 +32,12 @@ public class KakaoPayController {
     private final KakaoPayService kakaoPayService;
 
     @GetMapping("/ready/{productId}")//결재 요청
-    public KakaoPayReadyResponseDto ready(@PathVariable("productId") Long productId,
+    public ResponseEntity<HttpResponseDto> ready(@PathVariable("productId") Long productId,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody AuctionRequestDto requestDto) {
         KakaoPayReadyResponseDto kakaoPayReadyResponseDto = kakaoPayService.ready(productId, userDetails.getUser(),
                 requestDto);
-        return kakaoPayReadyResponseDto;
+        return ResponseUtils.of(KAKAOPAY_READY,kakaoPayReadyResponseDto);
     }
 
     @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}/{auctionId}")//결재 승인,옥션 결재상태 확인
@@ -62,7 +66,7 @@ public class KakaoPayController {
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
         // the “show payment status” API is called and then check if the status is FAIL_PAYMENT before suspending the payment
-        return agent + "/" + openType + "/fail";
+        return "결재 실패 결재가 완료되지 않았습니다 다시 결재해주세요";
     }
 
     @PostMapping("/refund")
