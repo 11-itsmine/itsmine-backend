@@ -51,18 +51,6 @@ function Main() {
           <Carousel/>
           <ItemList items={items}/>
           <Board chatRooms={chatRooms}/>
-          {/* 사용자 역할에 따라 추가 버튼을 렌더링 */}
-          {userRole === 'MANAGER' && (
-              <div>
-                <button
-                    onClick={() => window.location.href = '/reported-users'}>
-                  신고된 유저 목록
-                </button>
-                <button onClick={() => window.location.href = '/banned-users'}>
-                  유저 리스트
-                </button>
-              </div>
-          )}
         </MainWrapper>
       </div>
   );
