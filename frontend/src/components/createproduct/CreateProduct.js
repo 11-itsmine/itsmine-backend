@@ -84,16 +84,15 @@ const ProductCreatePage = () => {
   };
 
   const handleDueDateChange = (e) => {
-    const value = Math.max(0, Number(e.target.value) || 0);
-    const dueDate = new Date();
-    dueDate.setHours(dueDate.getHours() + value);
-    setDueDate(dueDate.toISOString());  // ISO 형식으로 서버에 전달
+    const hoursToAdd = Math.max(0, Number(e.target.value) || 0);
+    const currentTime = new Date();
+    const futureTime = new Date(currentTime.getTime() + hoursToAdd * 60 * 60 * 1000); // 시간 단위로 추가
+    setDueDate(futureTime.toISOString()); // ISO 형식으로 서버에 전달
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 기본 검증 로직 추가
     if (!productName || !description || !auctionNowPrice || !startPrice || !dueDate || !categoryName) {
       alert('모든 필드를 입력해주세요.');
       return;
@@ -107,7 +106,7 @@ const ProductCreatePage = () => {
           description,
           auctionNowPrice: Number(auctionNowPrice),
           startPrice: Number(startPrice),
-          dueDate,  // 클라이언트에서 계산된 ISO 형식의 날짜를 전송
+          dueDate,
           categoryName
         },
         productImagesRequestDto: {
@@ -115,17 +114,25 @@ const ProductCreatePage = () => {
         }
       };
 
-      await axiosInstance.post(`/v1/products`, productData, {
+      console.log("Sending product data:", JSON.stringify(productData, null, 2));
+      console.log("Authorization header:", token ? `Bearer ${token.trim()}` : '');
+
+      const response = await axiosInstance.post(`/v1/products`, productData, {
         headers: {
-          Authorization: token ? `Bearer ${token.trim()}` : '' // Authorization 헤더 추가
+          Authorization: token ? `Bearer ${token.trim()}` : ''
         }
       });
 
       alert('상품 등록이 완료 되었습니다.\n홈 화면으로 이동합니다.');
       navigate('/itsmine');
     } catch (error) {
-      console.error('Error creating product:', error.response ? error.response.data : error.message);
-      alert("상품 등록이 불가능합니다. 해당 상품의 이름과 정보를 다시 한번 확인해주세요.");
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response ? error.response.data : error.message);
+      if (error.response && error.response.status === 400) {
+        alert("잘못된 요청입니다. 입력한 정보를 다시 확인해주세요.");
+      } else {
+        alert("상품 등록이 불가능합니다. 서버 관리자에게 문의하세요.");
+      }
     }
   };
 
