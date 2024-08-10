@@ -15,6 +15,8 @@ import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayCancelRequestDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayCancelResponseDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyRequestDtd;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyResponseDto;
+import com.sparta.itsmine.domain.kakaopay.entity.KakaoPayTid;
+import com.sparta.itsmine.domain.kakaopay.repository.KakaoPayRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
@@ -52,6 +54,7 @@ public class KakaoPayService {
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final KakaoPayRepository kakaoPayRepository;
     private final AuctionService auctionService;
     private final ProductAdapter productAdapter;
 
@@ -127,6 +130,10 @@ public class KakaoPayService {
                         pgToken)//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
                 .build();
 
+        KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, kakaoPayApproveRequestDto.getTid(),
+                product.getId(), user.getUsername(), pgToken, auction);
+        kakaoPayRepository.save(KakaoPayTid);
+
         if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
             auction.updateStatus(SUCCESS_BID);
             auctionRepository.save(auction);
@@ -157,12 +164,13 @@ public class KakaoPayService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
+        KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
 
         // Request param
         KakaoPayCancelRequestDto kakaoPayCancelRequestDto = KakaoPayCancelRequestDto.builder()
-                .cid(cid)//가맹점 코드, 10자
+                .cid(kakaoPayTid.getCid())//가맹점 코드, 10자
                 .tid(tid)//결제 고유번호, 20자
-                .cancel_amount(1200)//취소 금액
+                .cancel_amount(kakaoPayTid.getAuction().getBidPrice())//취소 금액
                 .cancel_tax_free_amount(0)//취소 비과세 금액
                 .cancel_vat_amount(0)//취소 부가세 금액
                 .build();
@@ -176,6 +184,7 @@ public class KakaoPayService {
                 entityMap,
                 KakaoPayCancelResponseDto.class);
 
+        kakaoPayRepository.delete(kakaoPayTid);
         return response;
     }
 

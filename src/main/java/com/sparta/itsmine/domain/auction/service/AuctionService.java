@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.auction.service;
 
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_DENIED_BID;
 
@@ -9,6 +10,9 @@ import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionAdapter;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
+import com.sparta.itsmine.domain.kakaopay.entity.KakaoPayTid;
+import com.sparta.itsmine.domain.kakaopay.repository.KakaoPayRepository;
+import com.sparta.itsmine.domain.kakaopay.service.KakaoPayService;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
@@ -42,6 +46,8 @@ public class AuctionService {
     private final AuctionAdapter adapter;
     private final ProductAdapter productAdapter;
     private final RedissonClient redissonClient;
+//    private final KakaoPayService kakaoPayService;
+//    private final KakaoPayRepository kakaoPayRepository;
     private static final String LOCK_KEY = "auctionLock";
 
     public AuctionResponseDto createAuction(User user, Long productId,
@@ -98,8 +104,19 @@ public class AuctionService {
     }
 
     public void successfulAuction(Long productId) {
-        List<Auction> auction = auctionRepository.findAllByProductIdAndNeedPay(productId);
-        auctionRepository.deleteAll(auction);
+        List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
+
+//        for (Auction auction : auctions) {
+//            if (auction.getStatus().equals(BID)) {
+//                KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuction(auction);
+//                kakaoPayService.kakaoCancel(kakaoPayTid.getTid());
+//                auctionRepository.delete(auction);
+//            }
+//            else{
+//                auctionRepository.delete(auction);
+//            }
+//        }
+
         messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
     }
 

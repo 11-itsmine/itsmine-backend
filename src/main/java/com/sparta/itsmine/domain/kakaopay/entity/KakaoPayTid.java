@@ -30,7 +30,7 @@ public class KakaoPayTid {
     @Column(nullable = false)
     private String cid;//가맹점 코드, 10자
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String tid;//결제 고유번호, 결제 준비 API 응답에 포함
 
     @Column(nullable = false)
@@ -48,12 +48,13 @@ public class KakaoPayTid {
 
 
     @Builder
-    public KakaoPayTid(String cid,String tid,Long partnerOrderId,String partnerUserId,String pgToken,Auction auction){
-        this.cid=cid;
-        this.tid=tid;
-        this.partnerOrderId=partnerOrderId;
-        this.partnerUserId=partnerUserId;
-        this.pgToken=pgToken;
-        this.auction=auction;
+    public KakaoPayTid(String cid, String tid, Long partnerOrderId, String partnerUserId,
+            String pgToken, Auction auction) {
+        this.cid = cid;
+        this.tid = tid;
+        this.partnerOrderId = partnerOrderId;
+        this.partnerUserId = partnerUserId;
+        this.pgToken = pgToken;
+        this.auction = auction;
     }
 }
