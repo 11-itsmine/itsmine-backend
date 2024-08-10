@@ -57,7 +57,6 @@ public class LikeService {
 		return new LikeResponseDto(likeProduct, isLike);
 	}
 
-	@Transactional
 	protected void likeCounter(Product product, boolean countUp) {
 
 		if (countUp) {
