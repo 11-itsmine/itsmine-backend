@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface KakaoPayRepository extends JpaRepository<KakaoPayTid, Long> {
     KakaoPayTid findByTid(String tid);
 
-    KakaoPayTid findByAuction(Auction auction);
+    KakaoPayTid findByAuctionId(Long AuctionId);
 }
