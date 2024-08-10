@@ -103,9 +103,9 @@ public class AuctionService {
                 - System.currentTimeMillis();
     }
 
-    public void successfulAuction(Long productId) {
-        List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
-
+//    public void successfulAuction(Long productId) {
+//        List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
+//
 //        for (Auction auction : auctions) {
 //            if (auction.getStatus().equals(BID)) {
 //                KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuction(auction);
@@ -116,9 +116,9 @@ public class AuctionService {
 //                auctionRepository.delete(auction);
 //            }
 //        }
-
-        messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
-    }
+//
+//        messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
+//    }
 
     public void allDeleteBid(Long productId) {
         auctionRepository.deleteAllByProductId(productId);
