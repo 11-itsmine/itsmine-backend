@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import styled from 'styled-components';
 import ReportedUsers from './ReportedUsers';
-import BannedUsers from './BannedUsers';
+import Users from './Users';
+import BannedUsers from './BannedUsers'; // BannedUsers 컴포넌트 임포트
 
 const AdminPage = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -17,6 +18,8 @@ const AdminPage = () => {
               관리</MenuItem>
             <MenuItem onClick={() => setActiveSection('reportedUsers')}>신고된
               유저</MenuItem>
+            <MenuItem onClick={() => setActiveSection('bannedUsers')}>벤된
+              유저</MenuItem>
           </Menu>
         </Sidebar>
         <MainContent>
@@ -25,8 +28,12 @@ const AdminPage = () => {
           {activeSection === 'dashboard' && (
               <>
                 <ContentSection>
-                  <SectionTitle>신고된 유저 목록</SectionTitle>
+                  <SectionTitle>신고 목록</SectionTitle>
                   <ReportedUsers/>
+                </ContentSection>
+                <ContentSection>
+                  <SectionTitle>유저 목록</SectionTitle>
+                  <Users/>
                 </ContentSection>
                 <ContentSection>
                   <SectionTitle>벤된 유저 목록</SectionTitle>
@@ -37,15 +44,22 @@ const AdminPage = () => {
 
           {activeSection === 'userManagement' && (
               <ContentSection>
-                <SectionTitle>벤된 유저 목록</SectionTitle>
-                <BannedUsers/>
+                <SectionTitle>유저 목록</SectionTitle>
+                <Users/>
               </ContentSection>
           )}
 
           {activeSection === 'reportedUsers' && (
               <ContentSection>
-                <SectionTitle>신고된 유저 목록</SectionTitle>
+                <SectionTitle>신고 목록</SectionTitle>
                 <ReportedUsers/>
+              </ContentSection>
+          )}
+
+          {activeSection === 'bannedUsers' && (
+              <ContentSection>
+                <SectionTitle>벤된 유저 목록</SectionTitle>
+                <BannedUsers/>
               </ContentSection>
           )}
         </MainContent>
