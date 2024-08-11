@@ -88,8 +88,8 @@ const AuctionComponent = () => {
 
     try {
       const response = await axiosInstance.post(
-          `/v1/products/${productId}/auctions`,
-          { bidPrice },
+          `/ready/${productId}`, // 카카오페이 결제 준비 API 경로로 변경
+          { bidPrice }, // 입찰 가격을 요청 바디에 포함
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -97,17 +97,23 @@ const AuctionComponent = () => {
           }
       );
 
-      alert("입찰이 성공적으로 완료되었습니다.\n홈 화면으로 이동합니다.");
-      setMessage("입찰이 성공적으로 완료되었습니다.");
-      setError("입찰이 성공적으로 완료되었습니다.");
-      navigate("/itsmine");
+      // 응답에서 카카오페이 결제 페이지 URL을 추출
+      const { next_redirect_pc_url } = response.data.data;
+
+      // 카카오페이 결제 페이지를 팝업 창으로 열기
+      window.open(next_redirect_pc_url, "_blank", "width=600,height=800");
+
+      // 입찰 완료 알림
+      alert("입찰이 완료되었습니다.");
+
     } catch (err) {
       alert("입찰에 실패했습니다. 다시 시도하세요.");
       setError("입찰에 실패했습니다. 다시 시도하세요.");
-      setMessage("입찰에 실패했습니다. 다시 시도하세요.");
       console.error("Error creating auction:", err);
     }
+
   };
+
 
   // 다음 이미지로 이동
   const nextImage = () => {
@@ -444,4 +450,3 @@ const ChatButton = styled.button`
     background-color: #0056b3;
   }
 `;
-
