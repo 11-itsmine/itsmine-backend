@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.kakaopay.controller;
 
 
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_BID_CANCEL;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.KAKAOPAY_APPROVE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.KAKAOPAY_READY;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.KAKAOPAY_REFUND;
@@ -77,13 +78,22 @@ public class KakaoPayController {
         return "결재 실패 결재가 완료되지 않았습니다 다시 결재해주세요";
     }
 
-    //결제 취소 테스트
+    //결제 취소
     @PostMapping("/refund")
     public ResponseEntity<HttpResponseDto> refund(@RequestParam("tid") String tid) {
 
         KakaoPayCancelResponseDto kakaoPayCancelResponseDto = kakaoPayService.kakaoCancel(tid);
 
         return ResponseUtils.of(KAKAOPAY_REFUND, kakaoPayCancelResponseDto);
+    }
+
+    //환불 없는 입찰 취소
+    @PostMapping("/bidCancel")
+    public ResponseEntity<HttpResponseDto> bidCancel(@RequestParam("tid") String tid) {
+
+        kakaoPayService.bidCancel(tid);
+
+        return ResponseUtils.of(AUCTION_BID_CANCEL);
     }
 
 }

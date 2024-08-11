@@ -222,19 +222,25 @@ public class KakaoPayService {
         auction.updateStatus(NEED_PAY);
         auctionRepository.save(auction);
 
-        Auction maxBid=auctionRepository.findByProductIdAndMaxBid(product.getId());
-
-        if(maxBid == null){
-            product.currentPriceUpdate(product.getStartPrice());
-            productRepository.save(product);
-        }
-        else{
-            product.currentPriceUpdate(maxBid.getBidPrice());
-            productRepository.save(product);
-        }
+        bidCancelAndSetCurrentPrice(product);
 
         kakaoPayRepository.delete(kakaoPayTid);
         return response;
+    }
+
+    public void bidCancel(String tid) {
+
+        KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
+        Auction auction=auctionRepository.findById(kakaoPayTid.getAuction().getId()).orElseThrow();
+        Product product=productAdapter.getProduct(auction.getProduct().getId());
+
+        auction.updateStatus(NEED_PAY);
+        auctionRepository.save(auction);
+
+        bidCancelAndSetCurrentPrice(product);
+
+        kakaoPayRepository.delete(kakaoPayTid);
+
     }
 
     public void deleteWithOutSuccessfulAuction(Long productId) {
@@ -252,6 +258,21 @@ public class KakaoPayService {
         }
 
         messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
+    }
+
+    public void bidCancelAndSetCurrentPrice(Product product){
+
+        Auction maxBid=auctionRepository.findByProductIdAndMaxBid(product.getId());
+
+        if(maxBid == null){
+            product.currentPriceUpdate(product.getStartPrice());
+            productRepository.save(product);
+        }
+        else{
+            product.currentPriceUpdate(maxBid.getBidPrice());
+            productRepository.save(product);
+        }
+
     }
 
 }
