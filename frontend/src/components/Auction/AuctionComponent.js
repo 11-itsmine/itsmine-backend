@@ -178,9 +178,7 @@ const AuctionComponent = () => {
         {product.imagesUrl && product.imagesUrl.length > 0 && (
             <>
               <ImageSlider>
-                <Arrow left onClick={prevImage}>
-                  &lt;
-                </Arrow>
+                <Arrow left onClick={prevImage}>&lt;</Arrow>
                 <ProductImage
                     src={product.imagesUrl[currentImageIndex]}
                     alt={`Product ${currentImageIndex}`}
@@ -273,7 +271,7 @@ const Arrow = styled.div`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: transparent; /* 배경을 투명하게 설정 */
+  background-color: transparent;
   border-radius: 50%;
   width: 30px;
   height: 30px;
@@ -283,11 +281,10 @@ const Arrow = styled.div`
   cursor: pointer;
   font-size: 1.5rem;
   user-select: none;
-  color: #fff; /* 화살표 색상을 흰색으로 설정 */
+  color: #fff;
   &:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* 호버 시 약간의 배경색 추가 */
+    background-color: rgba(255, 255, 255, 0.2);
   }
-
   ${({ left }) => (left ? `left: 10px;` : `right: 10px;`)}
 `;
 
@@ -444,4 +441,3 @@ const ChatButton = styled.button`
     background-color: #0056b3;
   }
 `;
-

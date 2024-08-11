@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import axiosInstance from '../../api/axiosInstance';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
     const [profile, setProfile] = useState(null);
@@ -22,22 +23,16 @@ const Profile = () => {
     const [file, setFile] = useState(null);
     const [uploadError, setUploadError] = useState(null);
     const [uploadSuccess, setUploadSuccess] = useState(false);
-
     const [products, setProducts] = useState([]);
     const [productError, setProductError] = useState(null);
-
     const [likedProducts, setLikedProducts] = useState([]);
     const [likedError, setLikedError] = useState(null);
-
     const [auctions, setAuctions] = useState([]);
     const [auctionError, setAuctionError] = useState(null);
-
     const [tabValue, setTabValue] = useState(0);
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
-
     const defaultProfileImageUrl = '/images/default-profile.png';
-
     const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImageUrl);
     const [editMode, setEditMode] = useState(false);
     const [showUploadButton, setShowUploadButton] = useState(false);
@@ -56,9 +51,7 @@ const Profile = () => {
                 }
             } catch (err) {
                 alert("프로필 정보를 가져오는 중 오류가 발생했습니다.");
-                setProfileError(
-                    err.response ? err.response.data : '프로필 정보를 가져오는 중 오류가 발생했습니다.'
-                );
+                setProfileError(err.response ? err.response.data : '프로필 정보를 가져오는 중 오류가 발생했습니다.');
             }
         };
 
@@ -77,9 +70,7 @@ const Profile = () => {
                 setProducts(response.data.data.content);
             } catch (err) {
                 alert("내 상품 목록을 가져오는 중 오류가 발생했습니다.");
-                setProductError(
-                    err.response ? err.response.data : '내 상품 목록을 가져오는 중 오류가 발생했습니다.'
-                );
+                setProductError(err.response ? err.response.data : '내 상품 목록을 가져오는 중 오류가 발생했습니다.');
             }
         };
 
@@ -98,9 +89,7 @@ const Profile = () => {
                 setLikedProducts(response.data.data.content);
             } catch (err) {
                 alert("좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.");
-                setLikedError(
-                    err.response ? err.response.data : '좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.'
-                );
+                setLikedError(err.response ? err.response.data : '좋아하는 내 상품 목록을 가져오는 중 오류가 발생했습니다.');
             }
         };
 
@@ -119,9 +108,7 @@ const Profile = () => {
                 setAuctions(response.data.data.content);
             } catch (err) {
                 alert("경매 목록을 가져오는 중 오류가 발생했습니다.");
-                setAuctionError(
-                    err.response ? err.response.data : '경매 목록을 가져오는 중 오류가 발생했습니다.'
-                );
+                setAuctionError(err.response ? err.response.data : '경매 목록을 가져오는 중 오류가 발생했습니다.');
             }
         };
 
@@ -157,7 +144,7 @@ const Profile = () => {
                 imagesUrl: response.data.imageUrl,
             }));
             setUploadError(null);
-            setShowUploadButton(false); // 업로드 후 버튼 숨김
+            setShowUploadButton(false);
 
         } catch (err) {
             if (err.response && err.response.status === 409) {
@@ -410,61 +397,63 @@ const Profile = () => {
                                 )}
                                 {products.map((product) => (
                                     <Grid item xs={12} sm={6} md={4} key={product.id}>
-                                        <Paper sx={{ p: 2 }}>
-                                            {product.imagesUrl && product.imagesUrl.length > 0 && (
-                                                <img
-                                                    src={product.imagesUrl[0]}
-                                                    alt={product.productName}
-                                                    style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
-                                                />
-                                            )}
-                                            <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
-                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
-                                                {product.productName}
-                                            </Typography>
-                                            <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}> {/* 정보와 값 사이의 간격을 최소화 */}
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        시작 가격
-                                                    </Typography>
+                                        <Link to={`/v1/products/${product.id}`} style={{ textDecoration: 'none' }}>
+                                            <Paper sx={{ p: 2 }}>
+                                                {product.imagesUrl && product.imagesUrl.length > 0 && (
+                                                    <img
+                                                        src={product.imagesUrl[0]}
+                                                        alt={product.productName}
+                                                        style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
+                                                    />
+                                                )}
+                                                <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
+                                                <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
+                                                    {product.productName}
+                                                </Typography>
+                                                <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}> {/* 정보와 값 사이의 간격을 최소화 */}
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            시작 가격
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
+                                                            {product.startPrice}원
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            현재 가격
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
+                                                            {product.currentPrice}원
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            즉시 구매가
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
+                                                            {product.auctionNowPrice}원
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            마감일
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
+                                                            {new Date(product.dueDate).toLocaleString()}
+                                                        </Typography>
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
-                                                        {product.startPrice}원
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        현재 가격
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
-                                                        {product.currentPrice}원
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        즉시 구매가
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
-                                                        {product.auctionNowPrice}원
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        마감일
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
-                                                        {new Date(product.dueDate).toLocaleString()}
-                                                    </Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </Paper>
+                                            </Paper>
+                                        </Link>
                                     </Grid>
                                 ))}
                             </Grid>
@@ -478,61 +467,63 @@ const Profile = () => {
                                 )}
                                 {likedProducts.map((product) => (
                                     <Grid item xs={12} sm={6} md={4} key={product.id}>
-                                        <Paper sx={{ p: 2 }}>
-                                            {product.imagesUrl && product.imagesUrl.length > 0 && (
-                                                <img
-                                                    src={product.imagesUrl[0]}
-                                                    alt={product.productName}
-                                                    style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
-                                                />
-                                            )}
-                                            <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
-                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
-                                                {product.productName}
-                                            </Typography>
-                                            <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}> {/* 정보와 값 사이의 간격을 최소화 */}
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        시작 가격
-                                                    </Typography>
+                                        <Link to={`/v1/products/${product.id}`} style={{ textDecoration: 'none' }}>
+                                            <Paper sx={{ p: 2 }}>
+                                                {product.imagesUrl && product.imagesUrl.length > 0 && (
+                                                    <img
+                                                        src={product.imagesUrl[0]}
+                                                        alt={product.productName}
+                                                        style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
+                                                    />
+                                                )}
+                                                <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
+                                                <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
+                                                    {product.productName}
+                                                </Typography>
+                                                <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}> {/* 정보와 값 사이의 간격을 최소화 */}
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            시작 가격
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
+                                                            {product.startPrice}원
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            현재 가격
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
+                                                            {product.currentPrice}원
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            즉시 구매가
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
+                                                            {product.auctionNowPrice}원
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            마감일
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
+                                                            {new Date(product.dueDate).toLocaleString()}
+                                                        </Typography>
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
-                                                        {product.startPrice}원
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        현재 가격
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
-                                                        {product.currentPrice}원
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        즉시 구매가
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
-                                                        {product.auctionNowPrice}원
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        마감일
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
-                                                        {new Date(product.dueDate).toLocaleString()}
-                                                    </Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </Paper>
+                                            </Paper>
+                                        </Link>
                                     </Grid>
                                 ))}
                             </Grid>
@@ -545,35 +536,37 @@ const Profile = () => {
                                     </Typography>
                                 )}
                                 {auctions.map((auction) => (
-                                    <Grid item xs={12} sm={6} md={4} key={auction.id}>
-                                        <Paper sx={{ p: 2 }}>
-                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
-                                                상품: {auction.productName}
-                                            </Typography>
-                                            <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
-                                            <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}> {/* 정보와 값 사이의 간격을 최소화 */}
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        입찰자 이름
-                                                    </Typography>
+                                    <Grid item xs={12} sm={6} md={4} key={auction.productId}>
+                                        <Link to={`/v1/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
+                                            <Paper sx={{ p: 2 }}>
+                                                <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
+                                                    상품: {auction.productName}
+                                                </Typography>
+                                                <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
+                                                <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}> {/* 정보와 값 사이의 간격을 최소화 */}
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            입찰자 이름
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
+                                                            {auction.username}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            입찰 가격
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
+                                                            {auction.bidPrice}원
+                                                        </Typography>
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
-                                                        {auction.username}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                        입찰 가격
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
-                                                        {auction.bidPrice}원
-                                                    </Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </Paper>
+                                            </Paper>
+                                        </Link>
                                     </Grid>
                                 ))}
                             </Grid>
