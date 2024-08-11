@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by kakaopay
  */
 @RestController
+@RequestMapping("/v1/kakaopay")
 @RequiredArgsConstructor
 public class KakaoPayController {
 
@@ -75,6 +77,7 @@ public class KakaoPayController {
         return "결재 실패 결재가 완료되지 않았습니다 다시 결재해주세요";
     }
 
+    //결제 취소 테스트
     @PostMapping("/refund")
     public ResponseEntity<HttpResponseDto> refund(@RequestParam("tid") String tid) {
 

@@ -2,6 +2,7 @@ package com.sparta.itsmine.domain.kakaopay.service;
 
 
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
@@ -87,11 +88,11 @@ public class KakaoPayService {
                 .totalAmount(bidPrice)//상품 총액
                 .taxFreeAmount(0)//상품 비과세 금액
                 .vatAmount(0)//상품 부가세 금액
-                .approvalUrl(kakaopayHost + "/approve/pc/popup/" + product.getId() + "/"
+                .approvalUrl(kakaopayHost + "/v1/kakaopay/approve/pc/popup/" + product.getId() + "/"
                         + user.getId() + "/"
                         + createAuction.getId())//결제 성공 시 redirect url, 최대 255자 ,
-                .cancelUrl(kakaopayHost + "/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
-                .failUrl(kakaopayHost + "/fail/pc/popup")//결제 실패 시 redirect url, 최대 255자
+                .cancelUrl(kakaopayHost + "/v1/kakaopay/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
+                .failUrl(kakaopayHost + "/v1/kakaopay/fail/pc/popup")//결제 실패 시 redirect url, 최대 255자
                 .build();
 
         // Send reqeust
@@ -162,7 +163,7 @@ public class KakaoPayService {
         return response;
     }
 
-    public KakaoPayCancelResponseDto kakaoCancel(String tid) {
+    public KakaoPayCancelResponseDto kakaoCancelForSuccessBid(String tid) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
@@ -191,13 +192,58 @@ public class KakaoPayService {
         return response;
     }
 
+    public KakaoPayCancelResponseDto kakaoCancel(String tid) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
+        Auction auction=auctionRepository.findById(kakaoPayTid.getAuction().getId()).orElseThrow();
+        Product product=productAdapter.getProduct(auction.getProduct().getId());
+
+        // Request param
+        KakaoPayCancelRequestDto kakaoPayCancelRequestDto = KakaoPayCancelRequestDto.builder()
+                .cid(kakaoPayTid.getCid())//가맹점 코드, 10자
+                .tid(tid)//결제 고유번호, 20자
+                .cancel_amount(kakaoPayTid.getAuction().getTotalAmount())//취소 금액
+                .cancel_tax_free_amount(0)//취소 비과세 금액
+                .cancel_vat_amount(0)//취소 부가세 금액
+                .build();
+
+        // Send Request
+        HttpEntity<KakaoPayCancelRequestDto> entityMap = new HttpEntity<>(kakaoPayCancelRequestDto,
+                headers);
+
+        KakaoPayCancelResponseDto response = new RestTemplate().postForObject(
+                "https://open-api.kakaopay.com/online/v1/payment/cancel",
+                entityMap,
+                KakaoPayCancelResponseDto.class);
+
+        auction.updateStatus(NEED_PAY);
+        auctionRepository.save(auction);
+
+        Auction maxBid=auctionRepository.findByProductIdAndMaxBid(product.getId());
+
+        if(maxBid == null){
+            product.currentPriceUpdate(product.getStartPrice());
+            productRepository.save(product);
+        }
+        else{
+            product.currentPriceUpdate(maxBid.getBidPrice());
+            productRepository.save(product);
+        }
+
+        kakaoPayRepository.delete(kakaoPayTid);
+        return response;
+    }
+
     public void deleteWithOutSuccessfulAuction(Long productId) {
         List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
 
         for (Auction auction : auctions) {
             if (auction.getStatus().equals(BID)) {
                 KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
-                kakaoCancel(kakaoPayTid.getTid());
+                kakaoCancelForSuccessBid(kakaoPayTid.getTid());
                 auctionRepository.delete(auction);
             }
             else{

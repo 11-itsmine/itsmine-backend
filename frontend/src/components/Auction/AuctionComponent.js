@@ -88,7 +88,7 @@ const AuctionComponent = () => {
 
     try {
       const response = await axiosInstance.post(
-          `/ready/${productId}`, // 카카오페이 결제 준비 API 경로로 변경
+          `/v1/kakaopay/ready/${productId}`, // 카카오페이 결제 준비 API 경로로 변경
           { bidPrice }, // 입찰 가격을 요청 바디에 포함
           {
             headers: {

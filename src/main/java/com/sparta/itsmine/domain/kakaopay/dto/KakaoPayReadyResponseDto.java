@@ -7,7 +7,6 @@ import lombok.Setter;
  * Created by kakaopay
  */
 @Getter
-@Setter
 public class KakaoPayReadyResponseDto {
     private String tid;//결제 고유 번호, 20자
     private Boolean tms_result;

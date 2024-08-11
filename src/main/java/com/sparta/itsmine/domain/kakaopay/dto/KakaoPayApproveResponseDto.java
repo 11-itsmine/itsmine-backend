@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.joda.time.DateTime;
 
 @Getter
-@Setter
 public class KakaoPayApproveResponseDto {
     private String aid;//요청 고유 번호 - 승인/취소가 구분된 결제번호
     private String tid;//결제 고유 번호 - 승인/취소가 동일한 결제번호

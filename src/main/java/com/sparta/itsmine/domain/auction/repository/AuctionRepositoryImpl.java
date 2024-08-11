@@ -107,12 +107,20 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     /*
     select *
     from auctions
-    where product_id=1 and status='BID';
+    where product_id=3 and status='BID' and bid_price=(select max(bid_price) from auctions where product_id=3 and status='BID');
     */
-    public List<Auction> findAllByProductIdAndBid(Long productId) {
-        return jpaQueryFactory.select(auction)
+    public Auction findByProductIdAndMaxBid(Long productId) {
+
+        JPQLQuery<Integer> biddingMaxBidPriceSubQuery = JPAExpressions
+                .select(auction.bidPrice.max())
                 .from(auction)
-                .where(product.id.eq(productId).and(auction.status.eq(BID)))
-                .fetch();
+                .innerJoin(auction.product, product)
+                .where(product.id.eq(productId).and(auction.status.eq(BID)));
+
+        return jpaQueryFactory
+                .select(auction)
+                .from(auction)
+                .where(product.id.eq(productId).and(auction.status.eq(BID)).and(auction.bidPrice.eq(biddingMaxBidPriceSubQuery)))
+                .fetchOne();
     }
 }
