@@ -71,7 +71,7 @@ public class KakaoPayService {
 
         Product product = productAdapter.getProduct(productId);
         Integer bidPrice = requestDto.getBidPrice();
-        //즉시구매가와 같이 않으면 1/10만 보증금으로 결재
+        //즉시구매가와 같이 않으면 1/10만 보증금으로 결제
         if (!bidPrice.equals(product.getAuctionNowPrice())) {
             bidPrice = requestDto.getBidPrice() / 10;
         }

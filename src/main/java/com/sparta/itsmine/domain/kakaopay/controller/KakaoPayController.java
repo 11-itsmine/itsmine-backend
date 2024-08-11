@@ -37,7 +37,7 @@ public class KakaoPayController {
 
     private final KakaoPayService kakaoPayService;
 
-    @PostMapping("/ready/{productId}")//결재 요청
+    @PostMapping("/ready/{productId}")//결제 요청
     public ResponseEntity<HttpResponseDto> ready(@PathVariable("productId") Long productId,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody AuctionRequestDto requestDto) {
@@ -47,7 +47,7 @@ public class KakaoPayController {
         return ResponseUtils.of(KAKAOPAY_READY, kakaoPayReadyResponseDto);
     }
 
-    @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}/{auctionId}")//결재 승인,옥션 결재상태 확인
+    @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}/{auctionId}")//결제 승인,옥션 결제상태 확인
     public ResponseEntity<HttpResponseDto> approve(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken,
             @PathVariable("productId") Long productId, @PathVariable("userId") Long userId,
@@ -57,25 +57,25 @@ public class KakaoPayController {
         return ResponseUtils.of(KAKAOPAY_APPROVE, kakaoPayApproveResponseDto);
     }
 
-    @GetMapping("/cancel/{agent}/{openType}")//결재 취소
+    @GetMapping("/cancel/{agent}/{openType}")//결제 취소
     public String cancel(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType) {
         // 주문건이 진짜 취소되었는지 확인 후 취소 처리
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
         // the “show payment status” API is called and then check if the status is QUIT_PAYMENT before suspending the payment
-        return "결재 취소 및 환불";
+        return "결제 취소 및 환불";
     }
 
 
-    @GetMapping("/fail/{agent}/{openType}")//결재 실패
+    @GetMapping("/fail/{agent}/{openType}")//결제 실패
     public String fail(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType) {
         // 주문건이 진짜 실패되었는지 확인 후 실패 처리
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
         // the “show payment status” API is called and then check if the status is FAIL_PAYMENT before suspending the payment
-        return "결재 실패 결재가 완료되지 않았습니다 다시 결재해주세요";
+        return "결제 실패 결제가 완료되지 않았습니다 다시 결제해주세요";
     }
 
     //결제 취소

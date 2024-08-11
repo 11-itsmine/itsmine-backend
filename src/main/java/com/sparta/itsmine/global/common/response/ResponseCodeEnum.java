@@ -46,10 +46,10 @@ public enum ResponseCodeEnum {
     COMMENT_SUCCESS_UPDATE(HttpStatus.OK, "댓글 수정이 완료 되었습니다."),
     COMMENT_SUCCESS_DELETE(HttpStatus.OK, "댓글 삭제가 완료 되었습니다."),
 
-    //경매 및 결재
-    KAKAOPAY_READY(HttpStatus.CREATED, "결재 준비"),
-    KAKAOPAY_APPROVE(HttpStatus.OK, "결재 완료"),
-    KAKAOPAY_REFUND(HttpStatus.OK, "결재 취소 및 환볼 완료"),
+    //경매 및 결제
+    KAKAOPAY_READY(HttpStatus.CREATED, "결제 준비"),
+    KAKAOPAY_APPROVE(HttpStatus.OK, "결제 완료"),
+    KAKAOPAY_REFUND(HttpStatus.OK, "결제 취소 및 환볼 완료"),
     AUCTION_BID_CANCEL(HttpStatus.OK,"입찰 취소 완료"),
     AUCTION_SUCCESS_CREATE(HttpStatus.CREATED, "경매 생성이 완료 되었습니다."),
     AUCTION_SUCCESS_GET(HttpStatus.OK, "경매 조회가 완료 되었습니다."),
