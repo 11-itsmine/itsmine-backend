@@ -111,7 +111,7 @@ public class KakaoPayService {
         return kakaoPayReadyResponseDto;
     }
 
-    public ResponseEntity<KakaoPayApproveResponseDto> approve(String pgToken, Long productId,
+    public KakaoPayApproveResponseDto approve(String pgToken, Long productId,
             Long userId, Long auctionId) {
         // ready할 때 저장해놓은 TID로 승인 요청
         // Call “Execute approved payment” API by pg_token, TID mapping to the current payment transaction and other parameters.
@@ -153,7 +153,7 @@ public class KakaoPayService {
         HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
                 kakaoPayApproveRequestDto, headers);
 
-        ResponseEntity<KakaoPayApproveResponseDto> response = new RestTemplate().postForEntity(
+        KakaoPayApproveResponseDto response = new RestTemplate().postForObject(
                 "https://open-api.kakaopay.com/online/v1/payment/approve",
                 entityMap,
                 KakaoPayApproveResponseDto.class

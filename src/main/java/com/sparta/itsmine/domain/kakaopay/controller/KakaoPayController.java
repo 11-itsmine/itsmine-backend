@@ -1,7 +1,9 @@
 package com.sparta.itsmine.domain.kakaopay.controller;
 
 
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.KAKAOPAY_APPROVE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.KAKAOPAY_READY;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.KAKAOPAY_REFUND;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayApproveResponseDto;
@@ -35,17 +37,20 @@ public class KakaoPayController {
     public ResponseEntity<HttpResponseDto> ready(@PathVariable("productId") Long productId,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody AuctionRequestDto requestDto) {
-        KakaoPayReadyResponseDto kakaoPayReadyResponseDto = kakaoPayService.ready(productId, userDetails.getUser(),
+        KakaoPayReadyResponseDto kakaoPayReadyResponseDto = kakaoPayService.ready(productId,
+                userDetails.getUser(),
                 requestDto);
-        return ResponseUtils.of(KAKAOPAY_READY,kakaoPayReadyResponseDto);
+        return ResponseUtils.of(KAKAOPAY_READY, kakaoPayReadyResponseDto);
     }
 
     @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}/{auctionId}")//결재 승인,옥션 결재상태 확인
-    public ResponseEntity<KakaoPayApproveResponseDto> approve(@PathVariable("agent") String agent,
+    public ResponseEntity<HttpResponseDto> approve(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken,
             @PathVariable("productId") Long productId, @PathVariable("userId") Long userId,
             @PathVariable("auctionId") Long auctionId) {
-        return kakaoPayService.approve(pgToken, productId, userId, auctionId);
+        KakaoPayApproveResponseDto kakaoPayApproveResponseDto = kakaoPayService.approve(pgToken,
+                productId, userId, auctionId);
+        return ResponseUtils.of(KAKAOPAY_APPROVE, kakaoPayApproveResponseDto);
     }
 
     @GetMapping("/cancel/{agent}/{openType}")//결재 취소
@@ -70,11 +75,11 @@ public class KakaoPayController {
     }
 
     @PostMapping("/refund")
-    public ResponseEntity<KakaoPayCancelResponseDto> refund(@RequestParam("tid") String tid) {
+    public ResponseEntity<HttpResponseDto> refund(@RequestParam("tid") String tid) {
 
         KakaoPayCancelResponseDto kakaoPayCancelResponseDto = kakaoPayService.kakaoCancel(tid);
 
-        return new ResponseEntity<>(kakaoPayCancelResponseDto, HttpStatus.OK);
+        return ResponseUtils.of(KAKAOPAY_REFUND, kakaoPayCancelResponseDto);
     }
 
 }
