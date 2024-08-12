@@ -5,6 +5,7 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_CREATE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_GET;
 
+import com.sparta.itsmine.domain.auction.dto.AuctionProductImageResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
@@ -45,7 +46,7 @@ public class AuctionController {
     @GetMapping("/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
             @AuthenticationPrincipal UserDetailsImpl userDetails, Pageable pageable) {
-        Page<AuctionProductResponseDto> responseDto = auctionService.getAuctionByUser(
+        Page<AuctionProductImageResponseDto> responseDto = auctionService.getAuctionByUser(
                 userDetails.getUser(), pageable);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }

@@ -4,6 +4,7 @@ import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_DENIED_BID;
 
+import com.sparta.itsmine.domain.auction.dto.AuctionProductImageResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
@@ -100,7 +101,7 @@ public class AuctionService {
 		productRepository.save(product);
 	}
 
-	public Page<AuctionProductResponseDto> getAuctionByUser(User user, Pageable pageable) {
+	public Page<AuctionProductImageResponseDto> getAuctionByUser(User user, Pageable pageable) {
 		return adapter.findAuctionAllByUserid(user.getId(), pageable);
 	}
 
