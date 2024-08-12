@@ -14,7 +14,5 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
 
     List<Auction> findAllByProductId(Long productId);
 
-    Auction findByProductId(Long productId);
-
-    Long countByProductId(Long productId);
+    Auction findByBidPrice(Integer bidPrice);
 }

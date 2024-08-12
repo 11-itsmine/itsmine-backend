@@ -70,7 +70,7 @@ public class ChatRoomController {
     public ResponseEntity<HttpResponseDto> createRoom(@RequestBody UserRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
-        RoomInfoResponseDto responseDto = chatService.createChatRoom(user, requestDto.getUserId());
+        RoomInfoResponseDto responseDto = chatService.createChatRoom(user, requestDto);
         return ResponseUtils.of(CHAT_SUCCESS_CREATE, responseDto);
     }
 

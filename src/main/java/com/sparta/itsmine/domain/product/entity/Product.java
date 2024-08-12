@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "product", indexes = {
+        @Index(name = "idx_product_name", columnList = "productName"),
         @Index(name = "idx_user_product_name", columnList = "user_id, productName"),
         @Index(name = "idx_product_deleted", columnList = "deletedAt")
 })

@@ -29,7 +29,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
 
     fetchMessages();
 
-    const socket = new WebSocket('ws://52.79.213.8:8080/ws');
+    const socket = new WebSocket('wss://itsyours.store/ws');
     stompClient.current = Stomp.over(socket);
 
     stompClient.current.connect(
@@ -126,10 +126,10 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   return (
       <ChatWindowContainer>
         <Header>
-          <ChatTitle>{otherUserNickname}와의 채팅</ChatTitle>
+          <ChatTitle>{otherUserNickname}</ChatTitle>
           <ButtonContainer>
             <BackButton onClick={handleBackToList}>Back</BackButton>
-            <ReportButton onClick={handleReportClick}>신고하기</ReportButton>
+            <ReportButton onClick={handleReportClick}>Report</ReportButton>
             <LeaveButton onClick={handleLeaveRoom}>Exit</LeaveButton>
           </ButtonContainer>
         </Header>

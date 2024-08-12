@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.auction.repository;
 
+import com.sparta.itsmine.domain.auction.dto.AuctionProductImageResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import java.util.List;
@@ -12,14 +13,14 @@ import org.springframework.stereotype.Repository;
 public interface CustomAuctionRepository {
 
     //자신이 고른 상품 전체 조회
-    Page<AuctionProductResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable);
+    Page<AuctionProductImageResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable);
 
     //자신이 고른 상품 조회
     Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId, Long productId);
 
     List<Auction> findAllByProductIdWithOutMaxPrice(Long productId);
 
-    List<Auction> findAllByProductIdAndNeedPay(Long productId);
-
     Auction findByProductIdAndMaxBid(Long productId);
+
+    Auction findByBidPriceAndUserAndProduct(Long userId,Long productId,Integer bidPrice);
 }

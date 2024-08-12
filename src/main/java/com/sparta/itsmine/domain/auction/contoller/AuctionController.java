@@ -5,6 +5,7 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_CREATE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.AUCTION_SUCCESS_GET;
 
+import com.sparta.itsmine.domain.auction.dto.AuctionProductImageResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
@@ -26,26 +27,11 @@ public class AuctionController {
 
     private final AuctionService auctionService;
 
-    //구매자 입찰 생성
-    /*
-    @PostMapping("/products/{productId}/auctions")
-    public ResponseEntity<HttpResponseDto> createAuction(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long productId,
-            @RequestBody AuctionRequestDto requestDto) {
-        AuctionResponseDto responseDto = auctionService.createAuction(userDetails.getUser(), productId, requestDto);
-        return ResponseUtils.of(
-                responseDto.getStatus().equals(SUCCESS_BID) ? AUCTION_SUCCESSFUL_BID
-                        : AUCTION_SUCCESS_CREATE, responseDto);
-
-    }
-    */
-
     //유저(구매자(본인)) 입찰 조회(QueryDSL)
     @GetMapping("/auctions")
-    public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
+    public ResponseEntity<HttpResponseDto> getAuctionByUserToPage(
             @AuthenticationPrincipal UserDetailsImpl userDetails, Pageable pageable) {
-        Page<AuctionProductResponseDto> responseDto = auctionService.getAuctionByUser(
+        Page<AuctionProductImageResponseDto> responseDto = auctionService.getAuctionByUser(
                 userDetails.getUser(), pageable);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
     }
