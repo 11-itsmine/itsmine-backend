@@ -52,7 +52,7 @@ function KakaoPayTidForm() {
     }
   };
 
-// Bid Cancel 요청을 보내는 함수
+  // Bid Cancel 요청을 보내는 함수
   const handleBidCancel = async () => {
     if (!tid) {
       setError('TID를 먼저 가져와주세요.');
@@ -102,8 +102,8 @@ function KakaoPayTidForm() {
                   value={tid}
                   readOnly
               />
-              <Button onClick={handleRefund}>환불</Button>
-              <Button onClick={handleBidCancel}>입찰 취소</Button>
+              <RefundButton onClick={handleRefund}>환불</RefundButton>
+              <CancelButton onClick={handleBidCancel}>입찰 취소</CancelButton>
             </Form>
         )}
         {error && <ErrorText>{error}</ErrorText>}
@@ -149,6 +149,20 @@ const Button = styled.button`
   font-weight: bold;
   &:hover {
     background-color: #1971c2;
+  }
+`;
+
+const RefundButton = styled(Button)`
+  background-color: #e03131; /* 빨간색 */
+  &:hover {
+    background-color: #c92a2a;
+  }
+`;
+
+const CancelButton = styled(Button)`
+  background-color: #e03131; /* 빨간색 */
+  &:hover {
+    background-color: #c92a2a;
   }
 `;
 
