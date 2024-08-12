@@ -50,4 +50,8 @@ public class UserAdapter {
     public void delete(User user) {
         userRepository.delete(user);
     }
+
+    public List<User> blockUserList() {
+        return userRepository.findAllByBlockedAtIsNotNull();
+    }
 }

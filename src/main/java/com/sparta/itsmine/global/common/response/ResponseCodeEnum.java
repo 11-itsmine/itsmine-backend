@@ -18,6 +18,7 @@ public enum ResponseCodeEnum {
     USER_SUCCESS_SIGNUP(HttpStatus.OK, "님의 회원가입을 완료 했습니다."),
     REISSUE_ACCESS_TOKEN(HttpStatus.OK, "억세스 토큰 재발급을 완료했습니다."),
     USER_SUCCESS_LIST(HttpStatus.OK, "유저 리스트 입니다."),
+    USER_SUCCESS_UNBLOCK(HttpStatus.OK, "벤 헤제 완료 했습니다."),
 
     // 상품
     SUCCESS_SAVE_PRODUCT(HttpStatus.OK, "성공적으로 상품을 등록했습니다."),
@@ -68,7 +69,8 @@ public enum ResponseCodeEnum {
     //신고 관련
     REPORT_SUCCESS_CREATE(HttpStatus.CREATED, "신고가 접수 되었습니다."),
     REPORT_SUCCESS_UPDATE(HttpStatus.OK, "신고가 수정 되었습니다."),
-    REPORT_SUCCESS_DELETE(HttpStatus.CREATED, "신고가 삭제 되었습니다.");
+    REPORT_SUCCESS_DELETE(HttpStatus.CREATED, "신고가 삭제 되었습니다."),
+    REPORT_LIST(HttpStatus.OK, "신고목록입니다.");
 
 
 

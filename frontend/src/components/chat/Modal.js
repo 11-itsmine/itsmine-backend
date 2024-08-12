@@ -3,8 +3,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Modal = ({ isOpen, children, onClose }) => {
-  if (!isOpen) return null;
+const Modal = ({isOpen, children, onClose}) => {
+  if (!isOpen) {
+    return null;
+  }
 
   return (
       <ModalOverlay>
@@ -51,6 +53,7 @@ const CloseButton = styled.button`
   font-size: 1.5rem;
   cursor: pointer;
   transition: color 0.2s;
+
   &:hover {
     color: #ff0000;
   }

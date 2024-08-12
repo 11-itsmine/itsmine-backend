@@ -1,34 +1,26 @@
-// ChatRoom.js
-
 import React from 'react';
 import styled from 'styled-components';
 
-const ChatRoom = ({ room, onOpenChat }) => {
+const ChatRoom = ({room, onOpenChat}) => {
   console.log(room);
 
-  // 현재 로그인한 사용자가 발신자인지 수신자인지를 판단
-  const isCurrentUserSender = room.fromUserId === room.userDetailId;
-
-  // 나 또는 상대방으로 표현하기
-  const senderLabel = isCurrentUserSender ? '나' : '상대방';
-  const receiverLabel = !isCurrentUserSender ? '나' : '상대방';
-
-  // 상대방과 나의 정보를 한 번에 출력하기 위한 변수
-  const otherUserNickname = isCurrentUserSender ? room.toUserNickname : room.fromUserNickname;
-  const otherUserStatus = isCurrentUserSender ? room.toUserStatus : room.fromUserStatus;
-  const currentUserNickname = isCurrentUserSender ? room.fromUserNickname : room.toUserNickname;
-  const currentUserStatus = isCurrentUserSender ? room.fromUserStatus : room.toUserStatus;
+  // 상대방의 닉네임과 마지막 메시지, 날짜를 가져옵니다.
+  const otherUserNickname = room.fromUserId === room.userDetailId
+      ? room.toUserNickname : room.fromUserNickname;
+  const lastMessage = room.lastMessage || 'No messages yet'; // 가상의 속성, 실제로는 서버에서 전달받는 데이터 사용
+  const lastMessageDate = new Date(
+      room.lastMessageTime || Date.now()).toLocaleDateString('ko-KR', {
+    month: 'short',
+    day: 'numeric',
+  }); // 가상의 속성, 실제로는 서버에서 전달받는 데이터 사용
 
   return (
-      <ChatRoomItem onClick={onOpenChat}> {/* 클릭 시 채팅 열기 */}
-        {/* 채팅방 ID는 필요할 경우 여기에 추가 */}
-        {/* <RoomId>채팅방 ID: {room.roomId}</RoomId> */}
-        <UserInfo>
-          상대방 : ({otherUserNickname}) (상태: {otherUserStatus})
-        </UserInfo>
-        <UserInfo>
-          나 : ({currentUserNickname}) (상태: {currentUserStatus})
-        </UserInfo>
+      <ChatRoomItem onClick={onOpenChat}>
+        <ChatDetails>
+          <RoomName>{otherUserNickname}</RoomName>
+          <LastMessage>{lastMessage}</LastMessage>
+        </ChatDetails>
+        <MessageDate>{lastMessageDate}</MessageDate>
       </ChatRoomItem>
   );
 };
@@ -37,28 +29,39 @@ export default ChatRoom;
 
 // 스타일 정의
 const ChatRoomItem = styled.li`
-  background-color: #ffffff;
-  margin-bottom: 15px;
+  background-color: #f5f5f5;
   padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 
   &:hover {
-    transform: translateY(-5px);
+    background-color: #e0e0e0;
   }
 `;
 
-const RoomId = styled.h3`
-  margin-bottom: 10px;
-  color: #007bff;
-  font-size: 1.1em;
-  display: none; /* 채팅방 ID는 보이지 않도록 설정 */
+const ChatDetails = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
-const UserInfo = styled.p`
-  margin: 5px 0;
-  font-size: 0.95em;
-  color: #333333;
+const RoomName = styled.h4`
+  margin: 0;
+  font-size: 1em;
+  color: #333;
+  font-weight: bold;
+`;
+
+const LastMessage = styled.p`
+  margin: 0;
+  font-size: 0.9em;
+  color: #777;
+`;
+
+const MessageDate = styled.div`
+  font-size: 0.85em;
+  color: #999;
 `;

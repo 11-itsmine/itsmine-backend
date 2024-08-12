@@ -7,6 +7,7 @@ import lombok.Data;
 public class ReportRequestDto {
 
     private String title;
+    private Long typeId;
     private String content;
     private ReportType reportType;
 }

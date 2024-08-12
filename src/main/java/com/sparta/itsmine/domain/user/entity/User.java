@@ -145,4 +145,9 @@ public class User extends TimeStamp {
             throw new DataDuplicatedException(ResponseExceptionEnum.USER_BEN);
         }
     }
+
+    public void unBlock() {
+        this.benReason = null;
+        this.blockedAt = null;
+    }
 }

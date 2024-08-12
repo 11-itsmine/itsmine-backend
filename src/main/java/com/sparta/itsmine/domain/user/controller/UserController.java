@@ -13,8 +13,10 @@ import static com.sparta.itsmine.global.common.response.ResponseUtils.of;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.itsmine.domain.social.kakao.service.KakaoService;
+import com.sparta.itsmine.domain.user.dto.BlockResponseDto;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
+import com.sparta.itsmine.domain.user.dto.UserIdRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
 import com.sparta.itsmine.domain.user.dto.UserRoleDto;
 import com.sparta.itsmine.domain.user.entity.User;
@@ -27,6 +29,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -109,6 +113,26 @@ public class UserController {
         User user = userDetails.getUser();
         List<UserResponseDto> responseDtos = userService.getUserAllList(user);
         return ResponseUtils.of(USER_SUCCESS_LIST, responseDtos);
+    }
+
+    @GetMapping("/block-list")
+    public ResponseEntity<HttpResponseDto> blockUserList(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        User user = userDetails.getUser();
+        List<BlockResponseDto> responseDtos = userService.blockUserList(user);
+        return ResponseUtils.of(USER_SUCCESS_LIST, responseDtos);
+    }
+
+    @PutMapping("/unblock")
+    public ResponseEntity<HttpResponseDto> unBlockUser(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody UserIdRequestDto requestDto
+    ) {
+        User user = userDetails.getUser();
+        userService.unBlockUser(user, requestDto.getUserId());
+        return ResponseUtils.of(USER_SUCCESS_LIST);
     }
 
     @GetMapping("/role")

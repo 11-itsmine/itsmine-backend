@@ -1,10 +1,13 @@
 package com.sparta.itsmine.domain.report.service;
 
+import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.report.dto.BlockRequestDto;
 import com.sparta.itsmine.domain.report.dto.ReportRequestDto;
 import com.sparta.itsmine.domain.report.dto.ReportResponseDto;
 import com.sparta.itsmine.domain.report.entity.Report;
 import com.sparta.itsmine.domain.report.entity.ReportStatus;
+import com.sparta.itsmine.domain.report.entity.ReportType;
 import com.sparta.itsmine.domain.report.repository.ReportRepository;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
@@ -13,11 +16,11 @@ import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import com.sparta.itsmine.global.exception.DataNotFoundException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +31,20 @@ public class ReportService {
 
     private static final Logger log = LoggerFactory.getLogger(ReportService.class);
     private final ReportRepository reportRepository;
+    private final ProductRepository productRepository;
     private final UserAdapter userAdapter;
 
     public void createReport(User user, ReportRequestDto requestDto) {
-        Report report = new Report(user, requestDto);
-        reportRepository.save(report);
+        User badPerson = null;
+        if (requestDto.getReportType().equals(ReportType.PRODUCT)) {
+            Product product = productRepository.findById(requestDto.getTypeId()).orElseThrow(
+                    () -> new DataNotFoundException(ResponseExceptionEnum.PRODUCT_NOT_FOUND)
+            );
+            badPerson = product.getUser();
+        } else if (requestDto.getReportType().equals(ReportType.CHAT)) {
+            badPerson = userAdapter.findById(requestDto.getTypeId());
+        }
+        reportRepository.save(new Report(user, badPerson, requestDto));
     }
 
     @Transactional
@@ -49,17 +61,13 @@ public class ReportService {
         reportRepository.delete(report);
     }
 
-    public List<ReportResponseDto> getAllReport(User user) {
+    public Page<ReportResponseDto> getAllReport(User user, Pageable pageable) {
         if (user.getUserRole().equals(UserRole.MANAGER)) {
-            return reportRepository.findAll()
-                    .stream()
-                    .map(ReportResponseDto::new)
-                    .collect(Collectors.toList());
+            return reportRepository.findAll(pageable)
+                    .map(ReportResponseDto::new);
         } else {
-            return reportRepository.findAllByUserId(user.getId())
-                    .stream()
-                    .map(ReportResponseDto::new)
-                    .collect(Collectors.toList());
+            return reportRepository.findAllByUserId(user.getId(), pageable)
+                    .map(ReportResponseDto::new);
         }
     }
 
@@ -99,6 +107,13 @@ public class ReportService {
         log.info("BLOCK userID : {} ", requestDto.getUserId());
         User blockUser = userAdapter.findById(requestDto.getUserId());
         blockUser.block(blockDate, requestDto.getBenReason());
+    }
+
+    @Transactional
+    public void completeStatus(User user, Long reportId) {
+        checkUserRole(user);
+        Report report = getReport(reportId);
+        report.statusComp();
     }
 
 //    public List<> reportFarthing(User user, String reportType) {

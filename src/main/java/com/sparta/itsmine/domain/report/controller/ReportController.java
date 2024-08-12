@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.report.controller;
 
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.REPORT_LIST;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.REPORT_SUCCESS_CREATE;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.REPORT_SUCCESS_UPDATE;
 
@@ -11,8 +12,10 @@ import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -63,10 +66,11 @@ public class ReportController {
 
     @GetMapping
     public ResponseEntity<HttpResponseDto> getAllReport(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PageableDefault(size = 10) Pageable pageable) {
         User user = userDetails.getUser();
-        List<ReportResponseDto> responseDtos = reportService.getAllReport(user);
-        return ResponseUtils.of(REPORT_SUCCESS_CREATE, responseDtos);
+        Page<ReportResponseDto> responseDtos = reportService.getAllReport(user, pageable);
+        return ResponseUtils.of(REPORT_LIST, responseDtos);
     }
 
     @GetMapping("/{reportId}")
@@ -85,6 +89,16 @@ public class ReportController {
     ) {
         User user = userDetails.getUser();
         reportService.blockUser(user, requestDto);
+        return ResponseUtils.of(REPORT_SUCCESS_CREATE);
+    }
+
+    @PutMapping("/complete/{reportId}")
+    public ResponseEntity<HttpResponseDto> completeStatus(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long reportId
+    ) {
+        User user = userDetails.getUser();
+        reportService.completeStatus(user, reportId);
         return ResponseUtils.of(REPORT_SUCCESS_CREATE);
     }
 

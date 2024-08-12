@@ -28,6 +28,10 @@ public class Report extends TimeStamp {
     @JoinColumn(name = "report_user_id")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "bad_person_id")
+    private User badPerson;
+
     private String title;
 
     private String content;
@@ -40,8 +44,9 @@ public class Report extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private ReportStatus reportStatus;
 
-    public Report(User user, ReportRequestDto requestDto) {
+    public Report(User user, User badPerson, ReportRequestDto requestDto) {
         this.user = user;
+        this.badPerson = badPerson;
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
         this.reportType = requestDto.getReportType();
@@ -51,5 +56,9 @@ public class Report extends TimeStamp {
     public void update(ReportRequestDto requestDto) {
         this.content = requestDto.getContent();
         this.reportType = requestDto.getReportType();
+    }
+
+    public void statusComp() {
+        this.reportStatus = ReportStatus.COMPLETE;
     }
 }

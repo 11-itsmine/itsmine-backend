@@ -1,21 +1,23 @@
 import React, {useEffect, useState} from 'react';
-import axiosInstance from '../../api/axiosInstance';
+import axiosInstance from '../../api/axiosInstance'; // API 호출을 위한 axios 인스턴스 가져오기
 import styled from 'styled-components';
 import Modal from './Modal'; // 모달 컴포넌트 가져오기
 
-const BannedUsers = () => {
-  const [bannedUsers, setBannedUsers] = useState([]); // 벤된 유저 목록을 저장할 상태
+const Users = () => {
+  const [users, setUsers] = useState([]); // 유저 목록을 저장할 상태
   const [error, setError] = useState(''); // 오류 메시지를 저장할 상태
   const [selectedUser, setSelectedUser] = useState(null); // 선택된 유저의 프로필 정보를 저장할 상태
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 창 열기 상태
+  const [banDays, setBanDays] = useState(0); // 벤 기간 상태
+  const [banReason, setBanReason] = useState(''); // 벤 사유 상태
 
   useEffect(() => {
-    axiosInstance.get('/v1/users/block-list') // 벤된 유저 목록을 가져오는 API 호출
+    axiosInstance.get('/v1/users/list') // 유저 목록을 가져오는 API 호출
     .then(response => {
-      setBannedUsers(response.data.data); // 성공적으로 가져오면 벤된 유저 목록 상태에 저장
+      setUsers(response.data.data); // 성공적으로 가져오면 유저 목록 상태에 저장
     })
     .catch(error => {
-      setError('벤된 유저 목록을 불러오는 중 오류가 발생했습니다.'); // 오류가 발생하면 오류 메시지 설정
+      setError('유저 목록을 불러오는 중 오류가 발생했습니다.'); // 오류가 발생하면 오류 메시지 설정
     });
   }, []);
 
@@ -28,31 +30,36 @@ const BannedUsers = () => {
     setSelectedUser(null); // 프로필 보기에서 목록으로 돌아갈 때 상태 초기화
   };
 
-  const handleUnbanClick = () => {
-    setIsModalOpen(true); // 벤 해제 버튼 클릭 시 모달 창 열기
+  const handleBanClick = () => {
+    setIsModalOpen(true); // 벤하기 버튼 클릭 시 모달 창 열기
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false); // 모달 창 닫기
+    setBanDays(0); // 벤 기간 초기화
+    setBanReason(''); // 벤 사유 초기화
   };
 
-  const handleUnbanSubmit = () => {
+  const handleBanSubmit = () => {
     if (!selectedUser || !selectedUser.userId) {
       alert('유저 ID가 올바르지 않습니다.');
       return;
     }
 
-    const unbanData = {
-      userId: selectedUser.userId, // UserIdRequestDto 형식으로 데이터 준비
+    const banData = {
+      userId: selectedUser.userId,  // userId를 사용
+      blockPlusDate: banDays, // 벤 기간 (일수)
+      benReason: banReason, // 벤 사유
     };
 
-    axiosInstance.put('/v1/users/unblock', unbanData) // 벤 해제 API 호출
+    axiosInstance.put('/v1/report/block', banData)
     .then(response => {
-      alert('사용자가 성공적으로 벤 해제되었습니다.');
-      window.location.reload(); // 페이지 리프레시
+      alert('사용자가 성공적으로 벤 처리되었습니다.');
+      handleModalClose();
+      handleBackToList(); // 목록으로 돌아가기
     })
     .catch(error => {
-      alert('벤 해제에 실패했습니다. 다시 시도해주세요.');
+      alert('벤 처리에 실패했습니다. 다시 시도해주세요.');
     });
   };
 
@@ -89,42 +96,33 @@ const BannedUsers = () => {
                     <DetailTh>주소:</DetailTh>
                     <DetailTd>{selectedUser.address}</DetailTd>
                   </DetailRow>
-                  <DetailRow>
-                    <DetailTh>벤 사유:</DetailTh>
-                    <DetailTd>{selectedUser.benReson}</DetailTd>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailTh>벤 날짜:</DetailTh>
-                    <DetailTd>{new Date(
-                        selectedUser.blockedAt).toLocaleDateString()}</DetailTd>
-                  </DetailRow>
                   </tbody>
                 </ProfileDetailTable>
               </ProfileBody>
               <ButtonContainer>
                 <BackButton onClick={handleBackToList}>목록으로 돌아가기</BackButton>
-                <UnbanButton onClick={handleUnbanClick}>벤 해제</UnbanButton>
+                <BanButton onClick={handleBanClick}>벤하기</BanButton>
               </ButtonContainer>
             </ProfileContainer>
         ) : (
             <>
-              <h2>벤된 유저 목록</h2>
+              <h2>유저 목록</h2>
               {error && <ErrorText>{error}</ErrorText>} {/* 오류가 있을 경우 표시 */}
               <Table>
                 <thead>
                 <tr>
                   <Th>번호</Th>
-                  <Th>유저명</Th>
+                  <Th>이름</Th>
                   <Th>닉네임</Th>
                   <Th>이메일</Th>
                   <Th>주소</Th>
                 </tr>
                 </thead>
                 <tbody>
-                {bannedUsers.map((user, index) => (
+                {users.map((user, index) => (
                     <Tr key={user.userId} onClick={() => handleUserClick(user)}>
                       <Td>{index + 1}</Td> {/* 번호를 순서대로 표시 */}
-                      <Td>{user.username}</Td>
+                      <Td>{user.name}</Td>
                       <Td>{user.nickname}</Td>
                       <Td>{user.email}</Td>
                       <Td>{user.address}</Td>
@@ -139,10 +137,20 @@ const BannedUsers = () => {
         {isModalOpen && (
             <Modal onClose={handleModalClose}>
               <ModalContent>
-                <h3>벤 해제 확인</h3>
-                <p>정말로 이 사용자의 벤을 해제하시겠습니까?</p>
+                <h3>벤 기간 설정</h3>
+                <label>벤 기간 (일수):</label>
+                <input
+                    type="number"
+                    value={banDays}
+                    onChange={(e) => setBanDays(e.target.value)}
+                />
+                <label>벤 사유:</label>
+                <textarea
+                    value={banReason}
+                    onChange={(e) => setBanReason(e.target.value)}
+                />
                 <ButtonContainer>
-                  <ModalButton onClick={handleUnbanSubmit}>해제</ModalButton>
+                  <ModalButton onClick={handleBanSubmit}>벤 완료</ModalButton>
                   <ModalButton onClick={handleModalClose}>취소</ModalButton>
                 </ButtonContainer>
               </ModalContent>
@@ -152,7 +160,7 @@ const BannedUsers = () => {
   );
 };
 
-export default BannedUsers;
+export default Users;
 
 // 스타일 컴포넌트 정의
 const Container = styled.div`
@@ -171,7 +179,7 @@ const Table = styled.table`
 `;
 
 const Th = styled.th`
-  background-color: #f1f5f7;
+  background-color: #f1f3f5;
   padding: 8px;
   text-align: center;
   font-weight: bold;
@@ -281,16 +289,16 @@ const BackButton = styled.button`
   }
 `;
 
-const UnbanButton = styled.button`
+const BanButton = styled.button`
   padding: 10px 20px;
-  background-color: #28a745;
+  background-color: #dc3545;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 
   &:hover {
-    background-color: #218838;
+    background-color: #c82333;
   }
 `;
 

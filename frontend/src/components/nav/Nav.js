@@ -17,13 +17,12 @@ const Nav = ({userRole}) => {
     localStorage.removeItem('Authorization');
     alert('로그아웃 되었습니다');
     setIsLogin(false);
+    navigate('/itsmine');  // 로그아웃 시 메인 페이지로 이동
   };
 
   const goToMain = () => {
     navigate(`/itsmine`);
   };
-
-  console.log('User role in Nav:', userRole); // 사용자 역할 로그 출력
 
   return (
       <Container>
