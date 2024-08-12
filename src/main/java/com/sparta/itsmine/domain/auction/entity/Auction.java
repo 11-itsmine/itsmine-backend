@@ -43,6 +43,9 @@ public class Auction extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
+    @Column(nullable = false)
+    private Integer totalAmount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -53,11 +56,12 @@ public class Auction extends TimeStamp {
 
 
     @Builder
-    public Auction(User user, Product product, Integer bidPrice, ProductStatus status) {
+    public Auction(User user, Product product, Integer bidPrice, ProductStatus status,Integer totalAmount) {
         this.user = user;
         this.product = product;
         this.bidPrice = bidPrice;
         this.status = status;
+        this.totalAmount=totalAmount;
     }
 
     public void updateStatus(ProductStatus status) {
