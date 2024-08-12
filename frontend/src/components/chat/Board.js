@@ -102,4 +102,7 @@ const MinimizeButton = styled.button`
 const ChatWindowContainer = styled.div`
   width: 100%;
   height: 100%;
+  display: flex; /* 추가 */
+  flex-direction: column; /* 추가 */
+  overflow: hidden; /* overflow 속성을 추가하여 컨텐츠가 영역을 벗어나지 않도록 설정 */
 `;

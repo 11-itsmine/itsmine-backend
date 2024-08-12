@@ -6,7 +6,7 @@ const ChatRoomListContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #2f3136;
-  padding: 10px;
+  padding: 10px 10px 50px;
   border-radius: 10px;
   overflow-y: auto; /* 스크롤 가능하게 설정 */
   height: 100%; /* 높이를 부모 요소에 맞게 설정 */
