@@ -52,6 +52,7 @@ public enum ResponseCodeEnum {
     KAKAOPAY_READY(HttpStatus.CREATED, "결제 준비"),
     KAKAOPAY_APPROVE(HttpStatus.OK, "결제 완료"),
     KAKAOPAY_REFUND(HttpStatus.OK, "결제 취소 및 환볼 완료"),
+    KAKAOPAY_TID_SUCCESS_GET(HttpStatus.OK,"결제 코드 조회 완료"),
     AUCTION_BID_CANCEL(HttpStatus.OK,"입찰 취소 완료"),
     AUCTION_SUCCESS_CREATE(HttpStatus.CREATED, "경매 생성이 완료 되었습니다."),
     AUCTION_SUCCESS_GET(HttpStatus.OK, "경매 조회가 완료 되었습니다."),
