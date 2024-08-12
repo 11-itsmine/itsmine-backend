@@ -160,13 +160,17 @@ const AuctionComponent = () => {
       const token = localStorage.getItem("Authorization");
       const response = await axiosInstance.post(
           `/v1/chatrooms`,
-          {userId: product.userId},
+          {
+            userId: product.userId,
+            productId: productId
+          },
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
       );
+      console.log(productId);
       setChatRoomInfo(response.data.data);
       setIsChatOpen(true);
     } catch (err) {

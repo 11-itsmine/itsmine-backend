@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.auction.repository;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_NOT_FOUND;
 
+import com.sparta.itsmine.domain.auction.dto.AuctionProductImageResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.kakaopay.entity.KakaoPayTid;
@@ -23,7 +24,7 @@ public class AuctionAdapter {
 //    private final KakaoPayService kakaoPayService;
 //    private final KakaoPayRepository kakaoPayRepository;
 
-    public Page<AuctionProductResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
+    public Page<AuctionProductImageResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
 
         return auctionRepository.findAuctionAllByUserid(userId, pageable);
     }
