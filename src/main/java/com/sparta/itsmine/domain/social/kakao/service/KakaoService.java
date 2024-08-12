@@ -22,7 +22,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -56,8 +55,10 @@ public class KakaoService {
         User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
         // 4. return jwt
-        String accessToken = jwtProvider.createAccessToken(kakaoUser.getUsername(), kakaoUser.getUserRole());
-        String refreshToken = jwtProvider.createRefreshToken(kakaoUser.getUsername(), kakaoUser.getUserRole());
+        String accessToken = jwtProvider.createAccessToken(kakaoUser.getUsername(),
+                kakaoUser.getUserRole());
+        String refreshToken = jwtProvider.createRefreshToken(kakaoUser.getUsername(),
+                kakaoUser.getUserRole());
 
         res.setHeader(AUTHORIZATION_HEADER, accessToken);
         refreshTokenService.save(kakaoUser.getUsername(), refreshToken);
@@ -88,7 +89,7 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "08a46b304d568ef454241721bcb6b981");
-        body.add("redirect_uri", "http://52.79.213.8/oauth/callback/kakao");
+        body.add("redirect_uri", "http://localhost:3000/oauth/callback/kakao");
         body.add("code", code); // 우리가 이전에 받아온 인가코드
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity

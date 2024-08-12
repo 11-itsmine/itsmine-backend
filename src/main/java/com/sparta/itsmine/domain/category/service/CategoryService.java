@@ -17,7 +17,11 @@ public class CategoryService {
 
     @Transactional
     public void createCategory(CategoryDto categoryName) {
-        categoryRepository.save(categoryName.toEntity());
+        // 카테고리가 이미 존재하는지 확인 후 없는 경우 추가, 아니면 패스
+        if (!categoryRepository.existsByCategoryName(categoryName.getCategoryName())) {
+            Category category = categoryName.toEntity();
+            categoryRepository.save(category);
+        }
     }
 
     public List<CategoryResponseDto> getCategory(){

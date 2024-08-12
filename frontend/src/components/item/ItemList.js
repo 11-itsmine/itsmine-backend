@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Item from './Item';
 import SearchBar from './SearchBar';
@@ -7,7 +7,7 @@ import Category from './Category';
 import Price from './Price';
 import SORT_LIST from './SortListData';
 import BANNER_LIST from '../Data/bannerListData';
-import {CATEGORY_FILTER, PRICE_FILTER} from '../Data/categoryData';
+import { CATEGORY_FILTER, PRICE_FILTER } from '../Data/categoryData';
 import ItemNotFound from './ItemNotFound';
 import axiosInstance from '../../api/axiosInstance';
 
@@ -50,11 +50,8 @@ const ItemList = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const categoryString = selectCategory.query
-          ? `&category=${selectCategory.query}`
-          : '';
-      const priceString = selectPrice.query ? `&price=${selectPrice.query}`
-          : '';
+      const categoryString = selectCategory.query ? `&category=${selectCategory.query}` : '';
+      const priceString = selectPrice.query ? `&price=${selectPrice.query}` : '';
 
       try {
         const response = await axiosInstance.get(
@@ -66,7 +63,7 @@ const ItemList = () => {
         }
 
         const data = response.data.data.content;
-        console.log('Fetched data:', data);  // 여기서 데이터가 제대로 오는지 확인
+        console.log('Fetched data:', data);
         setProductsList((prevProducts) =>
             page === 0 ? data : [...prevProducts, ...data]
         );
@@ -112,11 +109,11 @@ const ItemList = () => {
 
   return (
       <ContentWrapper>
-        <SearchBar handleInput={handleInput} userInput={userInput}/>
+        <SearchBar handleInput={handleInput} userInput={userInput} />
         <BannerWrapper>
           <BannerList>
             {BANNER_LIST.map((banner) => (
-                <Banner key={banner.id} src={banner.src} text={banner.text}/>
+                <Banner key={banner.id} src={banner.src} text={banner.text} />
             ))}
           </BannerList>
         </BannerWrapper>
@@ -127,16 +124,20 @@ const ItemList = () => {
               {isCategorySelected && (
                   <>
                     <FilterStatus>{totalFilter}</FilterStatus>
-                    <FilterDelete onClick={deleteAllFilters}>모두
-                      삭제</FilterDelete>
+                    <FilterDelete onClick={deleteAllFilters}>모두 삭제</FilterDelete>
                   </>
               )}
             </Filter>
-            <Category categorydata={CATEGORY_FILTER}
-                      selectCategory={handleCategory}
-                      filterSelect={selectCategory}/>
-            <Price categorydata={PRICE_FILTER} selectPrice={handlePrice}
-                   filterSelect={selectPrice}/>
+            <Category
+                categorydata={CATEGORY_FILTER}
+                selectCategory={handleCategory}
+                filterSelect={selectCategory}
+            />
+            <Price
+                categorydata={PRICE_FILTER}
+                selectPrice={handlePrice}
+                filterSelect={selectPrice}
+            />
           </SearchFilter>
           <ItemContainer>
             <SearchOption>
@@ -144,15 +145,13 @@ const ItemList = () => {
                 {selectCategory.name && (
                     <FilterCategory>
                       {selectCategory.name}
-                      <DeleteButton onClick={() => deleteFilter(
-                          selectCategory)}>X</DeleteButton>
+                      <DeleteButton onClick={() => deleteFilter(selectCategory)}>X</DeleteButton>
                     </FilterCategory>
                 )}
                 {selectPrice.name && (
                     <FilterCategory>
                       {selectPrice.name}
-                      <DeleteButton onClick={() => deleteFilter(
-                          selectPrice)}>X</DeleteButton>
+                      <DeleteButton onClick={() => deleteFilter(selectPrice)}>X</DeleteButton>
                     </FilterCategory>
                 )}
               </FilterCategorys>
@@ -201,7 +200,7 @@ const ItemList = () => {
                   <LoadMore onClick={loadMore}>더보기</LoadMore>
                 </ItemWrapper>
             ) : (
-                <ItemNotFound/>
+                <ItemNotFound />
             )}
           </ItemContainer>
         </Content>
@@ -241,7 +240,7 @@ const Filter = styled.div`
   display: flex;
   width: 100%;
   margin-bottom: 1.5rem;
-  font-size: ${({theme}) => theme.fontSizes.xs};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
   font-weight: ${(props) => props.theme.fontWeights.semiBold};
   padding-left: ${(props) => props.theme.paddings.base};
 `;
@@ -266,6 +265,7 @@ const FilterDelete = styled.div`
   border-bottom: 1px solid gray;
   padding-bottom: 0;
   margin-left: 4.375rem;
+  cursor: pointer;
 `;
 
 const SearchOption = styled.div`
@@ -285,11 +285,14 @@ const FilterCategory = styled.div`
   border-radius: 0.625rem;
   margin-left: ${(props) => props.theme.margins.large};
   padding: 0.313rem;
+  display: flex;
+  align-items: center;
 `;
 
 const DeleteButton = styled.button`
   border-style: none;
   background-color: #f4f4f4;
+  cursor: pointer;
 `;
 
 const SortingWrapper = styled.div`
