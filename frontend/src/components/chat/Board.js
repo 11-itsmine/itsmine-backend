@@ -2,35 +2,22 @@ import React, {useEffect, useState} from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import ChatRoom from './ChatRoom';
 import ChatWindow from './ChatWindow';
+import ChatRoomListContainer from './ChatRoomListContainer';
 import styled from 'styled-components';
 
 const Board = ({currentUserId}) => {
   const [chatRooms, setChatRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isChatWindowVisible, setIsChatWindowVisible] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [isMinimized, setIsMinimized] = useState(false); // 최소화 상태를 관리하는 상태 추가
 
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
         const response = await axiosInstance.get('/v1/chatrooms');
-        const {data} = response;
-
-        if (data && Array.isArray(data.data)) {
-          setChatRooms(data.data);
-        } else {
-          console.error('Unexpected data format:', data);
-          setChatRooms([]);
-        }
+        setChatRooms(response.data.data || []);
       } catch (error) {
         console.error('Failed to fetch chat rooms:', error);
-        setError('채팅방 목록을 불러오는 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -44,41 +31,34 @@ const Board = ({currentUserId}) => {
 
   const closeChatWindow = () => {
     setIsChatWindowVisible(false);
-    setSelectedRoom(null); // 채팅방 선택 해제
+    setSelectedRoom(null);
   };
 
-  const renderRooms = () => {
-    return chatRooms.map((room) => (
-        <ChatRoom
-            key={room.roomId}
-            room={room}
-            onOpenChat={() => openChatWindow(room)}
-        />
-    ));
+  const toggleMinimize = () => {
+    setIsMinimized(!isMinimized); // 최소화 버튼을 누르면 상태를 토글
   };
 
   return (
-      <BoardContainer>
-        <Sidebar>
-          <h2>Chat Rooms</h2>
-          {loading ? (
-              <LoadingMessage>로딩 중...</LoadingMessage>
-          ) : error ? (
-              <ErrorMessage>{error}</ErrorMessage>
-          ) : chatRooms.length === 0 ? (
-              <NoRoomsMessage>참여 중인 채팅방이 없습니다.</NoRoomsMessage>
-          ) : (
-              <ChatRoomList>{renderRooms()}</ChatRoomList>
-          )}
-        </Sidebar>
-        {isChatWindowVisible && selectedRoom && (
+      <BoardContainer isMinimized={isMinimized}>
+        <Header>
+          <MinimizeButton onClick={toggleMinimize}>
+            {isMinimized ? '▲' : '▼'}
+          </MinimizeButton>
+        </Header>
+        {!isMinimized && !isChatWindowVisible && (
+            <ChatRoomListContainer>
+              <h2 style={{color: '#7289da'}}>Chat Rooms</h2>
+              {chatRooms.map((room) => (
+                  <ChatRoom key={room.roomId} room={room}
+                            onOpenChat={() => openChatWindow(room)}/>
+              ))}
+            </ChatRoomListContainer>
+        )}
+
+        {!isMinimized && isChatWindowVisible && selectedRoom && (
             <ChatWindowContainer>
-              <ChatWindow
-                  room={selectedRoom}
-                  currentUserId={currentUserId}
-                  onClose={closeChatWindow}
-                  onLeave={closeChatWindow}
-              />
+              <ChatWindow room={selectedRoom} currentUserId={currentUserId}
+                          onClose={closeChatWindow} onLeave={closeChatWindow}/>
             </ChatWindowContainer>
         )}
       </BoardContainer>
@@ -91,58 +71,35 @@ const BoardContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 85px; /* 상단에서 85px 아래에 위치 */
-  right: 0;
-  height: 850px; /* 높이를 850px로 설정 */
-  width: 850px; /* 너비를 850px로 설정 */
-  background-color: #2f3136;
+  bottom: ${({isMinimized}) => (isMinimized ? '-460px'
+      : '0')}; /* 최소화 상태에 따라 보드 위치 조정 */
+  left: 0;
+  width: 300px;
+  height: 500px;
+  background-color: rgba(0, 0, 0, 0.7);
   z-index: 1000;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden; /* 컨텐츠가 영역을 벗어날 경우 숨김 처리 */
+  transition: bottom 0.3s ease; /* 위치가 변할 때 부드러운 애니메이션 */
 `;
 
-const Sidebar = styled.div`
-  width: 400px; /* Sidebar 너비 설정 */
-  background-color: #202225;
-  color: #ffffff;
-  padding: 20px;
+const Header = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  overflow-y: auto;
+  justify-content: flex-end;
+  padding: 5px;
+`;
 
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    color: #7289da;
-  }
+const MinimizeButton = styled.button`
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  margin: 0;
 `;
 
 const ChatWindowContainer = styled.div`
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: #36393f;
-  color: #ffffff;
-  border-left: 1px solid #555;
-  overflow-y: auto;
-  width: 400px;
-  height: 100%; /* 부모 요소에 맞춰 높이 설정 */
-`;
-
-const LoadingMessage = styled.p`
-  color: #b9bbbe;
-`;
-
-const ErrorMessage = styled.p`
-  color: #f04747;
-`;
-
-const NoRoomsMessage = styled.p`
-  color: #b9bbbe;
-`;
-
-const ChatRoomList = styled.ul`
-  list-style-type: none;
-  padding: 0;
   width: 100%;
-  overflow-y: auto;
+  height: 100%;
 `;

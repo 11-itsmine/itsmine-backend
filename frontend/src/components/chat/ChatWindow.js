@@ -126,10 +126,10 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   return (
       <ChatWindowContainer>
         <Header>
-          <ChatTitle>{otherUserNickname}와의 채팅</ChatTitle>
+          <ChatTitle>{otherUserNickname}</ChatTitle>
           <ButtonContainer>
             <BackButton onClick={handleBackToList}>Back</BackButton>
-            <ReportButton onClick={handleReportClick}>신고하기</ReportButton>
+            <ReportButton onClick={handleReportClick}>Report</ReportButton>
             <LeaveButton onClick={handleLeaveRoom}>Exit</LeaveButton>
           </ButtonContainer>
         </Header>
