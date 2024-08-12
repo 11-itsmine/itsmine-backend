@@ -72,6 +72,7 @@ public class ProductRepositoryImpl implements CustomProductRepository {
     }
 
 
+    @Cacheable("productsMain")
     @Override
     public Page<Product> findProducts(Pageable pageable, String category, String price, String search, String sort) {
         if (sort == null) {
