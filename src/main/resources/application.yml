@@ -112,4 +112,4 @@ kakaopay:
 cid: TC0ONETIME
 
 sample:
-  host: http://localhost:8080
+  host: ${KAKAOPAY_HOST}

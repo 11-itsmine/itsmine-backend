@@ -18,8 +18,7 @@ public class LikeAdapter {
     }
 
     public Like getLike(Long productId, Long userId) {
-        return likeRepository.findByProductIdAndUserId(productId, userId).orElseThrow(() ->
-                new DataNotFoundException(ResponseExceptionEnum.LIKE_NOT_FOUND));
+        return likeRepository.findByProductIdAndUserId(productId, userId).orElse(null);
     }
 
     public boolean isUserLikedProduct(Long productId, User user) {
