@@ -115,6 +115,21 @@ const Profile = () => {
         fetchAuctions();
     }, [page, size]);
 
+    const getStatusText = (status) => {
+        switch (status) {
+            case 'BID':
+                return '입찰 중';
+            case 'SUCCESS_BID':
+                return '낙찰';
+            case 'FAIL_BID':
+                return '유찰';
+            case 'NEED_PAY':
+                return '결재 필요';
+            default:
+                return '알 수 없음'; // 예상하지 못한 값에 대한 기본 처리
+        }
+    };
+
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
         setShowUploadButton(true);
@@ -534,11 +549,18 @@ const Profile = () => {
                                     </Typography>
                                 )}
                                 {auctions.map((auction) => (
-                                    <Grid item xs={12} sm={6} md={4} key={auction.productId}>
-                                        <Link to={`/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
+                                    <Grid item xs={12} sm={6} md={4} key={auction.productName}>
+                                        <Link to={`/products/${auction.productName}`} style={{ textDecoration: 'none' }}>
                                             <Paper sx={{ p: 2 }}>
+                                                {auction.imagesUrl && auction.imagesUrl.length > 0 && (
+                                                    <img
+                                                        src={auction.imagesUrl[0]}
+                                                        alt={auction.productName}
+                                                        style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
+                                                    />
+                                                )}
                                                 <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
-                                                    상품: {auction.productName}
+                                                    {auction.productName}
                                                 </Typography>
                                                 <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}>
                                                     <Grid item xs={6}>
@@ -559,6 +581,16 @@ const Profile = () => {
                                                     <Grid item xs={6}>
                                                         <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
                                                             {auction.bidPrice}원
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                            입찰 상태
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
+                                                            {getStatusText(auction.status)}
                                                         </Typography>
                                                     </Grid>
                                                 </Grid>
