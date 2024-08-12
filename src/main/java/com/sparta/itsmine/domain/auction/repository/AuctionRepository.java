@@ -13,8 +13,4 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
     void deleteAllByProductId(Long productId);
 
     List<Auction> findAllByProductId(Long productId);
-
-    Auction findByProductId(Long productId);
-
-    Long countByProductId(Long productId);
 }
