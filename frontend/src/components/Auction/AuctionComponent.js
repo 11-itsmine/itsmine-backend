@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import styled from "styled-components";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ChatWindow from "../chat/ChatWindow";
 import Modal from "../chat/Modal";
 import ReportForm from "../backOffice/ReportForm";
@@ -18,7 +18,7 @@ const AuctionComponent = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
 
   const navigate = useNavigate();
-  const {productId} = useParams();
+  const { productId } = useParams();
 
   const fetchProduct = useCallback(async () => {
     try {
@@ -30,12 +30,13 @@ const AuctionComponent = () => {
       showError("제품 정보를 가져오는데 실패했습니다.");
     }
   }, [productId]);
-  
-  const fetchLikeStatus = useCallback(async () => {
+
+  const handleStartChat = async () => {
     try {
       const token = localStorage.getItem("Authorization");
-      const response = await axiosInstance.get(
-          `/v1/users/products/${productId}/likes`,
+      const response = await axiosInstance.post(
+          `/v1/chatrooms`,
+          { userId: product.userId },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -43,60 +44,24 @@ const AuctionComponent = () => {
           }
       );
 
-      console.log("Like status response:", response.data); // 응답 데이터 로그 출력
-      setIsLiked(response.data.data.liked); // 서버에서 받아온 좋아요 상태로 설정
+      setChatRoomInfo(response.data.data);
+      setIsChatOpen(true);
     } catch (err) {
-      console.error("Error fetching like status:", err);
-    }
-  }, [productId]);
-
-  useEffect(() => {
-    fetchProduct();
-    fetchLikeStatus();
-  }, [fetchProduct, fetchLikeStatus]);
-
-  const toggleLike = async () => {
-    try {
-      const token = localStorage.getItem("Authorization");
-      await axiosInstance.post(
-          `/v1/users/products/${productId}/likes`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-      );
-      setIsLiked((prevIsLiked) => !prevIsLiked);
-    } catch (err) {
-      setError("좋아요 변경에 실패했습니다. 다시 시도하세요.");
-      console.error("Error toggling like status:", err);
-      showError("좋아요 변경에 실패했습니다. 다시 시도하세요.");
+      setError("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
+      console.error("Error creating chat room:", err);
+      showError("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
     }
   };
 
-  const handleReport = async (reportData) => {
-    const token = localStorage.getItem("Authorization");
-    try {
-      await axiosInstance.post(
-          `/v1/report`,
-          {
-            ...reportData,
-            typeId: productId, // 신고 데이터에 상품 ID 포함
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-      );
-      alert("신고가 접수되었습니다.");
-      setIsReportOpen(false);
-    } catch (err) {
-      setError("신고에 실패했습니다. 다시 시도하세요.");
-      console.error("Error reporting content:", err);
-      showError("신고에 실패했습니다. 다시 시도하세요.");
-    }
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
+
+  const showError = (message) => {
+    setError(message);
+    setTimeout(() => {
+      setError("");
+    }, 3000); // 3초 후에 오류 메시지 삭제
   };
 
   const handleBid = async () => {
@@ -155,39 +120,6 @@ const AuctionComponent = () => {
     setBidPrice(product.currentPrice);
   };
 
-  const toggleChatWindow = () => {
-    setIsChatOpen(!isChatOpen);
-  };
-
-  const handleStartChat = async () => {
-    try {
-      const token = localStorage.getItem("Authorization");
-      const response = await axiosInstance.post(
-          `/v1/chatrooms`,
-          {userId: product.userId},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-      );
-
-      setChatRoomInfo(response.data.data);
-      setIsChatOpen(true);
-    } catch (err) {
-      setError("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
-      console.error("Error creating chat room:", err);
-      showError("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
-    }
-  };
-
-  const showError = (message) => {
-    setError(message);
-    setTimeout(() => {
-      setError("");
-    }, 3000); // 3초 후에 오류 메시지 삭제
-  };
-
   if (error) {
     return <ErrorText>{error}</ErrorText>;
   }
@@ -206,34 +138,19 @@ const AuctionComponent = () => {
             <MainImage src={product.imagesUrl[currentImageIndex]} alt="Product" />
             <Arrow onClick={nextImage}>&gt;</Arrow>
           </ImageSlider>
-          <ThumbnailContainer>
-            {product.imagesUrl.map((url, index) => (
-                <Thumbnail
-                    key={index}
-                    src={url}
-                    onClick={() => setCurrentImageIndex(index)}
-                    isActive={index === currentImageIndex}
-                />
-            ))}
-          </ThumbnailContainer>
         </LeftColumn>
         <RightColumn>
           <ProductTitle>{product.productName}</ProductTitle>
-          <LikeButton onClick={toggleLike} isLiked={isLiked}>
-            {isLiked ? "♥" : "♡"}
-          </LikeButton>
           <Description>{product.description}</Description>
           <PriceInfo>
-            <ActionButtons>
-              <PriceButton onClick={handleBuyNow} primary>
-                <PriceTitle>즉시구매가</PriceTitle>
-                <PriceValue>{product.auctionNowPrice.toLocaleString()}원</PriceValue>
-              </PriceButton>
-              <PriceButton onClick={handleCurrentPrice}>
-                <PriceTitle>현재 입찰가</PriceTitle>
-                <PriceValue>{product.currentPrice.toLocaleString()}원</PriceValue>
-              </PriceButton>
-            </ActionButtons>
+            <PriceButton onClick={handleBuyNow} primary>
+              <PriceTitle>즉시구매가</PriceTitle>
+              <PriceValue>{product.auctionNowPrice.toLocaleString()}원</PriceValue>
+            </PriceButton>
+            <PriceButton onClick={handleCurrentPrice}>
+              <PriceTitle>현재 입찰가</PriceTitle>
+              <PriceValue>{product.currentPrice.toLocaleString()}원</PriceValue>
+            </PriceButton>
           </PriceInfo>
           <BidSection>
             <h2>입찰하기</h2>
@@ -247,54 +164,39 @@ const AuctionComponent = () => {
               />
               <BidButton onClick={handleBid}>입찰</BidButton>
             </BidContainer>
-            {message && <SuccessText>{message}</SuccessText>}
-            {error && <ErrorText>{error}</ErrorText>}
           </BidSection>
           <ChatAndReportContainer>
             <ChatButton onClick={handleStartChat}>채팅으로 문의하기</ChatButton>
             <ReportButton onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
           </ChatAndReportContainer>
         </RightColumn>
-        <Modal isOpen={isChatOpen} onClose={toggleChatWindow}>
-          {chatRoomInfo && (
-              <ChatWindow room={chatRoomInfo} onClose={toggleChatWindow} />
-          )}
-        </Modal>
-        <Modal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)}>
-          {product && (
-              <ReportForm
-                  onSubmit={handleReport}
-                  onClose={() => setIsReportOpen(false)}
-                  productId={product.id} // 제품 ID 전달
-              />
-          )}
-        </Modal>
       </StyledContainer>
   );
 };
 
 export default AuctionComponent;
-// src/components/auction/AuctionComponent.js
 
-/* Styled Components */
+// Styled Components
 const StyledContainer = styled.div`
   display: flex;
   justify-content: space-between;
   margin: 100px auto;
   max-width: 1200px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Added shadow */
+  border-radius: 10px; /* Rounded corners */
+  padding: 20px; /* Added padding inside the box */
 `;
 
 const LeftColumn = styled.div`
-  flex: 1;
+  flex: 2;
   max-width: 50%;
   padding-right: 20px;
 `;
 
 const RightColumn = styled.div`
-  flex: 1;
+  flex: 3;
   padding-left: 20px;
   max-width: 50%;
-  position: relative;
 `;
 
 const ImageSlider = styled.div`
@@ -307,33 +209,34 @@ const ImageSlider = styled.div`
   position: relative;
   overflow: hidden;
   border-radius: 10px;
-  margin-bottom: 20px;
 `;
 
 const MainImage = styled.img`
   width: 100%;
-  border-radius: 10px;
+  height: 100%;
   object-fit: cover;
 `;
 
-const ThumbnailContainer = styled.div`
+const Arrow = styled.div`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
   display: flex;
-  justify-content: space-between;
-`;
-
-const Thumbnail = styled.img`
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border: ${({ isActive }) =>
-      isActive ? "2px solid #007bff" : "2px solid transparent"};
-  border-radius: 5px;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: border 0.3s ease;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 1.5rem;
+  user-select: none;
+  color: #fff;
   &:hover {
-    border: 2px solid #007bff;
+    background-color: rgba(255, 255, 255, 0.2);
   }
+
+  ${({ left }) => (left ? `left: 10px;` : `right: 10px;`)}
 `;
 
 const ProductTitle = styled.h1`
@@ -350,8 +253,8 @@ const Description = styled.p`
 
 const PriceInfo = styled.div`
   display: flex;
-  align-items: baseline;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  margin-bottom: 30px; /* Increased margin-bottom to move buttons down */
 `;
 
 const PriceButton = styled.button`
@@ -378,14 +281,8 @@ const PriceValue = styled.div`
   font-size: 1rem;
 `;
 
-const ActionButtons = styled.div`
-  display: flex;
-  width: 100%;
-  margin-bottom: 20px;
-`;
-
 const BidSection = styled.div`
-  margin-top: 20px;
+  margin-top: 30px; /* Increased margin-top to move bid section down */
 `;
 
 const BidContainer = styled.div`
@@ -418,7 +315,7 @@ const BidButton = styled.button`
 const ChatAndReportContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 30px; /* Increased margin-top to move buttons down */
 `;
 
 const ChatButton = styled.button`
@@ -449,12 +346,6 @@ const ReportButton = styled.button`
   }
 `;
 
-const SuccessText = styled.div`
-  color: green;
-  font-size: 1rem;
-  margin-top: 10px;
-`;
-
 const ErrorText = styled.div`
   color: red;
   font-size: 1rem;
@@ -464,42 +355,5 @@ const ErrorText = styled.div`
 const LoadingText = styled.div`
   font-size: 1.2rem;
   text-align: center;
-`;
-
-const LikeButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 10px;
-  font-size: 1.5rem;
-  background-color: transparent;
-  color: ${({isLiked}) => (isLiked ? "#e74c3c" : "#bbb")};
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    color: ${({isLiked}) => (isLiked ? "#c0392b" : "#888")};
-  }
-`;
-
-const Arrow = styled.div`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: transparent;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.5rem;
-  user-select: none;
-  color: #fff;
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-
-  ${({ left }) => (left ? `left: 10px;` : `right: 10px;`)}
+  margin-top: 50px;
 `;
