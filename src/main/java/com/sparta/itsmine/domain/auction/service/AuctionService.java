@@ -1,8 +1,5 @@
 package com.sparta.itsmine.domain.auction.service;
 
-import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
-import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
-import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.AUCTION_DENIED_BID;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionProductImageResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
@@ -11,9 +8,6 @@ import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionAdapter;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
-import com.sparta.itsmine.domain.kakaopay.entity.KakaoPayTid;
-import com.sparta.itsmine.domain.kakaopay.repository.KakaoPayRepository;
-import com.sparta.itsmine.domain.kakaopay.service.KakaoPayService;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
@@ -26,8 +20,6 @@ import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import lombok.RequiredArgsConstructor;
 

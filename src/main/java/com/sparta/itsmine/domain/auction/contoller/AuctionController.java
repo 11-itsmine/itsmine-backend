@@ -27,24 +27,9 @@ public class AuctionController {
 
     private final AuctionService auctionService;
 
-    //구매자 입찰 생성
-    /*
-    @PostMapping("/products/{productId}/auctions")
-    public ResponseEntity<HttpResponseDto> createAuction(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long productId,
-            @RequestBody AuctionRequestDto requestDto) {
-        AuctionResponseDto responseDto = auctionService.createAuction(userDetails.getUser(), productId, requestDto);
-        return ResponseUtils.of(
-                responseDto.getStatus().equals(SUCCESS_BID) ? AUCTION_SUCCESSFUL_BID
-                        : AUCTION_SUCCESS_CREATE, responseDto);
-
-    }
-    */
-
     //유저(구매자(본인)) 입찰 조회(QueryDSL)
     @GetMapping("/auctions")
-    public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
+    public ResponseEntity<HttpResponseDto> getAuctionByUserToPage(
             @AuthenticationPrincipal UserDetailsImpl userDetails, Pageable pageable) {
         Page<AuctionProductImageResponseDto> responseDto = auctionService.getAuctionByUser(
                 userDetails.getUser(), pageable);

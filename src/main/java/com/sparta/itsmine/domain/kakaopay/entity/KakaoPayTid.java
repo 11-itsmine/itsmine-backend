@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -18,7 +19,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "KakaoPayTid")
+@Table(name = "KakaoPayTid", indexes = {@Index(name = "idx_tid", columnList = "tid"),
+        @Index(name = "idx_auction_id", columnList = "auction_id")})
 @NoArgsConstructor
 //입찰과 연관관계를 만들어야겠다 어차피 입찰 보증금을 환불해주려고 하는건데 다른 연관관계는 필요 없을 거 같다
 public class KakaoPayTid {
