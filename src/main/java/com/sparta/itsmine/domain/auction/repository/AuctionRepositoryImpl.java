@@ -6,15 +6,19 @@ import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
 import static com.sparta.itsmine.domain.user.entity.QUser.user;
 
-import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.itsmine.domain.auction.dto.AuctionProductImageResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.QAuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
+import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.entity.QProduct;
+import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -27,21 +31,36 @@ import org.springframework.stereotype.Repository;
 public class AuctionRepositoryImpl implements CustomAuctionRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final ProductRepository productRepository;
 
+
+    /*
+    select u.username,p.product_name,max(a.bid_price),a.status
+    from auctions a,user u,product p
+    where u.id=2 and u.id=a.user_id and p.id=a.product_id and a.status = p.status and a.status != 'NEED_PAY'
+    group by p.id
+    */
     //자신이 고른 상품 전체 조회
     @Cacheable("AuctionAllPage")
-    public Page<AuctionProductResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
-        List<AuctionProductResponseDto> content = jpaQueryFactory
+    public Page<AuctionProductImageResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
+        List<AuctionProductResponseDto> auctionProductResponseDtoList  = jpaQueryFactory
                 .select(new QAuctionProductResponseDto(user.username, product.productName,
-                        auction.bidPrice.max()))
+                        auction.bidPrice.max(),auction.status))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
-                .where(user.id.eq(userId))
+                .where(user.id.eq(userId).and(auction.status.eq(product.status)).and(auction.status.ne(NEED_PAY)))
                 .groupBy(product.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        List<AuctionProductImageResponseDto> auctionProductImageResponseDtoList = auctionProductResponseDtoList.stream()
+                .map(dto -> {
+                    Product product=productRepository.findByProductName(dto.getProductName());
+                    return new AuctionProductImageResponseDto(dto, product);
+                })
+                .toList();
 
         Long count = jpaQueryFactory
                 .select(auction.id.countDistinct())
@@ -51,7 +70,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .where(user.id.eq(userId))
                 .fetchOne();
 
-        return new PageImpl<>(content, pageable, count);
+        return new PageImpl<>(auctionProductImageResponseDtoList, pageable, count);
     }
 
     //자신이 고른 상품 조회
@@ -60,7 +79,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
             Long productId) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(new QAuctionProductResponseDto(user.username, product.productName,
-                        auction.bidPrice.max()))
+                        auction.bidPrice.max(), auction.status))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
