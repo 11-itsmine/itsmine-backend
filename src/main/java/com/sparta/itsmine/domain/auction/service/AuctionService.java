@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuctionService {
 
+
     private final MessageSenderService messageSenderService;
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;

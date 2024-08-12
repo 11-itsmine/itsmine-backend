@@ -2,19 +2,22 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styled, {css} from 'styled-components';
 
-const Nav = () => {
+const Nav = ({userRole}) => {
   const [isLogin, setIsLogin] = useState(false);
   const creamToken = localStorage.getItem('Authorization');
   const navigate = useNavigate();
 
   useEffect(() => {
-    creamToken && setIsLogin(true);
-  }, [creamToken, isLogin]);
+    if (creamToken) {
+      setIsLogin(true);
+    }
+  }, [creamToken]);
 
   const logout = () => {
     localStorage.removeItem('Authorization');
     alert('로그아웃 되었습니다');
     setIsLogin(false);
+    navigate('/itsmine');  // 로그아웃 시 메인 페이지로 이동
   };
 
   const goToMain = () => {
@@ -25,31 +28,21 @@ const Nav = () => {
       <Container>
         <Logo onClick={goToMain}>ITSMINE</Logo>
         <ButtonContainer>
-          <Button login
-                  onClick={() => {
-                    navigate('/v1/products')
-                  }}>SELL</Button>
+          <Button login onClick={() => navigate('/products')}>SELL</Button>
           <Button>ABOUT</Button>
           {isLogin ? (
               <>
                 <Button login
-                        onClick={() => {
-                          navigate('/profile');
-                        }}
-                >MYPAGE</Button>
-                <Button logout onClick={logout}>
-                  LOGOUT
-                </Button>
+                        onClick={() => navigate('/profile')}>MYPAGE</Button>
+                <Button logout onClick={logout}>LOGOUT</Button>
+                {userRole === 'MANAGER' && (
+                    <Button login
+                            onClick={() => navigate('/admin')}>ADMIN</Button>
+                )}
               </>
           ) : (
-              <Button
-                  login
-                  onClick={() => {
-                    navigate('/itsmine/login');
-                  }}
-              >
-                LOGIN
-              </Button>
+              <Button login
+                      onClick={() => navigate('/itsmine/login')}>LOGIN</Button>
           )}
         </ButtonContainer>
       </Container>
