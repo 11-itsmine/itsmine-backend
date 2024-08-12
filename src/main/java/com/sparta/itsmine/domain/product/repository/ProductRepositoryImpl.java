@@ -1,10 +1,12 @@
 package com.sparta.itsmine.domain.product.repository;
 
 import static com.sparta.itsmine.domain.product.entity.QProduct.product;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.*;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.itsmine.domain.product.entity.Product;
+import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
@@ -50,13 +52,20 @@ public class ProductRepositoryImpl implements CustomProductRepository {
     @Override
     public Page<Product> findAllByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable) {
         List<Product> products = queryFactory.selectFrom(product)
-                .where(product.user.id.eq(userId).and(product.deletedAt.isNull()))
+                .where(
+                        product.user.id.eq(userId)
+                                .and(product.deletedAt.isNull())
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         long total = queryFactory.selectFrom(product)
-                .where(product.user.id.eq(userId).and(product.deletedAt.isNull()))
+                .where(
+                        product.user.id.eq(userId)
+                                .and(product.deletedAt.isNull())
+                                .and(product.status.eq(BID)) // Add condition for BID status
+                )
                 .fetch().size();
 
         return new PageImpl<>(products, pageable, total);
@@ -64,20 +73,20 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
 
     @Override
-    public Page<Product> findProducts(Pageable pageable, String category, String price,
-            String search, String sort) {
+    public Page<Product> findProducts(Pageable pageable, String category, String price, String search, String sort) {
         if (sort == null) {
             sort = "createdAt"; // 기본 정렬 필드 설정
         }
+
         List<Product> products = queryFactory
                 .selectFrom(product)
                 .where(
+                        product.status.eq(BID), // Ensure only products with status BID are fetched
                         categoryEq(category),
                         priceEq(price),
                         productNameContains(search)
                 )
-                .orderBy(sort.equals("createdAt") ? product.createdAt.desc()
-                        : product.createdAt.asc()) // Sorting logic
+                .orderBy(sort.equals("createdAt") ? product.createdAt.desc() : product.createdAt.asc()) // Sorting logic
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -85,6 +94,7 @@ public class ProductRepositoryImpl implements CustomProductRepository {
         long total = queryFactory
                 .selectFrom(product)
                 .where(
+                        product.status.eq(BID), // Ensure only products with status BID are counted
                         categoryEq(category),
                         priceEq(price),
                         productNameContains(search)
@@ -93,7 +103,6 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
         return new PageImpl<>(products, pageable, total);
     }
-
 
     private BooleanExpression categoryEq(String category) {
         return category != null ? product.category.categoryName.eq(category) : null;
