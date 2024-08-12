@@ -20,7 +20,7 @@ public interface CustomAuctionRepository {
 
     List<Auction> findAllByProductIdWithOutMaxPrice(Long productId);
 
-    List<Auction> findAllByProductIdAndNeedPay(Long productId);
-
     Auction findByProductIdAndMaxBid(Long productId);
+
+    Auction findByBidPriceAndUserAndProduct(Long userId,Long productId,Integer bidPrice);
 }

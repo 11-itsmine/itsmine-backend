@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import ReportedUsers from './ReportedUsers';
 import Users from './Users';
 import BannedUsers from './BannedUsers'; // BannedUsers 컴포넌트 임포트
+import KakaoPayTidForm from './KakaoPayTidForm';
 
 const AdminPage = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -20,6 +21,8 @@ const AdminPage = () => {
               유저</MenuItem>
             <MenuItem onClick={() => setActiveSection('bannedUsers')}>벤된
               유저</MenuItem>
+            <MenuItem onClick={() => setActiveSection('kakaoPayTidForm')}>입찰 취소 및
+              환불</MenuItem>
           </Menu>
         </Sidebar>
         <MainContent>
@@ -38,6 +41,10 @@ const AdminPage = () => {
                 <ContentSection>
                   <SectionTitle>벤된 유저 목록</SectionTitle>
                   <BannedUsers/>
+                </ContentSection>
+                <ContentSection>
+                  <SectionTitle>입찰 취소 및 환불</SectionTitle>
+                  <KakaoPayTidForm/>
                 </ContentSection>
               </>
           )}
@@ -60,6 +67,12 @@ const AdminPage = () => {
               <ContentSection>
                 <SectionTitle>벤된 유저 목록</SectionTitle>
                 <BannedUsers/>
+              </ContentSection>
+          )}
+          {activeSection === 'kakaoPayTidForm' && (
+              <ContentSection>
+                <SectionTitle>입찰 취소 및 환불</SectionTitle>
+                <KakaoPayTidForm/>
               </ContentSection>
           )}
         </MainContent>
