@@ -29,7 +29,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
 
     fetchMessages();
 
-    const socket = new WebSocket('ws://52.79.213.8:8080/ws');
+    const socket = new WebSocket('wss://itsyours.store/ws');
     stompClient.current = Stomp.over(socket);
 
     stompClient.current.connect(
@@ -73,7 +73,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
       message: newMessage,
       fromUserId: room.userDetailId,
       roomId: room.roomId,
-      time: new Date().getTime(),
+      time: new Date().toISOString(),
     };
 
     stompClient.current.send(`/app/chat.message/${room.roomId}`, {},
