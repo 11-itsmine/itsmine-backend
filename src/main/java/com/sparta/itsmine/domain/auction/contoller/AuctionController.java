@@ -29,7 +29,7 @@ public class AuctionController {
 
     //유저(구매자(본인)) 입찰 조회(QueryDSL)
     @GetMapping("/auctions")
-    public ResponseEntity<HttpResponseDto> getAuctionByUserToList(
+    public ResponseEntity<HttpResponseDto> getAuctionByUserToPage(
             @AuthenticationPrincipal UserDetailsImpl userDetails, Pageable pageable) {
         Page<AuctionProductImageResponseDto> responseDto = auctionService.getAuctionByUser(
                 userDetails.getUser(), pageable);

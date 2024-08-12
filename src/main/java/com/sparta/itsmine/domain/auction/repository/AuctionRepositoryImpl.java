@@ -41,15 +41,17 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     group by p.id
     */
     //자신이 고른 상품 전체 조회
-    @Cacheable("AuctionAllPage")
-    public Page<AuctionProductImageResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable) {
-        List<AuctionProductResponseDto> auctionProductResponseDtoList  = jpaQueryFactory
+    @Cacheable("AuctionAllByUser")
+    public Page<AuctionProductImageResponseDto> findAuctionAllByUserid(Long userId,
+            Pageable pageable) {
+        List<AuctionProductResponseDto> auctionProductResponseDtoList = jpaQueryFactory
                 .select(new QAuctionProductResponseDto(user.username, product.productName,
-                        auction.bidPrice.max(),auction.status))
+                        auction.bidPrice.max(), auction.status))
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
-                .where(user.id.eq(userId).and(auction.status.eq(product.status)).and(auction.status.ne(NEED_PAY)))
+                .where(user.id.eq(userId).and(auction.status.eq(product.status))
+                        .and(auction.status.ne(NEED_PAY)))
                 .groupBy(product.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -57,7 +59,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 
         List<AuctionProductImageResponseDto> auctionProductImageResponseDtoList = auctionProductResponseDtoList.stream()
                 .map(dto -> {
-                    Product product=productRepository.findByProductName(dto.getProductName());
+                    Product product = productRepository.findByProductName(dto.getProductName());
                     return new AuctionProductImageResponseDto(dto, product);
                 })
                 .toList();
@@ -74,7 +76,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     }
 
     //자신이 고른 상품 조회
-    @Cacheable("Auction")
+    @Cacheable("ByUserAndProduct")
     public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId,
             Long productId) {
         return Optional.ofNullable(jpaQueryFactory
@@ -114,20 +116,9 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     /*
     select *
     from auctions
-    where product_id=1 and status='NEED_PAY';
-    */
-    public List<Auction> findAllByProductIdAndNeedPay(Long productId) {
-        return jpaQueryFactory.select(auction)
-                .from(auction)
-                .where(product.id.eq(productId).and(auction.status.eq(NEED_PAY)))
-                .fetch();
-    }
-
-    /*
-    select *
-    from auctions
     where product_id=3 and status='BID' and bid_price=(select max(bid_price) from auctions where product_id=3 and status='BID');
     */
+    @Cacheable("ByProductAndMaxBid")
     public Auction findByProductIdAndMaxBid(Long productId) {
 
         JPQLQuery<Integer> biddingMaxBidPriceSubQuery = JPAExpressions
@@ -139,7 +130,26 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
         return jpaQueryFactory
                 .select(auction)
                 .from(auction)
-                .where(product.id.eq(productId).and(auction.status.eq(BID)).and(auction.bidPrice.eq(biddingMaxBidPriceSubQuery)))
+                .where(product.id.eq(productId).and(auction.status.eq(BID))
+                        .and(auction.bidPrice.eq(biddingMaxBidPriceSubQuery)))
                 .fetchOne();
     }
+
+    /*
+    select *
+    from auctions
+    where user_id=2 and product_id=4 and auctions.bid_price=50000 and status != 'NEED_PAY';
+    */
+    @Cacheable("ByBidPriceAndUserAndProduct")
+    public Auction findByBidPriceAndUserAndProduct(Long userId, Long productId, Integer bidPrice) {
+        return jpaQueryFactory
+                .select(auction)
+                .from(auction)
+                .innerJoin(auction.user, user)
+                .innerJoin(auction.product, product)
+                .where(user.id.eq(userId).and(product.id.eq(productId))
+                        .and(auction.bidPrice.eq(bidPrice)).and(auction.status.ne(NEED_PAY)))
+                .fetchOne();
+    }
+
 }

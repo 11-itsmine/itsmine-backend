@@ -15,6 +15,8 @@ import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayApproveRequestDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayApproveResponseDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayCancelRequestDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayCancelResponseDto;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayGetTidRequestDto;
+import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayGetTidResponseDto;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyRequestDtd;
 import com.sparta.itsmine.domain.kakaopay.dto.KakaoPayReadyResponseDto;
 import com.sparta.itsmine.domain.kakaopay.entity.KakaoPayTid;
@@ -23,10 +25,13 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
+import com.sparta.itsmine.domain.report.service.ReportService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
+import com.sparta.itsmine.domain.user.utils.UserRole;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -60,10 +65,10 @@ public class KakaoPayService {
     private final KakaoPayRepository kakaoPayRepository;
     private final AuctionService auctionService;
     private final MessageSenderService messageSenderService;
+    private final ReportService reportService;
     private final ProductAdapter productAdapter;
     private final AuctionAdapter auctionAdapter;
     private final UserAdapter userAdapter;
-
 
 
     public KakaoPayReadyResponseDto ready(Long productId, User user, AuctionRequestDto requestDto) {
@@ -80,7 +85,7 @@ public class KakaoPayService {
         }
 
         AuctionResponseDto createAuction = auctionService.createAuction(user, productId,
-                requestDto,bidPrice);
+                requestDto, bidPrice);
         // Request param
         KakaoPayReadyRequestDtd kakaoPayReadyRequestDtd = KakaoPayReadyRequestDtd.builder()
                 .cid(cid)//가맹점 코드, 10자
@@ -94,7 +99,8 @@ public class KakaoPayService {
                 .approvalUrl(kakaopayHost + "/v1/kakaopay/approve/pc/popup/" + product.getId() + "/"
                         + user.getId() + "/"
                         + createAuction.getId())//결제 성공 시 redirect url, 최대 255자 ,
-                .cancelUrl(kakaopayHost + "/v1/kakaopay/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
+                .cancelUrl(kakaopayHost
+                        + "/v1/kakaopay/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
                 .failUrl(kakaopayHost + "/v1/kakaopay/fail/pc/popup")//결제 실패 시 redirect url, 최대 255자
                 .build();
 
@@ -167,7 +173,6 @@ public class KakaoPayService {
     }
 
 
-
     public KakaoPayCancelResponseDto kakaoCancel(String tid) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -175,7 +180,7 @@ public class KakaoPayService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
         Auction auction = auctionAdapter.getAuction(kakaoPayTid.getAuction().getId());
-        Product product=productAdapter.getProduct(auction.getProduct().getId());
+        Product product = productAdapter.getProduct(auction.getProduct().getId());
 
         // Request param
         KakaoPayCancelRequestDto kakaoPayCancelRequestDto = KakaoPayCancelRequestDto.builder()
@@ -208,7 +213,7 @@ public class KakaoPayService {
 
         KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
         Auction auction = auctionAdapter.getAuction(kakaoPayTid.getAuction().getId());
-        Product product=productAdapter.getProduct(auction.getProduct().getId());
+        Product product = productAdapter.getProduct(auction.getProduct().getId());
 
         auction.updateStatus(NEED_PAY);
         auctionRepository.save(auction);
@@ -216,6 +221,22 @@ public class KakaoPayService {
         bidCancelAndSetCurrentPrice(product);
 
         kakaoPayRepository.delete(kakaoPayTid);
+
+    }
+
+    public KakaoPayGetTidResponseDto getTid(KakaoPayGetTidRequestDto kakaoPayGetTidRequestDto,User admin) {
+
+        reportService.checkUserRole(admin);
+
+        Optional<User> user = userRepository.findByUsername(kakaoPayGetTidRequestDto.getUsername());
+        Product product = productRepository.findByProductName(
+                kakaoPayGetTidRequestDto.getProductName());
+        Auction auction = auctionRepository.findByBidPriceAndUserAndProduct(
+                user.orElseThrow().getId(), product.getId(),
+                kakaoPayGetTidRequestDto.getBidPrice());
+        KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
+
+        return new KakaoPayGetTidResponseDto(kakaoPayTid.getTid());
 
     }
 
@@ -227,8 +248,7 @@ public class KakaoPayService {
                 KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
                 kakaoCancelForSuccessBid(kakaoPayTid.getTid());
                 auctionRepository.delete(auction);
-            }
-            else{
+            } else {
                 auctionRepository.delete(auction);
             }
         }
@@ -264,15 +284,14 @@ public class KakaoPayService {
         kakaoPayRepository.delete(kakaoPayTid);
     }
 
-    public void bidCancelAndSetCurrentPrice(Product product){
+    public void bidCancelAndSetCurrentPrice(Product product) {
 
-        Auction maxBid=auctionRepository.findByProductIdAndMaxBid(product.getId());
+        Auction maxBid = auctionRepository.findByProductIdAndMaxBid(product.getId());
 
-        if(maxBid == null){
+        if (maxBid == null) {
             product.currentPriceUpdate(product.getStartPrice());
             productRepository.save(product);
-        }
-        else{
+        } else {
             product.currentPriceUpdate(maxBid.getBidPrice());
             productRepository.save(product);
         }
