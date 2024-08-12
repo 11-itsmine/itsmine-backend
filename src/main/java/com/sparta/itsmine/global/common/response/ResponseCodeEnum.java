@@ -17,6 +17,8 @@ public enum ResponseCodeEnum {
     USER_UPDATE_SUCCESS(HttpStatus.OK, "유저 정보 수정을 완료했습니다."),
     USER_SUCCESS_SIGNUP(HttpStatus.OK, "님의 회원가입을 완료 했습니다."),
     REISSUE_ACCESS_TOKEN(HttpStatus.OK, "억세스 토큰 재발급을 완료했습니다."),
+    USER_SUCCESS_LIST(HttpStatus.OK, "유저 리스트 입니다."),
+    USER_SUCCESS_UNBLOCK(HttpStatus.OK, "벤 헤제 완료 했습니다."),
 
     // 상품
     SUCCESS_SAVE_PRODUCT(HttpStatus.OK, "성공적으로 상품을 등록했습니다."),
@@ -46,7 +48,11 @@ public enum ResponseCodeEnum {
     COMMENT_SUCCESS_UPDATE(HttpStatus.OK, "댓글 수정이 완료 되었습니다."),
     COMMENT_SUCCESS_DELETE(HttpStatus.OK, "댓글 삭제가 완료 되었습니다."),
 
-    //경매
+    //경매 및 결제
+    KAKAOPAY_READY(HttpStatus.CREATED, "결제 준비"),
+    KAKAOPAY_APPROVE(HttpStatus.OK, "결제 완료"),
+    KAKAOPAY_REFUND(HttpStatus.OK, "결제 취소 및 환볼 완료"),
+    AUCTION_BID_CANCEL(HttpStatus.OK,"입찰 취소 완료"),
     AUCTION_SUCCESS_CREATE(HttpStatus.CREATED, "경매 생성이 완료 되었습니다."),
     AUCTION_SUCCESS_GET(HttpStatus.OK, "경매 조회가 완료 되었습니다."),
     AUCTION_SUCCESSFUL_BID(HttpStatus.OK, "낙찰 되었습니다."),
@@ -58,7 +64,14 @@ public enum ResponseCodeEnum {
     CHAT_GET_ROOM_LIST(HttpStatus.OK, "채팅방 리스트 입니다."),
     CHAT_SUCCESS_ROOM_LEAVE(HttpStatus.OK, "채팅방에서 나갔습니다"),
     CHAT_BLACKLIST_USER_ADD(HttpStatus.CREATED, "블랙 리스트 추가 했습니다."),
-    CHAT_BLACKLIST_USER_CANCEL(HttpStatus.OK, "블랙 리스트 취소 했습니다.");
+    CHAT_BLACKLIST_USER_CANCEL(HttpStatus.OK, "블랙 리스트 취소 했습니다."),
+
+    //신고 관련
+    REPORT_SUCCESS_CREATE(HttpStatus.CREATED, "신고가 접수 되었습니다."),
+    REPORT_SUCCESS_UPDATE(HttpStatus.OK, "신고가 수정 되었습니다."),
+    REPORT_SUCCESS_DELETE(HttpStatus.CREATED, "신고가 삭제 되었습니다."),
+    REPORT_LIST(HttpStatus.OK, "신고목록입니다.");
+
 
 
     private final HttpStatus httpStatus;

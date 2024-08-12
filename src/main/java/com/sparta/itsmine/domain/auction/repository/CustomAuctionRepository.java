@@ -18,4 +18,8 @@ public interface CustomAuctionRepository {
     Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId, Long productId);
 
     List<Auction> findAllByProductIdWithOutMaxPrice(Long productId);
+
+    List<Auction> findAllByProductIdAndNeedPay(Long productId);
+
+    Auction findByProductIdAndMaxBid(Long productId);
 }

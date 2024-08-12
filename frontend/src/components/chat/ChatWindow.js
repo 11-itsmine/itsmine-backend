@@ -1,28 +1,26 @@
-// 클라이언트 측 ChatWindow.js
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
-import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
+import {Stomp} from '@stomp/stompjs';
 import axiosInstance from '../../api/axiosInstance';
-import { v4 as uuidv4 } from 'uuid'; // UUID 생성 라이브러리
+import {v4 as uuidv4} from 'uuid';
+import ReportForm from './ReportForm'; // 신고 폼 컴포넌트 임포트
 
-const ChatWindow = ({ room, onClose }) => {
-  const { roomId, userDetailId, fromUserId, fromUserNickname, toUserId, toUserNickname } = room;
+const ChatWindow = ({room, onClose, onLeave}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [isReportFormVisible, setIsReportFormVisible] = useState(false);
   const stompClient = useRef(null);
   const messageListRef = useRef(null);
 
   useEffect(() => {
-    if (!roomId) {
-      console.error('Room ID is not available');
+    if (!room?.roomId) {
       return;
     }
 
-    // 초기 메시지 로드
     const fetchMessages = async () => {
       try {
-        const response = await axiosInstance.get(`/v1/chatrooms/${roomId}`);
+        const response = await axiosInstance.get(
+            `/v1/chatrooms/${room.roomId}`);
         setMessages(response.data.data || []);
       } catch (error) {
         console.error('Failed to fetch messages:', error);
@@ -31,34 +29,33 @@ const ChatWindow = ({ room, onClose }) => {
 
     fetchMessages();
 
-    // SockJS 및 STOMP 연결 설정
-    const socket = new WebSocket('wss://b-58f9491d-c8de-422c-8b11-4a18f612ec43-1.mq.ap-northeast-2.amazonaws.com:61614/ws');
+    const socket = new WebSocket('ws://52.79.213.8:8080/ws');
     stompClient.current = Stomp.over(socket);
 
     stompClient.current.connect(
-        {
-          login: 'admin',
-          passcode: 'admin',
-        },
+        {},
         (frame) => {
           console.log('Connected: ' + frame);
-
-          // 서버에서 전송하는 메시지를 구독합니다.
-          stompClient.current.subscribe(`/topic/chat.message/${roomId}`, (message) => {
-            const newMsg = JSON.parse(message.body);
-            setMessages((prevMessages) => [...prevMessages, newMsg]);
-          });
+          stompClient.current.subscribe(`/topic/chat.message/${room.roomId}`,
+              (message) => {
+                const newMsg = JSON.parse(message.body);
+                setMessages((prevMessages) => [...prevMessages, newMsg]);
+              });
         },
         (error) => {
           console.error('Connection error: ', error);
         }
     );
 
-    // 컴포넌트 언마운트 시 연결 해제
     return () => {
-      disconnectWebSocket();
+      if (stompClient.current) {
+        stompClient.current.disconnect(() => {
+          console.log('Disconnected from WebSocket');
+          stompClient.current = null;
+        });
+      }
     };
-  }, [roomId]);
+  }, [room?.roomId]);
 
   useEffect(() => {
     if (messageListRef.current) {
@@ -66,21 +63,22 @@ const ChatWindow = ({ room, onClose }) => {
     }
   }, [messages]);
 
-  // 메시지 전송 함수
   const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;
+    if (newMessage.trim() === '' || !room?.roomId) {
+      return;
+    }
 
     const messageObject = {
-      messageId: uuidv4(), // 고유 메시지 ID 생성
+      messageId: uuidv4(),
       message: newMessage,
-      fromUserId: userDetailId, // 현재 로그인한 사용자 ID 사용
-      roomId: roomId,
+      fromUserId: room.userDetailId,
+      roomId: room.roomId,
       time: new Date().toISOString(),
     };
 
-    // 메시지 전송
-    stompClient.current.send(`/app/chat.message/${roomId}`, {}, JSON.stringify(messageObject));
-    setNewMessage(''); // 입력 필드 초기화
+    stompClient.current.send(`/app/chat.message/${room.roomId}`, {},
+        JSON.stringify(messageObject));
+    setNewMessage('');
   };
 
   const handleKeyPress = (event) => {
@@ -90,50 +88,60 @@ const ChatWindow = ({ room, onClose }) => {
     }
   };
 
-  // WebSocket 연결 해제 함수
-  const disconnectWebSocket = () => {
+  const handleLeaveRoom = () => {
     if (stompClient.current && stompClient.current.connected) {
       stompClient.current.disconnect(() => {
         console.log('Disconnected from WebSocket');
         stompClient.current = null;
       });
     }
+    onLeave();
   };
 
-  // 채팅방 나가기 및 페이지 새로고침 함수
-  const handleLeaveAndRefresh = async () => {
-    try {
-      await axiosInstance.delete(`/v1/chatrooms/${roomId}`);
-      console.log('Successfully left the chat room.');
-    } catch (error) {
-      console.error('Failed to leave the chat room:', error);
-    } finally {
-      disconnectWebSocket();
-      onClose();
-    }
+  const handleBackToList = () => {
+    onClose();
   };
 
-  // 상대방의 닉네임을 구하기
-  const otherUserNickname = fromUserId === userDetailId ? toUserNickname : fromUserNickname;
+  const handleReportClick = () => {
+    setIsReportFormVisible(true);
+  };
+
+  const handleCloseReportForm = () => {
+    setIsReportFormVisible(false);
+  };
+
+  const formatTime = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleTimeString('ko-KR',
+        {hour: '2-digit', minute: '2-digit'});
+  };
+
+  const otherUserNickname = room.fromUserId === room.userDetailId
+      ? room.toUserNickname
+      : room.fromUserNickname;
+
+  const toUserId = room.fromUserId === room.userDetailId ? room.toUserId
+      : room.fromUserId;
 
   return (
       <ChatWindowContainer>
         <Header>
-          <h2>{otherUserNickname}와의 채팅</h2> {/* 상대방의 닉네임으로 표시 */}
-          <CloseButton onClick={handleLeaveAndRefresh}>채팅방 나가기</CloseButton>
+          <ChatTitle>{otherUserNickname}와의 채팅</ChatTitle>
+          <ButtonContainer>
+            <BackButton onClick={handleBackToList}>Back</BackButton>
+            <ReportButton onClick={handleReportClick}>신고하기</ReportButton>
+            <LeaveButton onClick={handleLeaveRoom}>Exit</LeaveButton>
+          </ButtonContainer>
         </Header>
         <MessageList ref={messageListRef}>
           {messages.map((msg, index) => (
-              <MessageItem key={index} isOwnMessage={msg.fromUserId === userDetailId}>
-                <strong>
-                  {msg.fromUserId === userDetailId
-                      ? '나'
-                      : msg.fromUserId === fromUserId
-                          ? fromUserNickname // 발신자가 상대방일 경우
-                          : toUserNickname}
-                  :
-                </strong>{' '}
-                {msg.message}
+              <MessageItem key={index}
+                           isOwnMessage={msg.fromUserId === room.userDetailId}>
+                <MessageBubble
+                    isOwnMessage={msg.fromUserId === room.userDetailId}>
+                  <MessageText>{msg.message}</MessageText>
+                  <MessageTime>{formatTime(msg.time)}</MessageTime>
+                </MessageBubble>
               </MessageItem>
           ))}
         </MessageList>
@@ -147,20 +155,28 @@ const ChatWindow = ({ room, onClose }) => {
           />
           <SendButton onClick={handleSendMessage}>보내기</SendButton>
         </MessageInputContainer>
+        {isReportFormVisible && (
+            <ReportForm
+                onClose={handleCloseReportForm}
+                toUserId={toUserId} // 신고 대상 사용자의 ID 전달
+            />
+        )}
       </ChatWindowContainer>
   );
 };
 
 export default ChatWindow;
 
-// 스타일링 정의
+// 스타일 컴포넌트 정의
 const ChatWindowContainer = styled.div`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #2f3136;
+  color: #ffffff;
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
   position: relative;
 `;
 
@@ -168,63 +184,146 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #2f3136;
+  border-bottom: 1px solid #555;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 `;
 
-const CloseButton = styled.button`
-  background-color: #dc3545;
+const ChatTitle = styled.h2`
+  font-size: 1rem;
+  margin: 0;
+  color: #fff;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const BackButton = styled.button`
+  padding: 6px 10px;
+  background-color: #7289da;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 10px 20px;
   cursor: pointer;
   transition: background-color 0.2s;
+  font-size: 0.85rem;
 
   &:hover {
-    background-color: #c82333;
+    background-color: #5b6eae;
+  }
+`;
+
+const LeaveButton = styled.button`
+  padding: 6px 10px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.85rem;
+
+  &:hover {
+    background-color: #ff7875;
+  }
+`;
+
+const ReportButton = styled.button`
+  padding: 6px 10px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.85rem;
+
+  &:hover {
+    background-color: #f57c00;
   }
 `;
 
 const MessageList = styled.ul`
+  flex: 1;
   list-style-type: none;
-  padding: 0;
-  margin-bottom: 20px;
-  max-height: 400px;
+  padding: 10px;
+  margin: 0;
   overflow-y: auto;
+  background-color: #2f3136;
 `;
 
 const MessageItem = styled.li`
-  padding: 10px;
+  display: flex;
+  justify-content: ${(props) => (props.isOwnMessage ? 'flex-end'
+      : 'flex-start')};
   margin-bottom: 10px;
-  background-color: ${(props) =>
-    props.isOwnMessage ? '#daf8e3' : '#f1f1f1'}; /* 발신자와 수신자의 배경색을 다르게 설정 */
-  border-radius: 5px;
-  text-align: ${(props) =>
-    props.isOwnMessage ? 'right' : 'left'}; /* 발신자 메시지는 오른쪽 정렬 */
+`;
+
+const MessageBubble = styled.div`
+  max-width: 60%;
+  padding: 10px 15px;
+  background-color: ${(props) => (props.isOwnMessage ? '#FFEB3B' : '#03A9F4')};
+  border-radius: 15px;
+  position: relative;
+  color: #000;
+  text-align: left;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    ${(props) => (props.isOwnMessage ? 'right' : 'left')}: -10px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-top-color: ${(props) => (props.isOwnMessage ? '#FFEB3B'
+        : '#03A9F4')};
+    border-bottom: 0;
+    margin-top: 10px;
+  }
+`;
+
+const MessageText = styled.div`
+  white-space: pre-wrap;
+`;
+
+const MessageTime = styled.div`
+  margin-top: 5px;
+  font-size: 0.75rem;
+  color: #888888;
+  text-align: right;
 `;
 
 const MessageInputContainer = styled.div`
   display: flex;
+  padding: 10px;
+  background-color: #23272a;
+  border-top: 1px solid #444;
 `;
 
 const MessageInput = styled.input`
   flex: 1;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: none;
   border-radius: 4px;
   margin-right: 10px;
+  background-color: #40444b;
+  color: #fff;
 `;
 
 const SendButton = styled.button`
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #7289da;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #5b6eae;
   }
 `;

@@ -1,9 +1,8 @@
 package com.sparta.itsmine.domain.user.service;
 
 
-import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
-
 import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenAdapter;
+import com.sparta.itsmine.domain.user.dto.BlockResponseDto;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
@@ -12,15 +11,16 @@ import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import com.sparta.itsmine.global.exception.user.UserAlreadyExistsException;
 import com.sparta.itsmine.global.exception.user.UserDeletedException;
 import com.sparta.itsmine.global.exception.user.UserNotDeletedException;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -101,5 +101,31 @@ public class UserService {
 
         user.updateProfile(requestDto);
         userAdapter.save(user);
+    }
+
+    public List<UserResponseDto> getUserAllList(User user) {
+        checkUserRole(user);
+        return userAdapter.findAll().stream()  // 모든 사용자 목록을 스트림으로 변환
+                .map(UserResponseDto::new)  // 각 User 객체를 UserResponseDto로 변환
+                .collect(Collectors.toList());  // 결과를 리스트로 수집
+    }
+
+    public List<BlockResponseDto> blockUserList(User user) {
+        checkUserRole(user);
+        return userAdapter.blockUserList().stream().map(BlockResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void unBlockUser(User user, Long userId) {
+        checkUserRole(user);
+        User unBlockUser = userAdapter.findById(userId);
+        unBlockUser.unBlock();
+    }
+
+    public void checkUserRole(User user) {
+        if (!user.getUserRole().equals(UserRole.MANAGER)) {
+            throw new DataDuplicatedException(ResponseExceptionEnum.REPORT_MANAGER_STATUS);
+        }
     }
 }
