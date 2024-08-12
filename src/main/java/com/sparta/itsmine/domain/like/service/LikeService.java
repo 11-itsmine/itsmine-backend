@@ -53,9 +53,9 @@ public class LikeService {
 
 	public LikeResponseDto getLike(Long productId, User user) {
 		Like likeProduct = likeAdapter.getLike(productId, user.getId());
-		boolean isLike = likeAdapter.isUserLikedProduct(productId, user);
-		return new LikeResponseDto(likeProduct, isLike);
+		return new LikeResponseDto(likeProduct, likeProduct != null);
 	}
+
 
 	protected void likeCounter(Product product, boolean countUp) {
 
