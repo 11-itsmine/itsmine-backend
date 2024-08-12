@@ -29,7 +29,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
 
     fetchMessages();
 
-    const socket = new WebSocket('wss://52.79.213.8:443/ws');
+    const socket = new WebSocket('wss://itsyours.store:8080/ws');
     stompClient.current = Stomp.over(socket);
 
     stompClient.current.connect(
