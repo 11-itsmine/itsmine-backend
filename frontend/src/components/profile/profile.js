@@ -397,7 +397,7 @@ const Profile = () => {
                                 )}
                                 {products.map((product) => (
                                     <Grid item xs={12} sm={6} md={4} key={product.id}>
-                                        <Link to={`/v1/products/${product.id}`} style={{ textDecoration: 'none' }}>
+                                        <Link to={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
                                             <Paper sx={{ p: 2 }}>
                                                 {product.imagesUrl && product.imagesUrl.length > 0 && (
                                                     <img
@@ -406,7 +406,6 @@ const Profile = () => {
                                                         style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
                                                     />
                                                 )}
-                                                <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
                                                 <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
                                                     {product.productName}
                                                 </Typography>
@@ -467,7 +466,7 @@ const Profile = () => {
                                 )}
                                 {likedProducts.map((product) => (
                                     <Grid item xs={12} sm={6} md={4} key={product.id}>
-                                        <Link to={`/v1/products/${product.id}`} style={{ textDecoration: 'none' }}>
+                                        <Link to={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
                                             <Paper sx={{ p: 2 }}>
                                                 {product.imagesUrl && product.imagesUrl.length > 0 && (
                                                     <img
@@ -476,7 +475,6 @@ const Profile = () => {
                                                         style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
                                                     />
                                                 )}
-                                                <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
                                                 <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
                                                     {product.productName}
                                                 </Typography>
@@ -537,13 +535,12 @@ const Profile = () => {
                                 )}
                                 {auctions.map((auction) => (
                                     <Grid item xs={12} sm={6} md={4} key={auction.productId}>
-                                        <Link to={`/v1/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
+                                        <Link to={`/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
                                             <Paper sx={{ p: 2 }}>
                                                 <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
                                                     상품: {auction.productName}
                                                 </Typography>
-                                                <Divider sx={{ my: 1, backgroundColor: '#e0e0e0', width: '60%', mx: 'auto' }} /> {/* 이미지 밑에 구분선, 가운데 정렬 및 줄임 */}
-                                                <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}> {/* 정보와 값 사이의 간격을 최소화 */}
+                                                <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}>
                                                     <Grid item xs={6}>
                                                         <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
                                                             입찰자 이름
