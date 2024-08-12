@@ -342,15 +342,6 @@ const ProductTitle = styled.h1`
   margin-bottom: 20px;
 `;
 
-const Dot = styled.div`
-  width: 8px;
-  height: 8px;
-  background-color: ${({isActive}) => (isActive ? "#000" : "#bbb")};
-  border-radius: 50%;
-  margin: 0 5px;
-  transition: background-color 0.3s;
-`;
-
 const Description = styled.p`
   font-size: 1rem;
   color: #555;
