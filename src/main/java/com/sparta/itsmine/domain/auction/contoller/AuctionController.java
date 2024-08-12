@@ -27,6 +27,7 @@ public class AuctionController {
     private final AuctionService auctionService;
 
     //구매자 입찰 생성
+    /*
     @PostMapping("/products/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> createAuction(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -38,6 +39,7 @@ public class AuctionController {
                         : AUCTION_SUCCESS_CREATE, responseDto);
 
     }
+    */
 
     //유저(구매자(본인)) 입찰 조회(QueryDSL)
     @GetMapping("/auctions")
