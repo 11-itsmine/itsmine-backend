@@ -16,15 +16,12 @@ FROM nginx:alpine
 # Nginx 설정 파일 복사
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-# SSL 인증서 및 키 파일 복사
-COPY /path/to/your/fullchain.pem /etc/ssl/certs/fullchain.pem
-COPY /path/to/your/privkey.pem /etc/ssl/certs/privkey.pem
-
 # 빌드된 리액트 앱을 Nginx의 HTML 디렉토리로 복사
 COPY --from=build /app/build /usr/share/nginx/html
 
 # 포트 설정
 EXPOSE 80
+EXPOSE 443
 
 # Nginx 실행
 CMD ["nginx", "-g", "daemon off;"]
