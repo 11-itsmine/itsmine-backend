@@ -1,17 +1,5 @@
 name: Deploy Application
 
-# 워크플로우 트리거 설정
-on:
-  workflow_dispatch:  # 수동 트리거
-  push:  # 푸시 이벤트 트리거
-    branches:
-      - dev  # dev 브랜치로 푸시가 발생할 때 트리거
-  pull_request:  # PR 닫힘 이벤트 트리거 (머지될 때)
-    branches:
-      - dev  # dev 브랜치로의 PR이 닫힐 때 (병합될 때) 트리거
-    types:
-      - closed
-
 jobs:
   deploy:
     runs-on: ubuntu-latest  # 최신 우분투 이미지를 사용하여 작업 실행

@@ -1,17 +1,17 @@
 // Chat.js
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import ChatRoom from './ChatRoom';
 import './Chat.css';
-import { useChat } from './ChatContext';
+import {useChat} from './ChatContext';
 import ChatWindow from './ChatWindow';
 
 const Chat = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isModalOpen, selectedRoomId, closeModal } = useChat();
+  const {isModalOpen, selectedRoomId, closeModal} = useChat();
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -22,7 +22,7 @@ const Chat = () => {
         const response = await axiosInstance.get('/v1/chatrooms');
         console.log('방 목록 응답:', response);
 
-        const { data } = response;
+        const {data} = response;
 
         if (data && Array.isArray(data.data)) {
           if (!areArraysEqual(rooms, data.data)) {
@@ -45,9 +45,13 @@ const Chat = () => {
   }, []);
 
   const areArraysEqual = (arr1, arr2) => {
-    if (arr1.length !== arr2.length) return false;
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
     for (let i = 0; i < arr1.length; i++) {
-      if (arr1[i].roomId !== arr2[i].roomId) return false;
+      if (arr1[i].roomId !== arr2[i].roomId) {
+        return false;
+      }
     }
     return true;
   };
@@ -76,7 +80,8 @@ const Chat = () => {
             </ul>
         )}
 
-        {isModalOpen && selectedRoomId && <ChatWindow roomId={selectedRoomId} onClose={closeModal} />}
+        {isModalOpen && selectedRoomId && <ChatWindow roomId={selectedRoomId}
+                                                      onClose={closeModal}/>}
       </div>
   );
 };
