@@ -19,7 +19,7 @@ import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
-import com.sparta.itsmine.global.exception.DataDuplicatedException;
+import com.sparta.itsmine.global.lock.DistributedLock;
 
 import jakarta.transaction.Transactional;
 
@@ -40,86 +40,71 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuctionService {
 
+	private final MessageSenderService messageSenderService;
+	private final AuctionRepository auctionRepository;
+	private final ProductRepository productRepository;
+	private final AuctionAdapter adapter;
+	private final ProductAdapter productAdapter;
+	private final RedissonClient redissonClient;
 
-    private final MessageSenderService messageSenderService;
-    private final AuctionRepository auctionRepository;
-    private final ProductRepository productRepository;
-    private final AuctionAdapter adapter;
-    private final ProductAdapter productAdapter;
-    private final RedissonClient redissonClient;
-    private static final String LOCK_KEY = "auctionLock";
+	private final String LOCK_KEY_PREFIX = "auctionLock";
 
-    public AuctionResponseDto createAuction(User user, Long productId,
-            AuctionRequestDto requestDto, Integer totalAmount) {
-        RLock lock = redissonClient.getFairLock(LOCK_KEY);
-        Auction auction = null;
-        try {
-            boolean isLocked = lock.tryLock(10, TimeUnit.SECONDS);
-            if (!isLocked) {
-                throw new IllegalArgumentException("입찰 생성 대기시간 초과");
-            }
+	@DistributedLock(prefix = LOCK_KEY_PREFIX, key = "productId")
+	public AuctionResponseDto createAuction(User user, Long productId,
+		AuctionRequestDto requestDto, Integer totalAmount) {
+		Product product = productAdapter.getProduct(productId);
+		Integer bidPrice = requestDto.getBidPrice();
+		ProductStatus status = ProductStatus.NEED_PAY;
 
-            try {
-                Product product = productAdapter.getProduct(productId);
-                Integer bidPrice = requestDto.getBidPrice();
-                ProductStatus status = ProductStatus.NEED_PAY;
+		Auction auction = createAuctionEntity(user, product, bidPrice, status, totalAmount);
 
-                auction = createAuctionEntity(user, product, bidPrice, status, totalAmount);
+		checkAuctionValidity(auction, product, bidPrice, user);
+		auctionRepository.save(auction);
+		return new AuctionResponseDto(auction);
+	}
 
-                checkAuctionValidity(auction, product, bidPrice, user);
-                auctionRepository.save(auction);
-            } finally {
-                lock.unlock();
-            }
-        } catch (
-                InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        return new AuctionResponseDto(auction);
-    }
+	private Auction createAuctionEntity(User user, Product product, Integer bidPrice,
+		ProductStatus status, Integer totalAmount) {
+		return new Auction(user, product, bidPrice, status, totalAmount);
+	}
 
-    private Auction createAuctionEntity(User user, Product product, Integer bidPrice,
-            ProductStatus status, Integer totalAmount) {
-        return new Auction(user, product, bidPrice, status, totalAmount);
-    }
+	private void checkAuctionValidity(Auction auction, Product product, Integer bidPrice,
+		User user) {
+		auction.checkUser(user, product);
+		auction.checkStatus(product.getStatus());
+		auction.checkBidPrice(bidPrice, product);
+		auction.checkCurrentPrice(bidPrice, product.getCurrentPrice());
+	}
 
-    private void checkAuctionValidity(Auction auction, Product product, Integer bidPrice,
-            User user) {
-        auction.checkUser(user, product);
-        auction.checkStatus(product.getStatus());
-        auction.checkBidPrice(bidPrice, product);
-        auction.checkCurrentPrice(bidPrice, product.getCurrentPrice());
-    }
+	public void scheduleMessage(Long productId, LocalDateTime dueDate) {
+		long delayMillis = calculateDelay(dueDate);
+		messageSenderService.sendMessage(productId, delayMillis);
+	}
 
-    public void scheduleMessage(Long productId, LocalDateTime dueDate) {
-        long delayMillis = calculateDelay(dueDate);
-        messageSenderService.sendMessage(productId, delayMillis);
-    }
+	private long calculateDelay(LocalDateTime dueDate) {
+		return dueDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+			- System.currentTimeMillis();
+	}
 
-    private long calculateDelay(LocalDateTime dueDate) {
-        return dueDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                - System.currentTimeMillis();
-    }
+	public void allDeleteBid(Long productId) {
+		auctionRepository.deleteAllByProductId(productId);
+	}
 
-    public void allDeleteBid(Long productId) {
-        auctionRepository.deleteAllByProductId(productId);
-    }
+	@Transactional
+	public void avoidedAuction(Long productId) {
+		allDeleteBid(productId);
+	}
 
-    @Transactional
-    public void avoidedAuction(Long productId) {
-        allDeleteBid(productId);
-    }
+	public void currentPriceUpdate(Integer bidPrice, Product product) {
+		product.currentPriceUpdate(bidPrice);
+		productRepository.save(product);
+	}
 
-    public void currentPriceUpdate(Integer bidPrice, Product product) {
-        product.currentPriceUpdate(bidPrice);
-        productRepository.save(product);
-    }
+	public Page<AuctionProductResponseDto> getAuctionByUser(User user, Pageable pageable) {
+		return adapter.findAuctionAllByUserid(user.getId(), pageable);
+	}
 
-    public Page<AuctionProductResponseDto> getAuctionByUser(User user, Pageable pageable) {
-        return adapter.findAuctionAllByUserid(user.getId(), pageable);
-    }
-
-    public AuctionProductResponseDto getAuctionByProduct(User user, Long productId) {
-        return adapter.findByUserIdAndProductId(user.getId(), productId);
-    }
+	public AuctionProductResponseDto getAuctionByProduct(User user, Long productId) {
+		return adapter.findByUserIdAndProductId(user.getId(), productId);
+	}
 }
