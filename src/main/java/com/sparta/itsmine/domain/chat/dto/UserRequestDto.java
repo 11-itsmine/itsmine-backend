@@ -6,4 +6,5 @@ import lombok.Data;
 public class UserRequestDto {
 
     private Long userId;
+    private Long productId;
 }

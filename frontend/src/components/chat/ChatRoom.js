@@ -4,23 +4,24 @@ import styled from 'styled-components';
 const ChatRoom = ({room, onOpenChat}) => {
   console.log(room);
 
-  // 상대방의 닉네임과 마지막 메시지, 날짜를 가져옵니다.
-  const otherUserNickname = room.fromUserId === room.userDetailId
-      ? room.toUserNickname : room.fromUserNickname;
-  const lastMessage = room.lastMessage || 'No messages yet'; // 가상의 속성, 실제로는 서버에서 전달받는 데이터 사용
-  const lastMessageDate = new Date(
-      room.lastMessageTime || Date.now()).toLocaleDateString('ko-KR', {
-    month: 'short',
-    day: 'numeric',
-  }); // 가상의 속성, 실제로는 서버에서 전달받는 데이터 사용
+  // 상대방의 닉네임과 상태를 가져옵니다.
+  const isFromUser = room.fromUserId === room.userDetailId;
+  const otherUserNickname = isFromUser ? room.toUserNickname
+      : room.fromUserNickname;
+  const otherUserStatus = isFromUser ? room.toUserStatus : room.fromUserStatus;
+
+  // 상품명을 가져옵니다.
+  const productName = room.prductName;
 
   return (
       <ChatRoomItem onClick={onOpenChat}>
         <ChatDetails>
-          <RoomName>{otherUserNickname}</RoomName>
-          <LastMessage>{lastMessage}</LastMessage>
+          <RoomName>
+            {otherUserNickname} ({otherUserStatus}) {/* 상대방의 닉네임과 상태 */}
+          </RoomName>
+          <LastMessage>{productName}</LastMessage> {/* 상품명 표시 */}
         </ChatDetails>
-        <MessageDate>{lastMessageDate}</MessageDate>
+        <MessageDate>{/* 여기에 필요에 따라 날짜를 추가할 수 있음 */}</MessageDate>
       </ChatRoomItem>
   );
 };

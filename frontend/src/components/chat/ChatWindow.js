@@ -73,7 +73,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
       message: newMessage,
       fromUserId: room.userDetailId,
       roomId: room.roomId,
-      time: new Date().toISOString(),
+      time: new Date().getTime(),
     };
 
     stompClient.current.send(`/app/chat.message/${room.roomId}`, {},
