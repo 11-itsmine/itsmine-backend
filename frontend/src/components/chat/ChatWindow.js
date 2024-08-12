@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {Stomp} from '@stomp/stompjs';
 import axiosInstance from '../../api/axiosInstance';
 import {v4 as uuidv4} from 'uuid';
-import ReportForm from './ReportForm'; // 신고 폼 컴포넌트 임포트
+import ReportForm from './ReportForm'; // 신고 폼 컴포넌트 임포트 // 신고 폼 컴포넌트 임포트
 
 const ChatWindow = ({room, onClose, onLeave}) => {
   const [messages, setMessages] = useState([]);
@@ -16,7 +16,6 @@ const ChatWindow = ({room, onClose, onLeave}) => {
     if (!room?.roomId) {
       return;
     }
-
     const fetchMessages = async () => {
       try {
         const response = await axiosInstance.get(
@@ -26,12 +25,10 @@ const ChatWindow = ({room, onClose, onLeave}) => {
         console.error('Failed to fetch messages:', error);
       }
     };
-
     fetchMessages();
 
     const socket = new WebSocket('wss://itsyours.store/ws');
     stompClient.current = Stomp.over(socket);
-
     stompClient.current.connect(
         {},
         (frame) => {
@@ -67,7 +64,6 @@ const ChatWindow = ({room, onClose, onLeave}) => {
     if (newMessage.trim() === '' || !room?.roomId) {
       return;
     }
-
     const messageObject = {
       messageId: uuidv4(),
       message: newMessage,
@@ -75,7 +71,6 @@ const ChatWindow = ({room, onClose, onLeave}) => {
       roomId: room.roomId,
       time: new Date().toISOString(),
     };
-
     stompClient.current.send(`/app/chat.message/${room.roomId}`, {},
         JSON.stringify(messageObject));
     setNewMessage('');
@@ -95,16 +90,12 @@ const ChatWindow = ({room, onClose, onLeave}) => {
         stompClient.current = null;
       });
     }
-
     try {
-      // 채팅방 나가기 API 호출
       await axiosInstance.delete(`/v1/chatrooms/${room.roomId}`);
-      console.log('Successfully left the chat room.');
+      onLeave(); // 성공 시 onLeave 콜백 호출
     } catch (error) {
       console.error('Failed to leave the chat room:', error);
     }
-
-    onLeave(); // 채팅창 닫기
   };
 
   const handleBackToList = () => {
@@ -126,8 +117,8 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   };
 
   const otherUserNickname = room.fromUserId === room.userDetailId
-      ? room.toUserNickname : room.fromUserNickname;
-
+      ? room.toUserNickname
+      : room.fromUserNickname;
   const toUserId = room.fromUserId === room.userDetailId ? room.toUserId
       : room.fromUserId;
 
@@ -163,8 +154,12 @@ const ChatWindow = ({room, onClose, onLeave}) => {
           />
           <SendButton onClick={handleSendMessage}>보내기</SendButton>
         </MessageInputContainer>
-        {isReportFormVisible && <ReportForm onClose={handleCloseReportForm}
-                                            toUserId={toUserId}/>}
+        {isReportFormVisible && (
+            <ReportForm
+                onClose={handleCloseReportForm}
+                toUserId={toUserId} // 신고 대상 사용자의 ID 전달
+            />
+        )}
       </ChatWindowContainer>
   );
 };
