@@ -23,9 +23,7 @@ const Nav = ({ userRole }) => {
   };
 
   const goToMain = () => {
-    if (isLogin) {
-      navigate(`/itsmine`);
-    }
+    navigate(`/itsmine`); // 메인 페이지로 무조건 이동
   };
 
   const handleNavigation = (path) => {
@@ -42,7 +40,6 @@ const Nav = ({ userRole }) => {
         <Logo onClick={goToMain}>ITSMINE</Logo>
         <ButtonContainer>
           <Button login={isLogin} onClick={() => handleNavigation('/products')}>SELL</Button>
-          <Button login={isLogin} onClick={() => handleNavigation('/about')}>ABOUT</Button>
           {isLogin ? (
               <>
                 <Button login={isLogin} onClick={() => handleNavigation('/profile')}>MYPAGE</Button>

@@ -62,7 +62,11 @@ const ItemList = () => {
           throw new Error('Failed to fetch');
         }
 
-        const data = response.data.data.content;
+        let data = response.data.data.content;
+
+        // Sort products by currentPrice in descending order
+        data = data.sort((a, b) => b.currentPrice - a.currentPrice);
+
         console.log('Fetched data:', data);
         setProductsList((prevProducts) =>
             page === 0 ? data : [...prevProducts, ...data]
