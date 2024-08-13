@@ -2,7 +2,7 @@
 FROM openjdk:17-jdk-alpine
 
 # 이미지 메타데이터에 유지보수 정보를 추가합니다.
-LABEL maintainer="yugi828@naver.com"
+LABEL maintainer="yugi82828@naver.com"
 
 # /tmp 디렉토리를 호스트와 공유하는 볼륨으로 설정합니다.
 VOLUME /tmp
