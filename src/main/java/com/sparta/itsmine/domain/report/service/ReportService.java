@@ -2,6 +2,7 @@ package com.sparta.itsmine.domain.report.service;
 
 import com.sparta.itsmine.domain.chat.entity.ChatRoom;
 import com.sparta.itsmine.domain.chat.repository.ChatRoomRepository;
+import com.sparta.itsmine.domain.kakaopay.service.KakaoPayService;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.report.dto.BlockRequestDto;
@@ -37,6 +38,7 @@ public class ReportService {
     private final ProductRepository productRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final UserAdapter userAdapter;
+    private final KakaoPayService kakaoPayService;
 
     public void createReport(User user, ReportRequestDto requestDto) {
         User badPerson = null;
@@ -115,7 +117,10 @@ public class ReportService {
                 .findAllByFromUserIdOrToUserId(blockUser.getId());
 
         blockUser.block(blockDate, requestDto.getBenReason());
-        blockProducts.forEach(Product::blockProduct);
+        for (Product product : blockProducts) {
+            kakaoPayService.deleteProductWithAuction(product.getId());
+            product.blockProduct();
+        }
         chatRooms.forEach(chatRoom -> chatRoom.blockChatRoom(blockUser));
 
     }
@@ -129,4 +134,5 @@ public class ReportService {
 
 //    public List<> reportFarthing(User user, String reportType) {
 //    }
+
 }

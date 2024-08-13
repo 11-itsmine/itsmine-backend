@@ -10,6 +10,7 @@ public class HttpResponseDto {
     private Integer statusCode;
     private String message;
     private Object data;
+    private String redirectUrl;
 
     public HttpResponseDto(Integer statusCode, String message) {
         this.statusCode = statusCode;
@@ -20,6 +21,13 @@ public class HttpResponseDto {
         this.statusCode = statusCode;
         this.message = message;
         this.data = data;
+    }
+
+    public HttpResponseDto(Integer statusCode, String message, Object data, String redirectUrl) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.data = data;
+        this.redirectUrl = redirectUrl;
     }
 
     public HttpResponseDto(ResponseExceptionEnum responseExceptionEnum) {

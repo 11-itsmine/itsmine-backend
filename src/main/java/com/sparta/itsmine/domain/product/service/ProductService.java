@@ -4,6 +4,7 @@ import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.domain.images.service.ImagesService;
+import com.sparta.itsmine.domain.kakaopay.service.KakaoPayService;
 import com.sparta.itsmine.domain.like.entity.Like;
 import com.sparta.itsmine.domain.like.repository.LikeRepository;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
@@ -34,8 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductAdapter adapter;
-    private final AuctionService auctionService;
     private final ImagesService imagesService;
+    private final KakaoPayService kakaoPayService;
     private final MessageSenderService messageSenderService;
     private final LikeRepository likeRepository;
     private final ProductRepository productRepository;
@@ -107,10 +108,11 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long productId) {
         Product product = adapter.getProduct(productId);
+        kakaoPayService.deleteProductWithAuction(product.getId());
         product.markAsDeleted();
         product.updateStatus(ProductStatus.FAIL_BID);
         adapter.saveProduct(product);
-        auctionService.avoidedAuction(productId);
+//        auctionService.avoidedAuction(productId);
     }
 
 

@@ -30,6 +30,8 @@ import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +67,6 @@ public class KakaoPayService {
     private final KakaoPayRepository kakaoPayRepository;
     private final AuctionService auctionService;
     private final MessageSenderService messageSenderService;
-    private final ReportService reportService;
     private final ProductAdapter productAdapter;
     private final AuctionAdapter auctionAdapter;
     private final UserAdapter userAdapter;
@@ -96,12 +97,12 @@ public class KakaoPayService {
                 .totalAmount(bidPrice)//상품 총액
                 .taxFreeAmount(0)//상품 비과세 금액
                 .vatAmount(0)//상품 부가세 금액
-                .approvalUrl(kakaopayHost + "/v1/kakaopay/approve/pc/popup/" + product.getId() + "/"
+                .approvalUrl(kakaopayHost + "/v1/kakaopay/approve/pc/layer/" + product.getId() + "/"
                         + user.getId() + "/"
                         + createAuction.getId())//결제 성공 시 redirect url, 최대 255자 ,
                 .cancelUrl(kakaopayHost
-                        + "/v1/kakaopay/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
-                .failUrl(kakaopayHost + "/v1/kakaopay/fail/pc/popup")//결제 실패 시 redirect url, 최대 255자
+                        + "/v1/kakaopay/cancel/pc/layer")//결제 취소 시 redirect url, 최대 255자
+                .failUrl(kakaopayHost + "/v1/kakaopay/fail/pc/layer")//결제 실패 시 redirect url, 최대 255자
                 .build();
 
         // Send reqeust
@@ -172,7 +173,6 @@ public class KakaoPayService {
         return response;
     }
 
-
     public KakaoPayCancelResponseDto kakaoCancel(String tid) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -209,6 +209,34 @@ public class KakaoPayService {
         return response;
     }
 
+    public void kakaoCancelForSuccessBid(String tid) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
+
+        // Request param
+        KakaoPayCancelRequestDto kakaoPayCancelRequestDto = KakaoPayCancelRequestDto.builder()
+                .cid(kakaoPayTid.getCid())//가맹점 코드, 10자
+                .tid(tid)//결제 고유번호, 20자
+                .cancel_amount(kakaoPayTid.getAuction().getTotalAmount())//취소 금액
+                .cancel_tax_free_amount(0)//취소 비과세 금액
+                .cancel_vat_amount(0)//취소 부가세 금액
+                .build();
+
+        // Send Request
+        HttpEntity<KakaoPayCancelRequestDto> entityMap = new HttpEntity<>(kakaoPayCancelRequestDto,
+                headers);
+
+        new RestTemplate().postForObject(
+                "https://open-api.kakaopay.com/online/v1/payment/cancel",
+                entityMap,
+                KakaoPayCancelResponseDto.class);
+
+        kakaoPayRepository.delete(kakaoPayTid);
+    }
+
     public void bidCancel(String tid) {
 
         KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
@@ -224,9 +252,13 @@ public class KakaoPayService {
 
     }
 
-    public KakaoPayGetTidResponseDto getTid(KakaoPayGetTidRequestDto kakaoPayGetTidRequestDto,User admin) {
+    public KakaoPayGetTidResponseDto getTid(KakaoPayGetTidRequestDto kakaoPayGetTidRequestDto,
+            User admin) {
 
-        reportService.checkUserRole(admin);
+//        reportService.checkUserRole(admin);
+        if (!admin.getUserRole().equals(UserRole.MANAGER)) {
+            throw new DataDuplicatedException(ResponseExceptionEnum.REPORT_MANAGER_STATUS);
+        }
 
         Optional<User> user = userRepository.findByUsername(kakaoPayGetTidRequestDto.getUsername());
         Product product = productRepository.findByProductName(
@@ -256,32 +288,18 @@ public class KakaoPayService {
         messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
     }
 
-    public void kakaoCancelForSuccessBid(String tid) {
+    public void deleteProductWithAuction(Long productId) {
+        List<Auction> auctions = auctionRepository.findAllByProductId(productId);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "SECRET_KEY " + kakaopaySecretKey);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
-
-        // Request param
-        KakaoPayCancelRequestDto kakaoPayCancelRequestDto = KakaoPayCancelRequestDto.builder()
-                .cid(kakaoPayTid.getCid())//가맹점 코드, 10자
-                .tid(tid)//결제 고유번호, 20자
-                .cancel_amount(kakaoPayTid.getAuction().getTotalAmount())//취소 금액
-                .cancel_tax_free_amount(0)//취소 비과세 금액
-                .cancel_vat_amount(0)//취소 부가세 금액
-                .build();
-
-        // Send Request
-        HttpEntity<KakaoPayCancelRequestDto> entityMap = new HttpEntity<>(kakaoPayCancelRequestDto,
-                headers);
-
-        new RestTemplate().postForObject(
-                "https://open-api.kakaopay.com/online/v1/payment/cancel",
-                entityMap,
-                KakaoPayCancelResponseDto.class);
-
-        kakaoPayRepository.delete(kakaoPayTid);
+        for (Auction auction : auctions) {
+            if (auction.getStatus().equals(BID)) {
+                KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
+                kakaoCancel(kakaoPayTid.getTid());
+                auctionRepository.delete(auction);
+            } else {
+                auctionRepository.delete(auction);
+            }
+        }
     }
 
     public void bidCancelAndSetCurrentPrice(Product product) {

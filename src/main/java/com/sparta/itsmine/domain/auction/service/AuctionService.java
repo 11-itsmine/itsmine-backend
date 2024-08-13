@@ -97,7 +97,7 @@ public class AuctionService {
 		return adapter.findAuctionAllByUserid(user.getId(), pageable);
 	}
 
-	public AuctionProductResponseDto getAuctionByProduct(User user, Long productId) {
+/*	public AuctionProductResponseDto getAuctionByProduct(User user, Long productId) {
 		return adapter.findByUserIdAndProductId(user.getId(), productId);
-	}
+	}*/
 }

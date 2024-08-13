@@ -16,7 +16,7 @@ public interface CustomAuctionRepository {
     Page<AuctionProductImageResponseDto> findAuctionAllByUserid(Long userId, Pageable pageable);
 
     //자신이 고른 상품 조회
-    Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId, Long productId);
+//    Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId, Long productId);
 
     List<Auction> findAllByProductIdWithOutMaxPrice(Long productId);
 
