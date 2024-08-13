@@ -13,6 +13,12 @@ RUN npm run build
 # Nginx를 기반으로 하는 최종 이미지
 FROM nginx:alpine
 
+# 시간대 설정
+RUN apk add --no-cache tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    echo "Asia/Seoul" > /etc/timezone && \
+    apk del tzdata
+
 # Nginx 설정 파일 복사
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 

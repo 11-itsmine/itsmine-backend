@@ -7,6 +7,12 @@ LABEL maintainer="yugi828@naver.com"
 # /tmp 디렉토리를 호스트와 공유하는 볼륨으로 설정합니다.
 VOLUME /tmp
 
+# 시간대 설정
+RUN apk add --no-cache tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    echo "Asia/Seoul" > /etc/timezone && \
+    apk del tzdata
+
 # 컨테이너 외부에서 접근할 수 있도록 8080 포트를 노출합니다.
 EXPOSE 8080
 
