@@ -3,9 +3,11 @@ package com.sparta.itsmine.domain.kakaopay.service;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
+import static com.sparta.itsmine.domain.user.entity.QUser.user;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -43,6 +45,7 @@ import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.DataDuplicatedException;
+import com.sparta.itsmine.global.lock.DistributedLock;
 
 import lombok.RequiredArgsConstructor;
 
@@ -73,6 +76,7 @@ public class KakaoPayService {
     private final ProductAdapter productAdapter;
     private final AuctionAdapter auctionAdapter;
     private final UserAdapter userAdapter;
+    private final String KAKAOPAY_PREFIX = "kakaopay";
 
 
     public KakaoPayReadyResponseDto ready(Long productId, User user, AuctionRequestDto requestDto) {
@@ -137,6 +141,7 @@ public class KakaoPayService {
         Auction auction = auctionAdapter.getAuction(auctionId);
         Product product = productAdapter.getProduct(productId);
         User user = userAdapter.findById(userId);
+
         String tid = (String)redisTemplate.opsForValue().get(user.getUsername()+":tid");
         // Request param
         KakaoPayApproveRequestDto kakaoPayApproveRequestDto = KakaoPayApproveRequestDto.builder()
@@ -151,19 +156,10 @@ public class KakaoPayService {
         KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, tid,
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
-
+        redisTemplate.opsForValue().set(user.getUsername()+":auctionTemp", auction, 10, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(user.getUsername()+":productTemp", product, 10, TimeUnit.SECONDS);
         // 동시성 제어 시작 부분. 현재 가격 확인 로직도 들어가야함.
-        if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
-            auction.updateStatus(SUCCESS_BID);
-            auctionRepository.save(auction);
-            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
-            deleteWithOutSuccessfulAuction(productId);
-        } else {
-            auction.updateStatus(BID);
-            auctionRepository.save(auction);
-            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
-            auctionService.scheduleMessage(productId, product.getDueDate());
-        }
+        updateAuction(user.getUsername());
 
         // Send Request
         HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
@@ -319,6 +315,26 @@ public class KakaoPayService {
             productRepository.save(product);
         }
 
+    }
+
+    @DistributedLock(prefix = KAKAOPAY_PREFIX, key = "auctionId")
+    public void updateAuction(String username) {
+        Auction auction = (Auction)redisTemplate.opsForValue().get(username+":auctionTemp");
+        Product product = (Product)redisTemplate.opsForValue().get(username+":productTemp");
+        if (auction == null || product == null) {
+            throw new IllegalArgumentException("경매 혹은 상품을 찾을 수 없습니다.");
+        }
+        if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
+            auction.updateStatus(SUCCESS_BID);
+            auctionRepository.save(auction);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
+            deleteWithOutSuccessfulAuction(product.getId());
+        } else {
+            auction.updateStatus(BID);
+            auctionRepository.save(auction);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
+            auctionService.scheduleMessage(product.getId(), product.getDueDate());
+        }
     }
 
 }
