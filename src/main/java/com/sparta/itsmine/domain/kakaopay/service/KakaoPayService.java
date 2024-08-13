@@ -160,8 +160,8 @@ public class KakaoPayService {
         KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, tid,
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
-        redisTemplate.opsForValue().set(user.getUsername()+":auctionTemp", auctionId, 10, TimeUnit.SECONDS);
-        redisTemplate.opsForValue().set(user.getUsername()+":productTemp", productId, 10, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(user.getUsername() + ":auctionTemp", String.valueOf(auctionId), 10, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(user.getUsername() + ":productTemp", String.valueOf(productId), 10, TimeUnit.SECONDS);
         // 동시성 제어 시작 부분. 현재 가격 확인 로직도 들어가야함.
         updateAuction(user.getUsername());
 
