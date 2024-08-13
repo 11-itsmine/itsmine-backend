@@ -18,6 +18,7 @@ import AdminPage from "./components/backOffice/AdminPage";
 import axiosInstance from './api/axiosInstance';
 import LoadingScreen from './components/LoadingScreen';
 import ProductEditPage from "./components/createproduct/ProductEditPage"; // 로딩 페이지 추가
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'; // Navigate 임포트 추가
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
