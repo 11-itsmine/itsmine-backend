@@ -175,7 +175,7 @@ public class Product extends TimeStamp {
     }
 
     public void blockProductWithOutSuccessBid(Product product) {
-        if(product.getStatus().equals(SUCCESS_BID)){
+        if(!product.getStatus().equals(SUCCESS_BID)){
             this.status = ProductStatus.FAIL_BID;
             this.deletedAt = LocalDateTime.now();
         }
