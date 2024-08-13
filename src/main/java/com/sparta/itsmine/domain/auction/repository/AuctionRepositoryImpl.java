@@ -38,7 +38,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     select u.username,p.product_name,max(a.bid_price),a.status
     from auctions a,user u,product p
     where u.id=2 and u.id=a.user_id and p.id=a.product_id and a.status = p.status and a.status != 'NEED_PAY'
-    group by p.id
+    group by p.id;
     */
     //자신이 고른 상품 전체 조회
     @Cacheable("AuctionAllByUser")
