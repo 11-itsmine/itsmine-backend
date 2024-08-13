@@ -301,7 +301,7 @@ public class KakaoPayService {
                 KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
                 kakaoCancel(kakaoPayTid.getTid());
                 auctionRepository.delete(auction);
-            } else if(auction.getStatus().equals(NEED_PAY)) {
+            } else{ //if(auction.getStatus().equals(NEED_PAY)) {
                 auctionRepository.delete(auction);
             }
         }
