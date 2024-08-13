@@ -7,6 +7,7 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_UPDATE_QNA;
 import static com.sparta.itsmine.global.common.response.ResponseUtils.of;
 
+import com.sparta.itsmine.domain.qna.dto.QnAChangeRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -46,13 +47,12 @@ public class QnaController {
      */
     @PostMapping
     public ResponseEntity<HttpResponseDto> createQna(
-            @PathVariable Long productId,
+            @PathVariable("productId") Long productId,
             @Valid @RequestBody QnaRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         User user = userDetails.getUser();
-        qnaService.createQna(productId, requestDto, user);
-        return of(SUCCESS_CREATE_QNA);
+        return of(SUCCESS_CREATE_QNA, qnaService.createQna(productId, requestDto, user));
     }
 
     /**
@@ -98,12 +98,12 @@ public class QnaController {
 
     @PutMapping("/{qnaId}")
     public ResponseEntity<HttpResponseDto> updateQna(
-            @PathVariable Long qnaId,
+            @PathVariable("qnaId") Long qnaId,
+            @PathVariable("productId") Long productId,
             @RequestBody QnaRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
-        qnaService.updateQna(qnaId, requestDto, user);
-        return of(SUCCESS_UPDATE_QNA);
+        return of(SUCCESS_UPDATE_QNA, qnaService.updateQna(qnaId, productId, requestDto, user));
     }
 
     /**
@@ -115,11 +115,12 @@ public class QnaController {
      */
     @DeleteMapping("/{qnaId}")
     public ResponseEntity<HttpResponseDto> deleteQna(
-            @PathVariable Long productId,
-            @PathVariable Long qnaId,
+            @PathVariable("productId") Long productId,
+            @PathVariable("qnaId") Long qnaId,
+            @RequestBody QnAChangeRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
-        qnaService.deleteQna(productId, qnaId, user);
+        qnaService.deleteQna(productId, qnaId, requestDto.getPassword() ,user);
         return of(SUCCESS_DELETE_QNA);
     }
 }

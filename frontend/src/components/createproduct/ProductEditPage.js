@@ -13,11 +13,11 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axiosInstance from '../../api/axiosInstance';
 
-const ProductCreatePage = () => {
+const ProductEditPage = () => {
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
   const [auctionNowPrice, setAuctionNowPrice] = useState('');
@@ -27,6 +27,7 @@ const ProductCreatePage = () => {
   const [categories, setCategories] = useState([]);
   const [imageUrls, setImageUrls] = useState([]);
   const navigate = useNavigate();
+  const { productId } = useParams(); // URL에서 productId 가져오기
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -39,8 +40,26 @@ const ProductCreatePage = () => {
       }
     };
 
+    const fetchProductDetails = async () => {
+      try {
+        const response = await axiosInstance.get(`/v1/products/${productId}`);
+        const product = response.data.data;
+        setProductName(product.productName);
+        setDescription(product.description);
+        setAuctionNowPrice(product.auctionNowPrice);
+        setStartPrice(product.startPrice);
+        setDueDate(product.dueDate); // 경매 시간을 불러오지만 수정은 불가능하게 설정
+        setCategoryName(product.category.categoryName);
+        setImageUrls(product.imagesUrl);
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+        alert('상품 정보를 가져오는 중 오류가 발생했습니다.');
+      }
+    };
+
     fetchCategories();
-  }, []);
+    fetchProductDetails();
+  }, [productId]);
 
   const handleImageChange = async (event) => {
     const files = event.target.files;
@@ -82,7 +101,6 @@ const ProductCreatePage = () => {
           description,
           auctionNowPrice,
           startPrice,
-          dueDate,
           categoryName,
         },
         productImagesRequestDto: {
@@ -90,13 +108,13 @@ const ProductCreatePage = () => {
         },
       };
 
-      await axiosInstance.post('/v1/products', productData);
+      await axiosInstance.patch(`/v1/products/${productId}`, productData);
 
-      alert('상품 등록이 완료되었습니다.\n홈 화면으로 이동합니다.');
-      navigate('/itsmine'); // 상품 등록 후 홈 페이지로 이동
+      alert('상품 수정이 완료되었습니다.\n홈 화면으로 이동합니다.');
+      navigate('/itsmine'); // 수정 후 홈 페이지로 이동
     } catch (error) {
-      console.error('Error creating product:', error);
-      alert('상품 등록이 불가능합니다. 해당 상품의 이름과 정보를 다시 한번 확인해주세요.');
+      console.error('Error updating product:', error);
+      alert('상품 수정이 불가능합니다. 해당 상품의 이름과 정보를 다시 한번 확인해주세요.');
     }
   };
 
@@ -104,7 +122,7 @@ const ProductCreatePage = () => {
       <Container
           maxWidth="lg"
           sx={{
-            mt: 1,  // 이전 mt: 8에서 줄임
+            mt: 1,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -123,7 +141,7 @@ const ProductCreatePage = () => {
           <Grid container spacing={4}>
             <Grid item xs={12} md={7}>
               <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#262626' }}>
-                상품 등록
+                상품 수정
               </Typography>
             </Grid>
             <Grid item xs={12} md={5}>
@@ -193,14 +211,14 @@ const ProductCreatePage = () => {
                         }}
                     />
                   </Grid>
+                  {/* 경매 진행 시간 필드는 비활성화된 상태로 표시 */}
                   <Grid item xs={12} sm={6}>
                     <TextField
                         fullWidth
                         label="경매 진행 시간 (시간 단위)"
                         type="number"
                         value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
-                        required
+                        disabled
                         sx={{
                           '& .MuiInputBase-input': { fontSize: '16px' },
                           '& .MuiInputLabel-root': { color: '#757575', fontSize: '16px' },
@@ -237,7 +255,7 @@ const ProductCreatePage = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, width: '100%', justifyContent: 'center' }}>
                     {imageUrls.map((url, index) => (
-                        <Box key={index} sx={{ position: 'relative', width: '48%', height: '200px' }}> {/* 이미지 크기 키움 */}
+                        <Box key={index} sx={{ position: 'relative', width: '48%', height: '200px' }}>
                           <img
                               src={url}
                               alt={`이미지 ${index + 1}`}
@@ -272,7 +290,7 @@ const ProductCreatePage = () => {
                     width: '200px',
                   }}
               >
-                등록
+                수정 완료
               </Button>
               <Button
                   variant="contained"
@@ -294,4 +312,4 @@ const ProductCreatePage = () => {
   );
 };
 
-export default ProductCreatePage;
+export default ProductEditPage;
