@@ -1,5 +1,7 @@
 package com.sparta.itsmine.domain.comment.service;
 
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.*;
+
 import com.sparta.itsmine.domain.comment.dto.AddCommentResponseDto;
 import com.sparta.itsmine.domain.comment.dto.CommentRequestDto;
 import com.sparta.itsmine.domain.comment.dto.CommentResponseDto;
@@ -8,6 +10,9 @@ import com.sparta.itsmine.domain.comment.repository.CommentAdapter;
 import com.sparta.itsmine.domain.comment.repository.CommentRepository;
 import com.sparta.itsmine.domain.qna.entity.Qna;
 import com.sparta.itsmine.domain.user.entity.User;
+import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,51 +27,51 @@ public class CommentService {
     // 댓글 작성
     @Transactional
     public AddCommentResponseDto addComment(Long qnaId, User user, CommentRequestDto commentRequestDto) {
-
-        //판매자만 댓글 작성 가능
         Qna qna = getQna(qnaId);
-        qna.equalsSeller(user.getId());
+
+        // 판매자 또는 MANAGER만 댓글 작성 가능
+        if (!qna.getUser().getId().equals(user.getId()) && !user.getUserRole().equals(UserRole.MANAGER)) {
+            throw new DataNotFoundException(NO_AUTHORIZATION_COMMNET);
+        }
 
         checkDuplicateComment(qnaId);
-
         Comment comment = new Comment(commentRequestDto, qna);
-
         commentAdapter.save(comment);
 
-        return new AddCommentResponseDto(comment,user);
+        return new AddCommentResponseDto(comment, user);
     }
 
     // 댓글 조회
     public CommentResponseDto getComment(Long qnaId) {
-
         Comment comment = getCommentByQnaId(qnaId);
-
         return new CommentResponseDto(comment, qnaId);
     }
 
     // 댓글 수정
     @Transactional
     public void updateComment(Long qnaId, CommentRequestDto requestDto, User user) {
-        //판매자만 댓글 수정 가능
         Qna qna = getQna(qnaId);
-        qna.equalsSeller(user.getId());
 
-        // 댓글 가져오기
+        // 판매자 또는 MANAGER만 댓글 수정 가능
+        if (!qna.getUser().getId().equals(user.getId()) && !user.getUserRole().equals(UserRole.MANAGER)) {
+            throw new DataNotFoundException(NO_AUTHORIZATION_MODIFICATION);
+        }
+
         Comment comment = getCommentByQnaId(qnaId);
-
         comment.commentUpdate(requestDto);
     }
 
     // 댓글 삭제
     @Transactional
     public void deleteComment(Long qnaId, User user) {
-
-        //판매자만 댓글 삭제 가능
         Qna qna = getQna(qnaId);
-        qna.equalsSeller(user.getId());
+
+        // 판매자 또는 MANAGER만 댓글 삭제 가능
+        if (!qna.getUser().getId().equals(user.getId()) && !user.getUserRole().equals(UserRole.MANAGER)) {
+            throw new DataNotFoundException(NO_AUTHORIZATION_DELETE);
+        }
 
         Comment comment = getCommentByQnaId(qnaId);
-
         commentRepository.delete(comment);
     }
 

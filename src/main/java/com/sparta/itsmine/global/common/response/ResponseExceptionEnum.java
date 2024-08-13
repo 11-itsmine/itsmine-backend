@@ -31,11 +31,15 @@ public enum ResponseExceptionEnum {
     QNA_ERROR(HttpStatus.BAD_REQUEST, "문의 오류 발생"),
     QNA_NOT_FOUND(HttpStatus.NOT_FOUND, "문의 내용이 존재 하지 않습니다."),
     QNA_USER_NOT_VALID(HttpStatus.BAD_REQUEST, "문의 내용 작성자가 아닙니다."),
+    INVALID_PASSWORD(HttpStatus.NOT_FOUND, "패스워드가 일치하지 않습니다."),
 
     // 카테고리
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리를 찾을 수 없습니다."),
 
     // 댓글
+    NO_AUTHORIZATION_COMMNET(HttpStatus.UNAUTHORIZED, "댓글을 작성할 권한이 없습니다."),
+    NO_AUTHORIZATION_MODIFICATION(HttpStatus.UNAUTHORIZED, "댓글을 수정할 권한이 없습니다."),
+    NO_AUTHORIZATION_DELETE(HttpStatus.UNAUTHORIZED, "댓글을 삭제할 권한이 없습니다."),
     COMMENT_EQUAL_SELLER(HttpStatus.BAD_REQUEST, "해당 상품 판매자만 접근이 가능합니다"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
     COMMENT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "해당 문의사항에는 이미 댓글이 작성 되어 있습니다."),

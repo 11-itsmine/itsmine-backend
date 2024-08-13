@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.qna.entity;
 
+import static com.sparta.itsmine.domain.user.utils.UserRole.MANAGER;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.COMMENT_EQUAL_SELLER;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.QNA_USER_NOT_VALID;
 
@@ -38,6 +39,8 @@ public class Qna extends TimeStamp {
 
     private String content;
 
+    private String passowrd;
+
     private boolean secretQna;
 
     @ManyToOne
@@ -54,6 +57,7 @@ public class Qna extends TimeStamp {
     public Qna(QnaRequestDto requestDto, User user, Product product) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
+        this.passowrd = requestDto.getPassword();
         this.user = user;
         this.product = product;
         this.secretQna = requestDto.isSecretQna();
@@ -66,12 +70,11 @@ public class Qna extends TimeStamp {
     public void update(QnaRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
-        this.secretQna = requestDto.isSecretQna();
     }
 
     // 판매자 확인
     public void equalsSeller(Long userId) {
-        if (!this.product.getUser().getId().equals(userId)) {
+        if (!this.product.getUser().getId().equals(userId) || !this.product.getUser().getUserRole().equals(MANAGER)) {
             throw new CommentEqualSellerException(COMMENT_EQUAL_SELLER);
         }
     }

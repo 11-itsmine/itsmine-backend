@@ -1,14 +1,17 @@
-// src/components/auction/AuctionComponent.js
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import styled from "styled-components";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { MdEdit } from "react-icons/md";
+import { FaDeleteLeft } from "react-icons/fa6";
 import ChatWindow from "../chat/ChatWindow";
 import Modal from "../chat/Modal";
 import ReportForm from "../backOffice/ReportForm";
+import QnAList from "../qna/QnAList";
 
-const AuctionComponent = () => {
+const AuctionComponent = ({ userId }) => {
   const [product, setProduct] = useState(null);
+  const [userRole, setUserRole] = useState(""); // Add userRole state
   const [bidPrice, setBidPrice] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -19,20 +22,44 @@ const AuctionComponent = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
 
   const navigate = useNavigate();
-  const {productId} = useParams();
+  const { productId } = useParams();
 
-  const fetchProduct = async () => {
+  // Fetch user role
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const token = localStorage.getItem("Authorization");
+        if (token) {
+          const response = await axiosInstance.get("/v1/users/role", {
+            headers: {
+              Authorization: `Bearer ${token.trim()}`,
+            },
+          });
+          console.log("Fetched userRole:", response.data.userRole); // Log userRole
+          setUserRole(response.data.userRole);
+        } else {
+          console.log("No token found");
+        }
+      } catch (error) {
+        console.error("Failed to fetch user role:", error);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
+
+  const fetchProduct = useCallback(async () => {
     try {
       const response = await axiosInstance.get(`/v1/products/${productId}`);
       setProduct(response.data.data);
     } catch (err) {
-      alert("제품 정보를 가져오는데 실패했습니다.");
       setError("제품 정보를 가져오는데 실패했습니다.");
       console.error("Error fetching product data:", err);
+      showError("제품 정보를 가져오는데 실패했습니다.");
     }
-  };
+  }, [productId]);
 
-  const fetchLikeStatus = async () => {
+  const fetchLikeStatus = useCallback(async () => {
     try {
       const token = localStorage.getItem("Authorization");
       const response = await axiosInstance.get(
@@ -40,14 +67,21 @@ const AuctionComponent = () => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
+
+      console.log("Like status response:", response.data);
       setIsLiked(response.data.data.liked);
     } catch (err) {
       console.error("Error fetching like status:", err);
     }
-  };
+  }, [productId]);
+
+  useEffect(() => {
+    fetchProduct();
+    fetchLikeStatus();
+  }, [fetchProduct, fetchLikeStatus]);
 
   const toggleLike = async () => {
     try {
@@ -58,77 +92,75 @@ const AuctionComponent = () => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
       setIsLiked((prevIsLiked) => !prevIsLiked);
     } catch (err) {
-      alert("좋아요 변경에 실패했습니다. 다시 시도하세요.");
       setError("좋아요 변경에 실패했습니다. 다시 시도하세요.");
       console.error("Error toggling like status:", err);
+      showError("좋아요 변경에 실패했습니다. 다시 시도하세요.");
     }
   };
 
-  const handleReport = async (reportData) => {
-    const token = localStorage.getItem("Authorization");
+  const handleStartChat = async () => {
     try {
-      await axiosInstance.post(
-          `/v1/report`,
-          {
-            ...reportData,
-            typeId: productId, // 신고 데이터에 상품 ID 포함
-          },
+      const token = localStorage.getItem("Authorization");
+      const response = await axiosInstance.post(
+          `/v1/chatrooms`,
+          { userId: product.userId },
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
-      alert("신고가 접수되었습니다.");
-      setIsReportOpen(false);
+
+      setChatRoomInfo(response.data.data);
+      setIsChatOpen(true);
     } catch (err) {
-      alert("신고에 실패했습니다. 다시 시도하세요.");
-      console.error("Error reporting content:", err);
+      setError("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
+      console.error("Error creating chat room:", err);
+      showError("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
     }
   };
 
-  useEffect(() => {
-    fetchProduct();
-    fetchLikeStatus();
-  }, [productId]);
+  const showError = (message) => {
+    setError(message);
+    setTimeout(() => {
+      setError("");
+    }, 3000);
+  };
 
   const handleBid = async () => {
     if (!bidPrice) {
-      setError("입찰 가격을 입력하세요.");
+      showError("입찰 가격을 입력하세요.");
       return;
     }
     const token = localStorage.getItem("Authorization");
     try {
       const response = await axiosInstance.post(
-          `/v1/kakaopay/ready/${productId}`, // 카카오페이 결제 준비 API 경로로 변경
-          { bidPrice }, // 입찰 가격을 요청 바디에 포함
+          `/v1/kakaopay/ready/${productId}`,
+          { bidPrice },
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
 
-      // 응답에서 카카오페이 결제 페이지 URL을 추출
       const { next_redirect_pc_url } = response.data.data;
-
-      // 카카오페이 결제 페이지를 팝업 창으로 열기
       window.open(next_redirect_pc_url, "_blank", "width=600,height=800");
 
-      // 입찰 완료 알림
-      alert("입찰이 완료되었습니다.");
-
+      alert("입찰이 성공적으로 완료되었습니다.\n홈 화면으로 이동합니다.");
+      setMessage("입찰이 성공적으로 완료되었습니다.");
+      setError("");
+      navigate("/itsmine");
     } catch (err) {
-      alert("입찰에 실패했습니다. 다시 시도하세요.");
       setError("입찰에 실패했습니다. 다시 시도하세요.");
       console.error("Error creating auction:", err);
+      showError("입찰에 실패했습니다. 다시 시도하세요.");
     }
-
   };
 
   const nextImage = () => {
@@ -155,27 +187,47 @@ const AuctionComponent = () => {
     setIsChatOpen(!isChatOpen);
   };
 
-  const handleStartChat = async () => {
+  const handleReportSubmit = async (reportData) => {
     try {
       const token = localStorage.getItem("Authorization");
-      const response = await axiosInstance.post(
-          `/v1/chatrooms`,
+      await axiosInstance.post(
+          `/v1/report`,
           {
-            userId: product.userId,
-            productId: productId
+            ...reportData,
+            productId,
           },
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
-      console.log(productId);
-      setChatRoomInfo(response.data.data);
-      setIsChatOpen(true);
+      setIsReportOpen(false);
+      alert("신고가 접수되었습니다.");
     } catch (err) {
-      alert("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
-      console.error("Error creating chat room:", err);
+      console.error("Error submitting report:", err);
+      showError("신고 접수에 실패했습니다. 다시 시도하세요.");
+    }
+  };
+
+  const handleEdit = () => {
+    // 이동 또는 상품 수정 폼 열기
+    navigate(`/edit-product/${productId}`);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("Authorization");
+      await axiosInstance.delete(`/v1/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert("상품이 삭제되었습니다.");
+      navigate("/products"); // 삭제 후 상품 목록으로 이동
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      showError("상품 삭제에 실패했습니다. 다시 시도하세요.");
     }
   };
 
@@ -188,109 +240,108 @@ const AuctionComponent = () => {
   }
 
   return (
-      <Container>
-        {product.imagesUrl && product.imagesUrl.length > 0 && (
-            <>
-              <ImageSlider>
-                <Arrow left onClick={prevImage}>
-                  &lt;
-                </Arrow>
-                <ProductImage
-                    src={product.imagesUrl[currentImageIndex]}
-                    alt={`Product ${currentImageIndex}`}
-                />
-                <Arrow onClick={nextImage}>&gt;</Arrow>
-              </ImageSlider>
-              <Indicator>
-                {product.imagesUrl.map((_, index) => (
-                    <Dot key={index} isActive={index === currentImageIndex}/>
-                ))}
-              </Indicator>
-            </>
-        )}
-        <Details>
-          <Title>{product.productName}</Title>
-          <LikeButton onClick={toggleLike} isLiked={isLiked}>
-            {isLiked ? "♥" : "♡"}
-          </LikeButton>
+      <StyledContainer>
+        <LeftColumn>
+          <ImageSlider>
+            <Arrow left onClick={prevImage}>
+              &lt;
+            </Arrow>
+            <MainImage src={product.imagesUrl[currentImageIndex]} alt="Product" />
+            <Arrow onClick={nextImage}>&gt;</Arrow>
+          </ImageSlider>
+        </LeftColumn>
+        <RightColumn>
+          <ProductTitle>
+            {product.productName}
+            {(userRole === "MANAGER" || (userRole === "USER" && product.userId === userId)) && (
+                <IconContainer>
+                  <MdEdit onClick={handleEdit} />
+                  <FaDeleteLeft onClick={handleDelete} />
+                </IconContainer>
+            )}
+            <LikeButton onClick={toggleLike} isLiked={isLiked}>
+              {isLiked ? "♥" : "♡"}
+            </LikeButton>
+          </ProductTitle>
           <Description>{product.description}</Description>
-        </Details>
-        <AdditionalInfo>
-          <InfoText>경매 시작가: {product.startPrice}원</InfoText>
-          <InfoText>마감일: {new Date(product.dueDate).toLocaleString()}</InfoText>
-        </AdditionalInfo>
-        <ButtonContainer>
-          <PriceButton className="buy-btn" onClick={handleBuyNow}>
-            구매 {product.auctionNowPrice.toLocaleString()}원 즉시 구매가
-          </PriceButton>
-          <PriceButton className="bid-btn" onClick={handleCurrentPrice}>
-            입찰 {product.currentPrice.toLocaleString()}원 현재 입찰가
-          </PriceButton>
-        </ButtonContainer>
-        <BidSection>
-          <h2>입찰하기</h2>
-          <BidInput
-              type="number"
-              value={bidPrice}
-              onChange={(e) => setBidPrice(e.target.value)}
-              placeholder="입찰 가격"
-              min={product.currentPrice + 1}
-          />
-          <BidButton onClick={handleBid}>입찰</BidButton>
-          {message && <SuccessText>{message}</SuccessText>}
-          {error && <ErrorText>{error}</ErrorText>}
-        </BidSection>
-        <ChatButton onClick={handleStartChat}>채팅으로 문의하기</ChatButton>
-        <ReportButton onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
+          <PriceInfo>
+            <PriceButton onClick={handleBuyNow} primary>
+              <PriceTitle>즉시구매가</PriceTitle>
+              <PriceValue>{product.auctionNowPrice.toLocaleString()}원</PriceValue>
+            </PriceButton>
+            <PriceButton onClick={handleCurrentPrice}>
+              <PriceTitle>현재 입찰가</PriceTitle>
+              <PriceValue>{product.currentPrice.toLocaleString()}원</PriceValue>
+            </PriceButton>
+          </PriceInfo>
+          <BidSection>
+            <h2>입찰하기</h2>
+            <BidContainer>
+              <BidInput
+                  type="number"
+                  value={bidPrice}
+                  onChange={(e) => setBidPrice(e.target.value)}
+                  placeholder="입찰 가격"
+                  min={product.currentPrice + 1}
+              />
+              <BidButton onClick={handleBid}>입찰</BidButton>
+            </BidContainer>
+            {message && <SuccessText>{message}</SuccessText>}
+          </BidSection>
+          <ChatAndReportContainer>
+            <ChatButton onClick={handleStartChat}>채팅으로 문의하기</ChatButton>
+            <ReportButton onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
+          </ChatAndReportContainer>
+          <QnAList productId={productId} userId={userId} userRole={userRole} />
+        </RightColumn>
         <Modal isOpen={isChatOpen} onClose={toggleChatWindow}>
-          {chatRoomInfo && <ChatWindow room={chatRoomInfo}
-                                       onClose={toggleChatWindow}/>}
+          {chatRoomInfo && <ChatWindow room={chatRoomInfo} onClose={toggleChatWindow} />}
         </Modal>
         <Modal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)}>
-          {product && (
-              <ReportForm
-                  onSubmit={handleReport}
-                  onClose={() => setIsReportOpen(false)}
-                  productId={product.id} // 제품 ID 전달
-              />
-          )}
+          <ReportForm onSubmit={handleReportSubmit} />
         </Modal>
-      </Container>
+      </StyledContainer>
   );
 };
 
 export default AuctionComponent;
-// src/components/auction/AuctionComponent.js
 
-// ... (기존 코드 생략)
-
-const Container = styled.div`
-  width: 100%;
-  max-width: 600px;
-  margin: 100px auto;
-  background-color: #f9f9f9;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+// Styled Components
+const StyledContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+  margin: 100px auto;
+  max-width: 1200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 40px;
+`;
+
+const LeftColumn = styled.div`
+  flex: 2;
+  max-width: 50%;
+  padding-right: 20px;
+`;
+
+const RightColumn = styled.div`
+  flex: 3;
+  padding-left: 20px;
+  max-width: 50%;
 `;
 
 const ImageSlider = styled.div`
   width: 100%;
-  height: 300px;
-  background-color: #ddd;
+  height: 400px;
+  background-color: #f2f2f2;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  border-radius: 10px;
 `;
 
-const ProductImage = styled.img`
+const MainImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -311,120 +362,148 @@ const Arrow = styled.div`
   font-size: 1.5rem;
   user-select: none;
   color: #fff;
-
   &:hover {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
-  ${({left}) => (left ? `left: 10px;` : `right: 10px;`)}
+  ${({ left }) => (left ? `left: 10px;` : `right: 10px;`)}
 `;
 
-const Indicator = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-`;
-
-const Dot = styled.div`
-  width: 8px;
-  height: 8px;
-  background-color: ${({isActive}) => (isActive ? "#000" : "#bbb")};
-  border-radius: 50%;
-  margin: 0 5px;
-  transition: background-color 0.3s;
-`;
-
-const Details = styled.div`
-  width: 100%;
-  text-align: center;
-  padding: 10px;
-  background-color: #fff;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  position: relative;
-`;
-
-const Title = styled.h1`
-  font-size: 20px;
+const ProductTitle = styled.h1`
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+
+  & > svg {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #333;
+
+    &:hover {
+      color: #007bff;
+    }
+  }
 `;
 
 const Description = styled.p`
-  color: #666;
-  margin-top: 10px;
-`;
-
-const AdditionalInfo = styled.div`
-  width: 100%;
-  text-align: center;
-  padding: 10px;
-  background-color: #fff;
-  border-radius: 8px;
+  font-size: 1rem;
+  color: #555;
   margin-bottom: 20px;
 `;
 
-const InfoText = styled.p`
-  color: #999;
-`;
-
-const ButtonContainer = styled.div`
+const PriceInfo = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 100%;
   margin-bottom: 20px;
 `;
 
 const PriceButton = styled.button`
+  flex: 1;
+  background-color: ${({ primary }) => (primary ? "#e74c3c" : "#27ae60")};
   padding: 15px;
+  color: white;
+  border-radius: 10px;
+  text-align: left;
+  margin-right: ${({ primary }) => (primary ? "10px" : "0")};
   border: none;
-  border-radius: 5px;
-  color: #fff;
   cursor: pointer;
-  font-size: 16px;
-  width: 48%;
+  &:hover {
+    background-color: ${({ primary }) => (primary ? "#c0392b" : "#2ecc71")};
+  }
+`;
+
+const PriceTitle = styled.div`
+  font-size: 1.2rem;
   font-weight: bold;
+`;
 
-  &.buy-btn {
-    background-color: #e74c3c;
-  }
-
-  &.bid-btn {
-    background-color: #27ae60;
-  }
+const PriceValue = styled.div`
+  font-size: 1rem;
 `;
 
 const BidSection = styled.div`
-  width: 100%;
+  margin-top: 20px;
+`;
+
+const BidContainer = styled.div`
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
 `;
 
 const BidInput = styled.input`
-  width: 100%;
-  max-width: 200px;
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
+  flex: 3;
+  padding: 15px;
+  border: 1px solid #ddd;
   border-radius: 5px;
+  margin-right: 15px;
 `;
 
 const BidButton = styled.button`
-  padding: 10px 20px;
-  font-size: 1rem;
-  background-color: #4caf50;
-  color: white;
+  flex: 1;
+  background-color: #27ae60;
   border: none;
-  border-radius: 5px;
+  padding: 15px;
+  color: white;
   cursor: pointer;
-
+  border-radius: 5px;
+  font-size: 1rem;
   &:hover {
-    background-color: #45a049;
+    background-color: #2ecc71;
+  }
+`;
+
+const ChatAndReportContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+`;
+
+const ChatButton = styled.button`
+  background-color: #007bff;
+  border: none;
+  padding: 15px;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 48%;
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+const ReportButton = styled.button`
+  background-color: #e74c3c;
+  border: none;
+  padding: 15px;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 48%;
+  &:hover {
+    background-color: #c0392b;
+  }
+`;
+
+const LikeButton = styled.button`
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: ${({ isLiked }) => (isLiked ? "#e74c3c" : "#ccc")};
+  &:hover {
+    color: ${({ isLiked }) => (isLiked ? "#c0392b" : "#888")};
   }
 `;
 
@@ -442,51 +521,6 @@ const ErrorText = styled.div`
 
 const LoadingText = styled.div`
   font-size: 1.2rem;
+  text-align: center;
   margin-top: 50px;
-`;
-
-const LikeButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 10px;
-  font-size: 1.5rem;
-  background-color: transparent;
-  color: ${({isLiked}) => (isLiked ? "#e74c3c" : "#bbb")};
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    color: ${({isLiked}) => (isLiked ? "#c0392b" : "#888")};
-  }
-`;
-
-const ChatButton = styled.button`
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-const ReportButton = styled.button`
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #c82333;
-  }
 `;

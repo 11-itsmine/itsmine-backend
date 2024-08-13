@@ -14,8 +14,8 @@ public class GetQnaResponseDto {
     private final Long product_id;
     private final String username;
     private final String nickname;
-    private final LocalDateTime createAt;
-    private final LocalDateTime updateAt;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
     private GetQnaResponseDto(Qna qna) {
         this.id = qna.getId();
@@ -25,8 +25,8 @@ public class GetQnaResponseDto {
         this.secretQna = qna.isSecretQna();
         this.username = qna.getUser().getUsername();
         this.nickname = qna.getUser().getNickname();
-        this.createAt = qna.getCreatedAt();
-        this.updateAt = qna.getUpdatedAt();
+        this.createdAt = qna.getCreatedAt();
+        this.updatedAt = qna.getUpdatedAt();
     }
 
     public static GetQnaResponseDto of(Qna qna) {

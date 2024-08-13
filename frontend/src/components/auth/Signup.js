@@ -205,7 +205,8 @@ const ErrorText = styled.p`
 const SignUpBtn = styled.button`
   background: #ebebeb;
   width: 100%;
-  margin: ${props => props.theme.margins.xl};
+  margin-top: 0.8rem;
+  margin-bottom: 0.5rem;
   padding: ${props => props.theme.paddings.large};
   border: none;
   border-radius: 10px;

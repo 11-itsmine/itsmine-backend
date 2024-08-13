@@ -8,6 +8,7 @@ import com.sparta.itsmine.domain.like.entity.Like;
 import com.sparta.itsmine.domain.like.repository.LikeRepository;
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
+import com.sparta.itsmine.domain.product.dto.ProductUpdateRequestDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
@@ -16,6 +17,7 @@ import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -89,9 +91,15 @@ public class ProductService {
     }
 
     @Transactional
-    public void updateProduct(ProductCreateDto createDto, Long productId) {
+    public void updateProduct(ProductUpdateRequestDto updateDto, Long productId) {
         Product product = adapter.getProduct(productId);
-        product.updateProduct(product, createDto, createDto.getDueDate());
+
+        // 기존 상품 정보 업데이트
+        product.updateProduct(product, updateDto.getProductCreateDto(), updateDto.getProductCreateDto().getDueDate());
+
+        // 이미지 업데이트 (추가 및 삭제)
+        imagesService.updateProductImages(product, updateDto.getProductImagesRequestDto(), updateDto.getImagesToDelete());
+
         adapter.saveProduct(product);
     }
 

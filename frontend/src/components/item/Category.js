@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -11,33 +10,32 @@ const Category = ({ categorydata, selectCategory, filterSelect }) => {
     setIsFilterTab(!isFilterTab);
   };
   return (
-
-    <CategoryWrapper>
-      <Title>
-        <CategoryTag>{categoryName}</CategoryTag>
-        <SeeMore onClick={handelCategory}>{isFilterTab ? '+' : '-'}</SeeMore>
-      </Title>
-      <List>
-        {categoryList.map(category => {
-          return (
-            <Hide key={category.id} isFilterTab={isFilterTab}>
-              <SelectCategory
-                onClick={() => {
-                  selectCategory(category);
-                }}
-              >
-                <CheckBox
-                  type="checkBox"
-                  checked={filterSelect.name === category.name}
-                  readOnly
-                />
-                {category.name}
-              </SelectCategory>
-            </Hide>
-          );
-        })}
-      </List>
-    </CategoryWrapper>
+      <CategoryWrapper>
+        <Title>
+          <CategoryTag>{categoryName}</CategoryTag>
+          <SeeMore onClick={handelCategory}>{isFilterTab ? '+' : '-'}</SeeMore>
+        </Title>
+        <List>
+          {categoryList.map(category => {
+            return (
+                <Hide key={category.id} isFilterTab={isFilterTab}>
+                  <SelectCategory
+                      onClick={() => {
+                        selectCategory(category);
+                      }}
+                  >
+                    <CheckBox
+                        type="checkBox"
+                        checked={filterSelect.name === category.name}
+                        readOnly
+                    />
+                    {category.name}
+                  </SelectCategory>
+                </Hide>
+            );
+          })}
+        </List>
+      </CategoryWrapper>
   );
 };
 
@@ -72,9 +70,7 @@ const List = styled.div`
 `;
 
 const Hide = styled.div`
-
   display: ${props => (props.isFilterTab ? 'none' : 'block')};
-
 `;
 
 const SelectCategory = styled.div``;
@@ -86,5 +82,4 @@ const CheckBox = styled.input`
   height: 0.625rem;
   margin-right: ${props => props.theme.margins.large};
   margin-bottom: ${props => props.theme.margins.small};
-
 `;
