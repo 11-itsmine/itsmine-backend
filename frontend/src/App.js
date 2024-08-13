@@ -75,6 +75,7 @@ function App() {
           <Nav userRole={userRole} />
           <MainWrapper>
             <Routes>
+              <Route path="/" element={<Navigate to="/itsmine" />} />
               <Route path="/itsmine" element={<Main />} />
               <Route path="/itsmine/login" element={<SignIn isLoggedIn={isLoggedIn} onLogin={handleLogin} />} />
               <Route path="/signup" element={<SignUp />} />
