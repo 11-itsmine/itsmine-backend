@@ -89,7 +89,7 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "08a46b304d568ef454241721bcb6b981");
-        body.add("redirect_uri", "http://localhost:3000/oauth/callback/kakao");
+        body.add("redirect_uri", "https://itsyours.store/oauth/callback/kakao");
         body.add("code", code); // 우리가 이전에 받아온 인가코드
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
