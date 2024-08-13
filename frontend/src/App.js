@@ -6,7 +6,7 @@ import Main from "./main/Main";
 import Footer from "./components/footer/Footer";
 import Nav from "./components/nav/Nav";
 import CreateProduct from "./components/createproduct/CreateProduct";
-import styled, { ThemeProvider } from "styled-components";
+import styled, {ThemeProvider} from "styled-components";
 import SignIn from "./components/auth/Signin";
 import theme from "./styles/theme";
 import ItemList from "./components/item/ItemList";

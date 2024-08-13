@@ -1,5 +1,7 @@
 package com.sparta.itsmine.domain.report.service;
 
+import com.sparta.itsmine.domain.chat.entity.ChatRoom;
+import com.sparta.itsmine.domain.chat.repository.ChatRoomRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.report.dto.BlockRequestDto;
@@ -16,6 +18,7 @@ import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import com.sparta.itsmine.global.exception.DataNotFoundException;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,7 @@ public class ReportService {
     private static final Logger log = LoggerFactory.getLogger(ReportService.class);
     private final ReportRepository reportRepository;
     private final ProductRepository productRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final UserAdapter userAdapter;
 
     public void createReport(User user, ReportRequestDto requestDto) {
@@ -106,7 +110,14 @@ public class ReportService {
         LocalDateTime blockDate = LocalDateTime.now().plusDays(requestDto.getBlockPlusDate());
         log.info("BLOCK userID : {} ", requestDto.getUserId());
         User blockUser = userAdapter.findById(requestDto.getUserId());
+        List<Product> blockProducts = productRepository.findAllByUserId(blockUser.getId());
+        List<ChatRoom> chatRooms = chatRoomRepository
+                .findAllByFromUserIdOrToUserId(blockUser.getId());
+
         blockUser.block(blockDate, requestDto.getBenReason());
+        blockProducts.forEach(Product::blockProduct);
+        chatRooms.forEach(chatRoom -> chatRoom.blockChatRoom(blockUser));
+
     }
 
     @Transactional
