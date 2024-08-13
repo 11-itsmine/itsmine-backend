@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
+import { MdEdit } from "react-icons/md";
+import { FaDeleteLeft } from "react-icons/fa6";
 import ChatWindow from "../chat/ChatWindow";
 import Modal from "../chat/Modal";
 import ReportForm from "../backOffice/ReportForm";
@@ -26,20 +28,20 @@ const AuctionComponent = ({ userId }) => {
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        const token = localStorage.getItem('Authorization');
+        const token = localStorage.getItem("Authorization");
         if (token) {
-          const response = await axiosInstance.get('/v1/users/role', {
+          const response = await axiosInstance.get("/v1/users/role", {
             headers: {
               Authorization: `Bearer ${token.trim()}`,
             },
           });
-          console.log('Fetched userRole:', response.data.userRole); // Log userRole
+          console.log("Fetched userRole:", response.data.userRole); // Log userRole
           setUserRole(response.data.userRole);
         } else {
-          console.log('No token found');
+          console.log("No token found");
         }
       } catch (error) {
-        console.error('Failed to fetch user role:', error);
+        console.error("Failed to fetch user role:", error);
       }
     };
 
@@ -65,7 +67,7 @@ const AuctionComponent = ({ userId }) => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
 
@@ -90,7 +92,7 @@ const AuctionComponent = ({ userId }) => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
       setIsLiked((prevIsLiked) => !prevIsLiked);
@@ -110,7 +112,7 @@ const AuctionComponent = ({ userId }) => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
 
@@ -143,7 +145,7 @@ const AuctionComponent = ({ userId }) => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
 
@@ -208,6 +210,27 @@ const AuctionComponent = ({ userId }) => {
     }
   };
 
+  const handleEdit = () => {
+    // 이동 또는 상품 수정 폼 열기
+    navigate(`/edit-product/${productId}`);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("Authorization");
+      await axiosInstance.delete(`/v1/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert("상품이 삭제되었습니다.");
+      navigate("/products"); // 삭제 후 상품 목록으로 이동
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      showError("상품 삭제에 실패했습니다. 다시 시도하세요.");
+    }
+  };
+
   if (error) {
     return <ErrorText>{error}</ErrorText>;
   }
@@ -230,6 +253,12 @@ const AuctionComponent = ({ userId }) => {
         <RightColumn>
           <ProductTitle>
             {product.productName}
+            {(userRole === "MANAGER" || (userRole === "USER" && product.userId === userId)) && (
+                <IconContainer>
+                  <MdEdit onClick={handleEdit} />
+                  <FaDeleteLeft onClick={handleDelete} />
+                </IconContainer>
+            )}
             <LikeButton onClick={toggleLike} isLiked={isLiked}>
               {isLiked ? "♥" : "♡"}
             </LikeButton>
@@ -263,7 +292,6 @@ const AuctionComponent = ({ userId }) => {
             <ChatButton onClick={handleStartChat}>채팅으로 문의하기</ChatButton>
             <ReportButton onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
           </ChatAndReportContainer>
-          {/* Q&A Section */}
           <QnAList productId={productId} userId={userId} userRole={userRole} />
         </RightColumn>
         <Modal isOpen={isChatOpen} onClose={toggleChatWindow}>
@@ -348,6 +376,23 @@ const ProductTitle = styled.h1`
   display: flex;
   align-items: center;
   justify-content: space-between;
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+
+  & > svg {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #333;
+
+    &:hover {
+      color: #007bff;
+    }
+  }
 `;
 
 const Description = styled.p`

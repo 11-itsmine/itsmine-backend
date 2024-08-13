@@ -16,7 +16,8 @@ import Item from "./components/item/Item";
 import KakaoCallback from "./api/KakaoCallback";
 import AdminPage from "./components/backOffice/AdminPage";
 import axiosInstance from './api/axiosInstance';
-import LoadingScreen from './components/LoadingScreen'; // 로딩 페이지 추가
+import LoadingScreen from './components/LoadingScreen';
+import ProductEditPage from "./components/createproduct/ProductEditPage"; // 로딩 페이지 추가
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -79,6 +80,7 @@ function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/oauth/callback/kakao" element={<KakaoCallback isLoggedIn={isLoggedIn} onLogin={handleLogin} />} />
               <Route path="/products" element={<CreateProduct />} />
+              <Route path="/edit-product/:productId" element={<ProductEditPage />} />
               <Route path="/items" element={<ItemList />} />
               <Route path="/item" element={<Item />} />
               <Route path="/products/:productId" element={<AuctionComponent />} />
