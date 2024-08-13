@@ -13,6 +13,15 @@ RUN npm run build
 # Nginx를 기반으로 하는 최종 이미지
 FROM nginx:alpine
 
+# 시간대 및 로케일 설정
+RUN apk add --no-cache tzdata musl-locales musl-locales-lang && \
+    ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    echo "Asia/Seoul" > /etc/timezone && \
+    echo "export LANG=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
+    echo "export LANGUAGE=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
+    echo "export LC_ALL=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
+    apk del tzdata
+
 # Nginx 설정 파일 복사
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
