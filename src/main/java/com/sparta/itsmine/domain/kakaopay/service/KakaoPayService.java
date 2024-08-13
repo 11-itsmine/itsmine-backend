@@ -156,8 +156,8 @@ public class KakaoPayService {
         KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, tid,
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
-        redisTemplate.opsForValue().set(user.getUsername()+":auctionTemp", auction, 10, TimeUnit.SECONDS);
-        redisTemplate.opsForValue().set(user.getUsername()+":productTemp", product, 10, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(user.getUsername()+":auctionTemp", auctionId, 10, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(user.getUsername()+":productTemp", productId, 10, TimeUnit.SECONDS);
         // 동시성 제어 시작 부분. 현재 가격 확인 로직도 들어가야함.
         updateAuction(user.getUsername());
 
@@ -319,8 +319,8 @@ public class KakaoPayService {
 
     @DistributedLock(prefix = KAKAOPAY_PREFIX, key = "auctionId")
     public void updateAuction(String username) {
-        Auction auction = (Auction)redisTemplate.opsForValue().get(username+":auctionTemp");
-        Product product = (Product)redisTemplate.opsForValue().get(username+":productTemp");
+        Auction auction = auctionRepository.findById((Long)redisTemplate.opsForValue().get(username+":auctionTemp")).orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
+        Product product = productRepository.findById((Long)redisTemplate.opsForValue().get(username+":productTemp")).orElseThrow(() -> new IllegalArgumentException("물품을 찾을 수 없습니다."));
         if (auction == null || product == null) {
             throw new IllegalArgumentException("경매 혹은 상품을 찾을 수 없습니다.");
         }
