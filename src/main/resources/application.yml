@@ -13,7 +13,7 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST} # 로컬에서 할 때는  localhost, 배포할 때는 ${REDIS_HOST}
+      host: ${REDIS_HOST} # ${REDIS_HOST} # 로컬에서 할 때는  localhost, 배포할 때는 ${REDIS_HOST}
       port: ${REDIS_PORT}
       repositories:
         enabled: false
@@ -33,11 +33,11 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
 
   # 로컬용
-#  datasource:
-#      url: jdbc:mysql://${DB_URL}/itsmine
-#      username: ${DB_USER}
-#      password: ${DB_PASSWORD}
-#      driver-class-name: com.mysql.cj.jdbc.Driver
+  #  datasource:
+  #      url: jdbc:mysql://${DB_URL}/itsmine
+  #      username: ${DB_USER}
+  #      password: ${DB_PASSWORD}
+  #      driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
     init:
