@@ -148,7 +148,7 @@ public class KakaoPayService {
                         pgToken)//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
                 .build();
 
-        KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, kakaoPayApproveRequestDto.getTid(),
+        KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, tid,
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
 
