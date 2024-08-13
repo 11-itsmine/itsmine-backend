@@ -9,6 +9,7 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS
 import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.dto.ProductCreateRequestDto;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
+import com.sparta.itsmine.domain.product.dto.ProductUpdateRequestDto;
 import com.sparta.itsmine.domain.product.service.ProductService;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.PageableResponse;
@@ -95,10 +96,10 @@ public class ProductController {
 
     @PatchMapping("/{productId}")
     public ResponseEntity<HttpResponseDto> updateProduct(
-            @RequestBody ProductCreateDto createDto,
+            @RequestBody ProductUpdateRequestDto updateRequestDto,
             @PathVariable("productId") Long productId
     ) {
-        productService.updateProduct(createDto, productId);
+        productService.updateProduct(updateRequestDto, productId);
         return ResponseUtils.of(SUCCESS_TO_UPDATE);
     }
 

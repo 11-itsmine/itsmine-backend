@@ -2,15 +2,10 @@ package com.sparta.itsmine.domain.qna.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
-public class QnaRequestDto {
-
-    @NotBlank(message = "사용자 이름이 비어있습니다.")
-    private String author;
-    @NotBlank(message = "패스워드를 입력해주세요.")
-    private String password;
+@Getter
+public class QnAChangeRequestDto {
 
     @NotBlank(message = "제목이 비어있습니다.")
     @Size(min = 3)
@@ -20,5 +15,9 @@ public class QnaRequestDto {
     @Size(min = 3)
     private String content;
 
+    @NotBlank(message = "패스워드를 입력해주세요.")
+    private String password;
+
     private boolean secretQna;
+
 }
