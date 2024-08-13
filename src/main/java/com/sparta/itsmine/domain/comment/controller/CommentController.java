@@ -37,7 +37,6 @@ public class CommentController {
     @GetMapping
     public ResponseEntity<HttpResponseDto> getComment(
             @PathVariable Long qnaId) {
-
         CommentResponseDto comment = commentService.getComment(qnaId);
         return of(COMMENT_SUCCESS_GET, comment);
     }
