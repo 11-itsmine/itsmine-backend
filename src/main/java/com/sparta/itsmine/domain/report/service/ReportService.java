@@ -117,10 +117,9 @@ public class ReportService {
                 .findAllByFromUserIdOrToUserId(blockUser.getId());
 
         blockUser.block(blockDate, requestDto.getBenReason());
-//        blockProducts.forEach(Product::blockProduct);
         for (Product product : blockProducts) {
-            product.blockProduct();
             kakaoPayService.deleteProductWithAuction(product.getId());
+            product.blockProduct();
         }
         chatRooms.forEach(chatRoom -> chatRoom.blockChatRoom(blockUser));
 
@@ -135,4 +134,5 @@ public class ReportService {
 
 //    public List<> reportFarthing(User user, String reportType) {
 //    }
+
 }

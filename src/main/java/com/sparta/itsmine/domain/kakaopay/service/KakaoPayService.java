@@ -30,6 +30,8 @@ import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
+import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +67,6 @@ public class KakaoPayService {
     private final KakaoPayRepository kakaoPayRepository;
     private final AuctionService auctionService;
     private final MessageSenderService messageSenderService;
-    private final ReportService reportService;
     private final ProductAdapter productAdapter;
     private final AuctionAdapter auctionAdapter;
     private final UserAdapter userAdapter;
@@ -96,12 +97,12 @@ public class KakaoPayService {
                 .totalAmount(bidPrice)//상품 총액
                 .taxFreeAmount(0)//상품 비과세 금액
                 .vatAmount(0)//상품 부가세 금액
-                .approvalUrl(kakaopayHost + "/v1/kakaopay/approve/pc/popup/" + product.getId() + "/"
+                .approvalUrl(kakaopayHost + "/v1/kakaopay/approve/pc/layer/" + product.getId() + "/"
                         + user.getId() + "/"
                         + createAuction.getId())//결제 성공 시 redirect url, 최대 255자 ,
                 .cancelUrl(kakaopayHost
-                        + "/v1/kakaopay/cancel/pc/popup")//결제 취소 시 redirect url, 최대 255자
-                .failUrl(kakaopayHost + "/v1/kakaopay/fail/pc/popup")//결제 실패 시 redirect url, 최대 255자
+                        + "/v1/kakaopay/cancel/pc/layer")//결제 취소 시 redirect url, 최대 255자
+                .failUrl(kakaopayHost + "/v1/kakaopay/fail/pc/layer")//결제 실패 시 redirect url, 최대 255자
                 .build();
 
         // Send reqeust
@@ -171,7 +172,6 @@ public class KakaoPayService {
 
         return response;
     }
-
 
     public KakaoPayCancelResponseDto kakaoCancel(String tid) {
 
@@ -255,7 +255,10 @@ public class KakaoPayService {
     public KakaoPayGetTidResponseDto getTid(KakaoPayGetTidRequestDto kakaoPayGetTidRequestDto,
             User admin) {
 
-        reportService.checkUserRole(admin);
+//        reportService.checkUserRole(admin);
+        if (!admin.getUserRole().equals(UserRole.MANAGER)) {
+            throw new DataDuplicatedException(ResponseExceptionEnum.REPORT_MANAGER_STATUS);
+        }
 
         Optional<User> user = userRepository.findByUsername(kakaoPayGetTidRequestDto.getUsername());
         Product product = productRepository.findByProductName(

@@ -75,9 +75,9 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
         return new PageImpl<>(auctionProductImageResponseDtoList, pageable, count);
     }
 
-    //자신이 고른 상품 조회
-    @Cacheable("ByUserAndProduct")
-    public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long UserId,
+    //자신이 고른 상품 조회(신텍스오류)
+/*    @Cacheable("ByUserAndProduct")
+    public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long userId,
             Long productId) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(new QAuctionProductResponseDto(user.username, product.productName,
@@ -85,9 +85,9 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .from(auction)
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
-                .where(user.id.eq(UserId).and(product.id.eq(productId)))
+                .where(user.id.eq(userId).and(product.id.eq(productId)))
                 .fetchOne());
-    }
+    }*/
 
     /*
     select *

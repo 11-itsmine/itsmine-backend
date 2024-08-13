@@ -37,12 +37,12 @@ public class AuctionController {
     }
 
     //유저(구매자(본인)) 상품 입찰 조회
-    @GetMapping("/products/{productId}/auctions")
+/*    @GetMapping("/products/{productId}/auctions")
     public ResponseEntity<HttpResponseDto> getAuctionByProduct(
             @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long productId) {
         AuctionProductResponseDto responseDto = auctionService.getAuctionByProduct(
                 userDetails.getUser(), productId);
         return ResponseUtils.of(AUCTION_SUCCESS_GET, responseDto);
-    }
+    }*/
 
 }

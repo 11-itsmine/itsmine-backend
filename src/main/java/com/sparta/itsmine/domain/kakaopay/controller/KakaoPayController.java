@@ -17,8 +17,10 @@ import com.sparta.itsmine.domain.kakaopay.service.KakaoPayService;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -53,13 +55,19 @@ public class KakaoPayController {
     }
 
     @GetMapping("/approve/{agent}/{openType}/{productId}/{userId}/{auctionId}")//결제 승인,옥션 결제상태 확인
-    public ResponseEntity<HttpResponseDto> approve(@PathVariable("agent") String agent,
+    public ResponseEntity<Void> approve(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken,
             @PathVariable("productId") Long productId, @PathVariable("userId") Long userId,
             @PathVariable("auctionId") Long auctionId) {
-        KakaoPayApproveResponseDto kakaoPayApproveResponseDto = kakaoPayService.approve(pgToken,
-                productId, userId, auctionId);
-        return ResponseUtils.of(KAKAOPAY_APPROVE, kakaoPayApproveResponseDto);
+        kakaoPayService.approve(pgToken, productId, userId, auctionId);
+        String redirectUrl = "https://itsyours.store/itsmine";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+
+        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+
+//        return ResponseUtils.of(KAKAOPAY_APPROVE, kakaoPayApproveResponseDto, redirectUrl);
     }
 
     //결제 도중 취소하면 결제 중단
@@ -108,7 +116,7 @@ public class KakaoPayController {
             @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody
     KakaoPayGetTidRequestDto kakaoPayGetTidRequestDto) {
         KakaoPayGetTidResponseDto kakaoPayGetTidResponseDto = kakaoPayService.getTid(
-                kakaoPayGetTidRequestDto,userDetails.getUser());
+                kakaoPayGetTidRequestDto, userDetails.getUser());
         return ResponseUtils.of(KAKAOPAY_TID_SUCCESS_GET, kakaoPayGetTidResponseDto);
     }
 }

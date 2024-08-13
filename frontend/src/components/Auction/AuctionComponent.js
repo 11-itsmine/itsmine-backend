@@ -144,7 +144,7 @@ const AuctionComponent = ({userId}) => {
     try {
       const response = await axiosInstance.post(
           `/v1/kakaopay/ready/${productId}`,
-          {bidPrice},
+          { bidPrice },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -152,13 +152,11 @@ const AuctionComponent = ({userId}) => {
           }
       );
 
-      const {next_redirect_pc_url} = response.data.data;
-      window.open(next_redirect_pc_url, "_blank", "width=600,height=800");
+      const { next_redirect_pc_url } = response.data.data;
+      window.location.href = next_redirect_pc_url; // 리다이렉트로 변경
 
-      alert("입찰이 성공적으로 완료되었습니다.\n홈 화면으로 이동합니다.");
       setMessage("입찰이 성공적으로 완료되었습니다.");
       setError("");
-      navigate("/itsmine");
     } catch (err) {
       setError("입찰에 실패했습니다. 다시 시도하세요.");
       console.error("Error creating auction:", err);
