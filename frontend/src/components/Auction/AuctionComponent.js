@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import axiosInstance from "../../api/axiosInstance";
 import styled from "styled-components";
-import { useNavigate, useParams } from "react-router-dom";
-import { MdEdit } from "react-icons/md";
-import { FaDeleteLeft } from "react-icons/fa6";
+import {useNavigate, useParams} from "react-router-dom";
+import {MdEdit} from "react-icons/md";
+import {FaDeleteLeft} from "react-icons/fa6";
 import ChatWindow from "../chat/ChatWindow";
 import Modal from "../chat/Modal";
 import ReportForm from "../backOffice/ReportForm";
 import QnAList from "../qna/QnAList";
 
-const AuctionComponent = ({ userId }) => {
+const AuctionComponent = ({userId}) => {
   const [product, setProduct] = useState(null);
   const [userRole, setUserRole] = useState(""); // Add userRole state
   const [bidPrice, setBidPrice] = useState("");
@@ -22,7 +22,7 @@ const AuctionComponent = ({ userId }) => {
   const [isReportOpen, setIsReportOpen] = useState(false);
 
   const navigate = useNavigate();
-  const { productId } = useParams();
+  const {productId} = useParams();
 
   // Fetch user role
   useEffect(() => {
@@ -108,7 +108,10 @@ const AuctionComponent = ({ userId }) => {
       const token = localStorage.getItem("Authorization");
       const response = await axiosInstance.post(
           `/v1/chatrooms`,
-          { userId: product.userId },
+          {
+            userId: product.userId,
+            productId: productId
+          },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -141,7 +144,7 @@ const AuctionComponent = ({ userId }) => {
     try {
       const response = await axiosInstance.post(
           `/v1/kakaopay/ready/${productId}`,
-          { bidPrice },
+          {bidPrice},
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -149,7 +152,7 @@ const AuctionComponent = ({ userId }) => {
           }
       );
 
-      const { next_redirect_pc_url } = response.data.data;
+      const {next_redirect_pc_url} = response.data.data;
       window.open(next_redirect_pc_url, "_blank", "width=600,height=800");
 
       alert("입찰이 성공적으로 완료되었습니다.\n홈 화면으로 이동합니다.");
@@ -246,17 +249,19 @@ const AuctionComponent = ({ userId }) => {
             <Arrow left onClick={prevImage}>
               &lt;
             </Arrow>
-            <MainImage src={product.imagesUrl[currentImageIndex]} alt="Product" />
+            <MainImage src={product.imagesUrl[currentImageIndex]}
+                       alt="Product"/>
             <Arrow onClick={nextImage}>&gt;</Arrow>
           </ImageSlider>
         </LeftColumn>
         <RightColumn>
           <ProductTitle>
             {product.productName}
-            {(userRole === "MANAGER" || (userRole === "USER" && product.userId === userId)) && (
+            {(userRole === "MANAGER" || (userRole === "USER" && product.userId
+                === userId)) && (
                 <IconContainer>
-                  <MdEdit onClick={handleEdit} />
-                  <FaDeleteLeft onClick={handleDelete} />
+                  <MdEdit onClick={handleEdit}/>
+                  <FaDeleteLeft onClick={handleDelete}/>
                 </IconContainer>
             )}
             <LikeButton onClick={toggleLike} isLiked={isLiked}>
@@ -290,15 +295,17 @@ const AuctionComponent = ({ userId }) => {
           </BidSection>
           <ChatAndReportContainer>
             <ChatButton onClick={handleStartChat}>채팅으로 문의하기</ChatButton>
-            <ReportButton onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
+            <ReportButton
+                onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
           </ChatAndReportContainer>
-          <QnAList productId={productId} userId={userId} userRole={userRole} />
+          <QnAList productId={productId} userId={userId} userRole={userRole}/>
         </RightColumn>
         <Modal isOpen={isChatOpen} onClose={toggleChatWindow}>
-          {chatRoomInfo && <ChatWindow room={chatRoomInfo} onClose={toggleChatWindow} />}
+          {chatRoomInfo && <ChatWindow room={chatRoomInfo}
+                                       onClose={toggleChatWindow}/>}
         </Modal>
         <Modal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)}>
-          <ReportForm onSubmit={handleReportSubmit} />
+          <ReportForm onSubmit={handleReportSubmit}/>
         </Modal>
       </StyledContainer>
   );
@@ -362,11 +369,12 @@ const Arrow = styled.div`
   font-size: 1.5rem;
   user-select: none;
   color: #fff;
+
   &:hover {
     background-color: rgba(255, 255, 255, 0.2);
   }
 
-  ${({ left }) => (left ? `left: 10px;` : `right: 10px;`)}
+  ${({left}) => (left ? `left: 10px;` : `right: 10px;`)}
 `;
 
 const ProductTitle = styled.h1`
@@ -409,16 +417,17 @@ const PriceInfo = styled.div`
 
 const PriceButton = styled.button`
   flex: 1;
-  background-color: ${({ primary }) => (primary ? "#e74c3c" : "#27ae60")};
+  background-color: ${({primary}) => (primary ? "#e74c3c" : "#27ae60")};
   padding: 15px;
   color: white;
   border-radius: 10px;
   text-align: left;
-  margin-right: ${({ primary }) => (primary ? "10px" : "0")};
+  margin-right: ${({primary}) => (primary ? "10px" : "0")};
   border: none;
   cursor: pointer;
+
   &:hover {
-    background-color: ${({ primary }) => (primary ? "#c0392b" : "#2ecc71")};
+    background-color: ${({primary}) => (primary ? "#c0392b" : "#2ecc71")};
   }
 `;
 
@@ -457,6 +466,7 @@ const BidButton = styled.button`
   cursor: pointer;
   border-radius: 5px;
   font-size: 1rem;
+
   &:hover {
     background-color: #2ecc71;
   }
@@ -477,6 +487,7 @@ const ChatButton = styled.button`
   border-radius: 5px;
   font-size: 1rem;
   width: 48%;
+
   &:hover {
     background-color: #0056b3;
   }
@@ -491,6 +502,7 @@ const ReportButton = styled.button`
   border-radius: 5px;
   font-size: 1rem;
   width: 48%;
+
   &:hover {
     background-color: #c0392b;
   }
@@ -501,9 +513,10 @@ const LikeButton = styled.button`
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: ${({ isLiked }) => (isLiked ? "#e74c3c" : "#ccc")};
+  color: ${({isLiked}) => (isLiked ? "#e74c3c" : "#ccc")};
+
   &:hover {
-    color: ${({ isLiked }) => (isLiked ? "#c0392b" : "#888")};
+    color: ${({isLiked}) => (isLiked ? "#c0392b" : "#888")};
   }
 `;
 
