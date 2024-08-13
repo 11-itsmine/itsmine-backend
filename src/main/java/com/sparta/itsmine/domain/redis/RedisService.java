@@ -26,4 +26,9 @@ public class RedisService {
 	public void saveKakaoTid(String username, String tid) {
 		redisTemplate.opsForValue().set(username+":tid", tid, kakaoTidExpiration, TimeUnit.MILLISECONDS);
 	}
+
+	@Transactional
+	public String getValue(String key, String prefix) {
+		return redisTemplate.opsForValue().get(key + prefix);
+	}
 }
