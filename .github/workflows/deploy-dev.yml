@@ -5,7 +5,7 @@ on:
   workflow_dispatch:  # 수동 트리거
   push: # 푸시 이벤트 트리거
     branches:
-      - feature/wssChatTest  # 모든 브랜치에서 dev 브랜치로 푸시될 때 작동
+      - feature/mainAndSell  # 모든 브랜치에서 dev 브랜치로 푸시될 때 작동
   pull_request: # PR 닫힘 이벤트 트리거
     branches:
       - dev # 모든 브랜치에서 dev 브랜치로 PR이 머지될 때 작동
