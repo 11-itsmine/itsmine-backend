@@ -8,9 +8,12 @@ LABEL maintainer="yugi828@naver.com"
 VOLUME /tmp
 
 # 시간대 설정
-RUN apk add --no-cache tzdata && \
+RUN apk add --no-cache tzdata musl-locales musl-locales-lang && \
     ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
     echo "Asia/Seoul" > /etc/timezone && \
+    echo "export LANG=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
+    echo "export LANGUAGE=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
+    echo "export LC_ALL=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
     apk del tzdata
 
 # 컨테이너 외부에서 접근할 수 있도록 8080 포트를 노출합니다.
