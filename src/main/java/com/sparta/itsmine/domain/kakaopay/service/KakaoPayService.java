@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -324,11 +325,8 @@ public class KakaoPayService {
 
     @DistributedLock(prefix = KAKAOPAY_PREFIX, key = "auctionId")
     public void updateAuction(String username) {
-        Auction auction = auctionRepository.findById((Long)redisTemplate.opsForValue().get(username+":auctionTemp")).orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
-        Product product = productRepository.findById((Long)redisTemplate.opsForValue().get(username+":productTemp")).orElseThrow(() -> new IllegalArgumentException("물품을 찾을 수 없습니다."));
-        if (auction == null || product == null) {
-            throw new IllegalArgumentException("경매 혹은 상품을 찾을 수 없습니다.");
-        }
+        Auction auction = auctionRepository.findById(Long.valueOf(redisService.getValue(username, ":auctionTemp"))).orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
+        Product product = productRepository.findById(Long.valueOf(redisService.getValue(username, ":productTemp"))).orElseThrow(() -> new IllegalArgumentException("물품을 찾을 수 없습니다."));
         if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
             auction.updateStatus(SUCCESS_BID);
             auctionRepository.save(auction);
