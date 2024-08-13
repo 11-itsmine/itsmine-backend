@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom'; // Navigate 임포트 추가
 import SignUp from "./components/auth/Signup";
 import Main from "./main/Main";
 import Footer from "./components/footer/Footer";
 import Nav from "./components/nav/Nav";
 import CreateProduct from "./components/createproduct/CreateProduct";
-import styled, { ThemeProvider } from "styled-components";
+import styled, {ThemeProvider} from "styled-components";
 import SignIn from "./components/auth/Signin";
 import theme from "./styles/theme";
 import ItemList from "./components/item/ItemList";
@@ -66,31 +66,36 @@ function App() {
   };
 
   if (isLoading) {
-    return <LoadingScreen onFinish={finishLoading} />; // 로딩 중일 때 로딩 페이지 표시
+    return <LoadingScreen onFinish={finishLoading}/>; // 로딩 중일 때 로딩 페이지 표시
   }
 
   return (
       <ThemeProvider theme={theme}>
         <BrowserRouter>
-          <Nav userRole={userRole} />
+          <Nav userRole={userRole}/>
           <MainWrapper>
             <Routes>
-              <Route path="/" element={<Navigate to="/itsmine" />} />
-              <Route path="/itsmine" element={<Main />} />
-              <Route path="/itsmine/login" element={<SignIn isLoggedIn={isLoggedIn} onLogin={handleLogin} />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/oauth/callback/kakao" element={<KakaoCallback isLoggedIn={isLoggedIn} onLogin={handleLogin} />} />
-              <Route path="/products" element={<CreateProduct />} />
-              <Route path="/edit-product/:productId" element={<ProductEditPage />} />
-              <Route path="/items" element={<ItemList />} />
-              <Route path="/item" element={<Item />} />
-              <Route path="/products/:productId" element={<AuctionComponent />} />
-              <Route path="/profile" element={<Profile />} />
+              <Route path="/" element={<Navigate to="/itsmine"/>}/>
+              <Route path="/itsmine" element={<Main/>}/>
+              <Route path="/itsmine/login"
+                     element={<SignIn isLoggedIn={isLoggedIn}
+                                      onLogin={handleLogin}/>}/>
+              <Route path="/signup" element={<SignUp/>}/>
+              <Route path="/oauth/callback/kakao"
+                     element={<KakaoCallback isLoggedIn={isLoggedIn}
+                                             onLogin={handleLogin}/>}/>
+              <Route path="/products" element={<CreateProduct/>}/>
+              <Route path="/edit-product/:productId"
+                     element={<ProductEditPage/>}/>
+              <Route path="/items" element={<ItemList/>}/>
+              <Route path="/item" element={<Item/>}/>
+              <Route path="/products/:productId" element={<AuctionComponent/>}/>
+              <Route path="/profile" element={<Profile/>}/>
               {userRole === 'MANAGER' && (
-                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/admin" element={<AdminPage/>}/>
               )}
             </Routes>
-            <Footer />
+            <Footer/>
           </MainWrapper>
         </BrowserRouter>
       </ThemeProvider>
