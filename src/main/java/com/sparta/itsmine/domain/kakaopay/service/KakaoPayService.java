@@ -141,7 +141,7 @@ public class KakaoPayService {
         Auction auction = auctionAdapter.getAuction(auctionId);
         Product product = productAdapter.getProduct(productId);
         User user = userAdapter.findById(userId);
-        String tid = (String)redisTemplate.opsForValue().get(user.getUsername());
+        String tid = (String)redisTemplate.opsForValue().get(user.getUsername()+":tid");
         // Request param
         KakaoPayApproveRequestDto kakaoPayApproveRequestDto = KakaoPayApproveRequestDto.builder()
                 .cid(cid)//가맹점 코드, 10자
@@ -156,6 +156,7 @@ public class KakaoPayService {
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
 
+        // 동시성 제어 시작 부분. 현재 가격 확인 로직도 들어가야함.
         if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
             auction.updateStatus(SUCCESS_BID);
             auctionRepository.save(auction);
