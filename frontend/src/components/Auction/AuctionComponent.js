@@ -7,8 +7,9 @@ import Modal from "../chat/Modal";
 import ReportForm from "../backOffice/ReportForm";
 import QnAList from "../qna/QnAList";
 
-const AuctionComponent = ({ userId, userRole }) => {
+const AuctionComponent = ({ userId }) => {
   const [product, setProduct] = useState(null);
+  const [userRole, setUserRole] = useState(""); // Add userRole state
   const [bidPrice, setBidPrice] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -20,6 +21,30 @@ const AuctionComponent = ({ userId, userRole }) => {
 
   const navigate = useNavigate();
   const { productId } = useParams();
+
+  // Fetch user role
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const token = localStorage.getItem('Authorization');
+        if (token) {
+          const response = await axiosInstance.get('/v1/users/role', {
+            headers: {
+              Authorization: `Bearer ${token.trim()}`,
+            },
+          });
+          console.log('Fetched userRole:', response.data.userRole); // Log userRole
+          setUserRole(response.data.userRole);
+        } else {
+          console.log('No token found');
+        }
+      } catch (error) {
+        console.error('Failed to fetch user role:', error);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
 
   const fetchProduct = useCallback(async () => {
     try {
@@ -172,7 +197,7 @@ const AuctionComponent = ({ userId, userRole }) => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
       );
       setIsReportOpen(false);
@@ -236,9 +261,7 @@ const AuctionComponent = ({ userId, userRole }) => {
           </BidSection>
           <ChatAndReportContainer>
             <ChatButton onClick={handleStartChat}>채팅으로 문의하기</ChatButton>
-            <ReportButton onClick={() => setIsReportOpen(true)}>
-              신고하기
-            </ReportButton>
+            <ReportButton onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
           </ChatAndReportContainer>
           {/* Q&A Section */}
           <QnAList productId={productId} userId={userId} userRole={userRole} />

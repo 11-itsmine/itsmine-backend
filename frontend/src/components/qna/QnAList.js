@@ -6,21 +6,18 @@ import QnAForm from "./QnAForm";
 import ReplyForm from "./ReplyForm";
 
 const QnAList = ({ productId, userId, userRole }) => {
-  const [qnaList, setQnAList] = useState([]);
+  const [qnaList, setQnAList] = useState([]); // 기본적으로 빈 배열로 초기화
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [replyToQnaId, setReplyToQnaId] = useState(null);
-  const [isProductOwner, setIsProductOwner] = useState(false);
+  const [replyToQnaId, setReplyToQnaId] = useState(null); // 답글을 다는 QnA의 ID를 저장합니다.
 
   useEffect(() => {
     const fetchQnAList = async () => {
       try {
         const response = await axiosInstance.get(`/v1/products/${productId}/qnas`);
-        console.log("QnA List:", response.data.data);
         if (response.data && response.data.data) {
           const filteredQnAList = response.data.data.filter((qna) => qna && qna.id);
-          setQnAList(filteredQnAList);
-          setIsProductOwner(response.data.productOwnerId === userId || userRole === 'MANAGER');
+          setQnAList(filteredQnAList.reverse()); // 최신 질문이 위로 올라오게 정렬
         }
       } catch (error) {
         console.error("Error fetching QnA list:", error);
@@ -28,7 +25,7 @@ const QnAList = ({ productId, userId, userRole }) => {
     };
 
     fetchQnAList();
-  }, [productId, userId, userRole]);
+  }, [productId]);
 
   const handleQnAUpdated = (updatedQnA) => {
     setQnAList((prevQnAList) =>
@@ -41,11 +38,11 @@ const QnAList = ({ productId, userId, userRole }) => {
   };
 
   const handleAddQnA = (newQnA) => {
-    setQnAList((prevQnAList) => [...prevQnAList, newQnA]);
+    setQnAList((prevQnAList) => [newQnA, ...prevQnAList]); // 최신 QnA가 위로 올라오게
   };
 
   const handleReply = (qnaId) => {
-    setReplyToQnaId(qnaId);
+    setReplyToQnaId(qnaId); // 답글을 다는 QnA의 ID를 설정합니다.
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -66,17 +63,16 @@ const QnAList = ({ productId, userId, userRole }) => {
                           qnaId={qna.id}
                           productId={productId}
                           userId={userId}
-                          userRole={userRole}
+                          userRole={userRole} // Passing userRole to QnAItem
                           onQnAUpdated={handleQnAUpdated}
                           onQnADeleted={handleQnADeleted}
                           onReply={handleReply}
-                          isProductOwner={isProductOwner}
                       />
-                      {replyToQnaId === qna.id && isProductOwner && (
+                      {replyToQnaId === qna.id && (
                           <ReplyForm
                               qnaId={qna.id}
-                              author={userId}
-                              onReplyAdded={() => setReplyToQnaId(null)}
+                              author={userRole === "MANAGER" ? "Administrator" : "Seller"} // Role-based author setting
+                              onReplyAdded={() => setReplyToQnaId(null)} // 답글 추가 후 폼을 닫습니다.
                           />
                       )}
                     </Box>
