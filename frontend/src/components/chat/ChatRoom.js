@@ -1,4 +1,3 @@
-// ChatRoom.js
 import React from 'react';
 import styled from 'styled-components';
 
@@ -7,7 +6,11 @@ const ChatRoom = ({room, onOpenChat}) => {
   const otherUserNickname = isFromUser ? room.toUserNickname
       : room.fromUserNickname;
   const otherUserStatus = isFromUser ? room.toUserStatus : room.fromUserStatus;
-  const productName = room.prductName;
+
+  // fromUserStatus가 'END'일 경우 렌더링하지 않음
+  if (room.fromUserStatus === 'END') {
+    return null;
+  }
 
   return (
       <ChatRoomItem onClick={onOpenChat}>
@@ -15,7 +18,7 @@ const ChatRoom = ({room, onOpenChat}) => {
           <RoomName>
             {otherUserNickname} ({otherUserStatus})
           </RoomName>
-          <LastMessage>{productName}</LastMessage>
+          <LastMessage>{room.productName}</LastMessage>
         </ChatDetails>
       </ChatRoomItem>
   );

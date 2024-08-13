@@ -17,7 +17,6 @@ public class WebConfig {
         config.setAllowCredentials(true);
         config.addAllowedOrigin("https://itsyours.store");
         config.addAllowedOrigin("https://52.79.213.8");
-        config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.addExposedHeader("Authorization"); // CORS로 인해 프론트단에서 인식하지 못하는 Authrization 헤더를 노출

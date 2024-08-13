@@ -3,6 +3,7 @@ package com.sparta.itsmine.domain.chat.controller;
 import com.sparta.itsmine.domain.chat.dto.MessageRequestDto;
 import com.sparta.itsmine.domain.chat.service.ChatService;
 import jakarta.jms.Queue;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +45,7 @@ public class ChatController {
     @MessageMapping("chat.message/{chatRoomId}")
     public void sendMessage(@Payload MessageRequestDto requestDto) {
         log.info("Attempting to send message: {}", requestDto.getMessage());
-
+        requestDto.setTime(LocalDateTime.now());
         // 메시지 ID 설정
         if (requestDto.getMessageId() == null) {
             requestDto.setMessageId(UUID.randomUUID());

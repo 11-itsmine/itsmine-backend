@@ -68,8 +68,13 @@ public class ChatRoom {
         }
     }
 
-    public void blockChatRoom() {
+    public void blockChatRoom(User user) {
         this.deletedAt = LocalDateTime.now();
+        if (user.getId().equals(fromUser.getId())) {
+            this.fromUserStatus = ChatStatus.BLOCK;
+        } else {
+            this.toUserStatus = ChatStatus.BLOCK;
+        }
     }
 
 }

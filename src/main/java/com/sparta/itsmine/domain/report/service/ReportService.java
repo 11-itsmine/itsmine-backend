@@ -1,5 +1,6 @@
 package com.sparta.itsmine.domain.report.service;
 
+import com.sparta.itsmine.domain.chat.entity.ChatRoom;
 import com.sparta.itsmine.domain.chat.repository.ChatRoomRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
@@ -109,10 +110,13 @@ public class ReportService {
         LocalDateTime blockDate = LocalDateTime.now().plusDays(requestDto.getBlockPlusDate());
         log.info("BLOCK userID : {} ", requestDto.getUserId());
         User blockUser = userAdapter.findById(requestDto.getUserId());
-        List<Product> blockProducts = productRepository.findAllById(blockUser.getId());
+        List<Product> blockProducts = productRepository.findAllByUserId(blockUser.getId());
+        List<ChatRoom> chatRooms = chatRoomRepository
+                .findAllByFromUserIdOrToUserId(blockUser.getId());
 
         blockUser.block(blockDate, requestDto.getBenReason());
         blockProducts.forEach(Product::blockProduct);
+        chatRooms.forEach(chatRoom -> chatRoom.blockChatRoom(blockUser));
 
     }
 
