@@ -204,4 +204,10 @@ public class ChatService {
             messageTable.deleteItem(message);
         }
     }
+
+    public ChatRoom isBlock(Long userId) {
+        return chatRoomRepository.findAllByFromUserId(userId).orElseThrow(
+                () -> new DataNotFoundException(CHAT_ROOM_NOT_FOUND)
+        );
+    }
 }
