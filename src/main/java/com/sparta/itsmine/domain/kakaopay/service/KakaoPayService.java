@@ -1,9 +1,20 @@
 package com.sparta.itsmine.domain.kakaopay.service;
 
-
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
@@ -25,23 +36,15 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
-import com.sparta.itsmine.domain.report.service.ReportService;
+import com.sparta.itsmine.domain.redis.RedisService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserAdapter;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
 import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.DataDuplicatedException;
-import java.util.List;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Created by kakaopay
@@ -50,6 +53,8 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class KakaoPayService {
 
+    private final RedisTemplate redisTemplate;
+    private final RedisService redisService;
     @Value("${kakaopay.api.secret.key}")
     private String kakaopaySecretKey;
 
@@ -58,8 +63,6 @@ public class KakaoPayService {
 
     @Value("${sample.host}")
     private String kakaopayHost;
-
-    private String tid;
 
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
@@ -122,7 +125,8 @@ public class KakaoPayService {
 
         // 주문번호와 TID를 매핑해서 저장해놓는다.
         // Mapping TID with partner_order_id then save it to use for approval request.
-        this.tid = kakaoPayReadyResponseDto.getTid();
+        // this.tid = kakaoPayReadyResponseDto.getTid();
+        redisService.saveKakaoTid(user.getUsername(), kakaoPayReadyResponseDto.getTid());
         return kakaoPayReadyResponseDto;
     }
 
@@ -137,7 +141,7 @@ public class KakaoPayService {
         Auction auction = auctionAdapter.getAuction(auctionId);
         Product product = productAdapter.getProduct(productId);
         User user = userAdapter.findById(userId);
-
+        String tid = (String)redisTemplate.opsForValue().get(user.getUsername());
         // Request param
         KakaoPayApproveRequestDto kakaoPayApproveRequestDto = KakaoPayApproveRequestDto.builder()
                 .cid(cid)//가맹점 코드, 10자
@@ -148,7 +152,7 @@ public class KakaoPayService {
                         pgToken)//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
                 .build();
 
-        KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, kakaoPayApproveRequestDto.getTid(),
+        KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, tid,
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
 

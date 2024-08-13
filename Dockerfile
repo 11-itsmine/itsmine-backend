@@ -2,10 +2,19 @@
 FROM openjdk:17-jdk-alpine
 
 # 이미지 메타데이터에 유지보수 정보를 추가합니다.
-LABEL maintainer="yugi82828@naver.com"
+LABEL maintainer="yugi828@naver.com"
 
 # /tmp 디렉토리를 호스트와 공유하는 볼륨으로 설정합니다.
 VOLUME /tmp
+
+# 시간대 설정
+RUN apk add --no-cache tzdata musl-locales musl-locales-lang && \
+    ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    echo "Asia/Seoul" > /etc/timezone && \
+    echo "export LANG=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
+    echo "export LANGUAGE=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
+    echo "export LC_ALL=ko_KR.UTF-8" >> /etc/profile.d/locale.sh && \
+    apk del tzdata
 
 # 컨테이너 외부에서 접근할 수 있도록 8080 포트를 노출합니다.
 EXPOSE 8080
