@@ -3,43 +3,16 @@ import styled from 'styled-components';
 import {Stomp} from '@stomp/stompjs';
 import axiosInstance from '../../api/axiosInstance';
 import {v4 as uuidv4} from 'uuid';
-import ReportForm from './ReportForm';
+import ReportForm from './ReportForm'; // 신고 폼 컴포넌트 임포트
 
 const ChatWindow = ({room, onClose, onLeave}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isReportFormVisible, setIsReportFormVisible] = useState(false);
-  const [isBlocked, setIsBlocked] = useState(false); // 상대방이 차단했는지 여부
-  const [isUserBlocked, setIsUserBlocked] = useState(false); // 본인이 차단당했는지 여부
   const stompClient = useRef(null);
   const messageListRef = useRef(null);
 
   useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        // 상대방 상태 확인
-        const toUserResponse = await axiosInstance.get(
-            `/v1/users/${room.toUserId}/status`);
-        if (toUserResponse.data.status === 'BLOCKED') {
-          alert('차단당한 유저입니다.');
-          onClose(); // 팝업을 띄운 후 채팅방을 닫음
-          return;
-        }
-
-        // 본인 상태 확인
-        const fromUserResponse = await axiosInstance.get(
-            `/v1/users/${room.userDetailId}/status`);
-        if (fromUserResponse.data.status === 'BLOCKED') {
-          setIsUserBlocked(true); // 본인이 차단당했으면 입력 필드를 비활성화
-        }
-
-      } catch (error) {
-        console.error('Failed to check user status:', error);
-      }
-    };
-
-    checkUserStatus();
-
     if (!room?.roomId) {
       return;
     }
@@ -53,10 +26,12 @@ const ChatWindow = ({room, onClose, onLeave}) => {
         console.error('Failed to fetch messages:', error);
       }
     };
+
     fetchMessages();
 
     const socket = new WebSocket('wss://itsyours.store/ws');
     stompClient.current = Stomp.over(socket);
+
     stompClient.current.connect(
         {},
         (frame) => {
@@ -89,9 +64,10 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === '' || !room?.roomId || isUserBlocked) {
+    if (newMessage.trim() === '' || !room?.roomId) {
       return;
     }
+
     const messageObject = {
       messageId: uuidv4(),
       message: newMessage,
@@ -99,6 +75,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
       roomId: room.roomId,
       time: new Date().toISOString(),
     };
+
     stompClient.current.send(`/app/chat.message/${room.roomId}`, {},
         JSON.stringify(messageObject));
     setNewMessage('');
@@ -111,22 +88,14 @@ const ChatWindow = ({room, onClose, onLeave}) => {
     }
   };
 
-  const handleLeaveRoom = async () => {
+  const handleLeaveRoom = () => {
     if (stompClient.current && stompClient.current.connected) {
       stompClient.current.disconnect(() => {
         console.log('Disconnected from WebSocket');
         stompClient.current = null;
       });
     }
-    try {
-      await axiosInstance.delete(`/v1/chatrooms/${room.roomId}`);
-      onLeave(); // 성공 시 onLeave 콜백 호출
-    } catch (error) {
-      console.error('Failed to leave the chat room:', error);
-    } finally {
-      // 페이지 리프레시
-      window.location.reload();
-    }
+    onLeave();
   };
 
   const handleBackToList = () => {
@@ -150,16 +119,17 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   const otherUserNickname = room.fromUserId === room.userDetailId
       ? room.toUserNickname
       : room.fromUserNickname;
+
   const toUserId = room.fromUserId === room.userDetailId ? room.toUserId
       : room.fromUserId;
 
   return (
       <ChatWindowContainer>
         <Header>
-          <ChatTitle>{otherUserNickname}</ChatTitle>
+          <ChatTitle>{otherUserNickname}와의 채팅</ChatTitle>
           <ButtonContainer>
             <BackButton onClick={handleBackToList}>Back</BackButton>
-            <ReportButton onClick={handleReportClick}>Report</ReportButton>
+            <ReportButton onClick={handleReportClick}>신고하기</ReportButton>
             <LeaveButton onClick={handleLeaveRoom}>Exit</LeaveButton>
           </ButtonContainer>
         </Header>
@@ -180,14 +150,10 @@ const ChatWindow = ({room, onClose, onLeave}) => {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={isUserBlocked ? '차단되어 메시지를 보낼 수 없습니다'
-                  : '메시지를 입력하세요...'}
+              placeholder="메시지를 입력하세요..."
               onKeyPress={handleKeyPress}
-              disabled={isUserBlocked} // 본인이 차단당했을 경우 입력 비활성화
           />
-          <SendButton onClick={handleSendMessage} disabled={isUserBlocked}>
-            보내기
-          </SendButton>
+          <SendButton onClick={handleSendMessage}>보내기</SendButton>
         </MessageInputContainer>
         {isReportFormVisible && (
             <ReportForm
@@ -200,8 +166,6 @@ const ChatWindow = ({room, onClose, onLeave}) => {
 };
 
 export default ChatWindow;
-
-// 스타일 컴포넌트 정의는 이전과 동일
 
 // 스타일 컴포넌트 정의
 const ChatWindowContainer = styled.div`
