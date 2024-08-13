@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -48,6 +49,8 @@ public class ChatRoom {
     @Enumerated(EnumType.STRING)
     private ChatStatus toUserStatus;
 
+    private LocalDateTime deletedAt;
+
     public ChatRoom(User fromUser, User toUser, Product product) {
         this.roomId = UUID.randomUUID().toString();
         this.fromUser = fromUser;
@@ -64,4 +67,9 @@ public class ChatRoom {
             this.toUserStatus = ChatStatus.END;
         }
     }
+
+    public void blockChatRoom() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
 }

@@ -172,4 +172,9 @@ public class Product extends TimeStamp {
     public void countUpdate(int count) {
         this.likeCount = this.likeCount + count;
     }
+
+    public void blockProduct() {
+        this.status = ProductStatus.FAIL_BID;
+        this.deletedAt = LocalDateTime.now();
+    }
 }
