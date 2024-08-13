@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-const Category = ({ categorydata, selectPrice, filterSelect }) => {
+const Price = ({ categorydata, selectPrice, filterSelect }) => {
   const [isFilterTab, setIsFilterTab] = useState(true);
 
   const { categoryList, categoryName } = categorydata;
@@ -39,7 +39,7 @@ const Category = ({ categorydata, selectPrice, filterSelect }) => {
   );
 };
 
-export default Category;
+export default Price;
 
 const CategoryWrapper = styled.div`
   border-bottom: 1px solid lightgray;

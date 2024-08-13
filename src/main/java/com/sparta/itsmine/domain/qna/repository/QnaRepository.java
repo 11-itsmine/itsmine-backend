@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface QnaRepository extends JpaRepository<Qna, Long> {
 
+
+
     Page<Qna> findAllByProduct(Product product, Pageable pageable);
 
     @Query("SELECT q FROM Qna q WHERE q.product.id = :productId AND q.user.id = :userId AND q.secretQna = :secretQna")

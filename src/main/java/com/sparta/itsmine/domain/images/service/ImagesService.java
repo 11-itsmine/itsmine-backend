@@ -110,6 +110,39 @@ public class ImagesService {
         }
     }
 
+    // 선택한 이미지 삭제
+    @Transactional
+    public void deleteSelectedImages(List<Long> imageIds) {
+        List<Images> images = imagesRepository.findAllById(imageIds);
+        for (Images image : images) {
+            deleteFile(image.getImagesUrl());
+        }
+        imagesRepository.deleteAll(images);
+    }
+
+    // 새로운 이미지 업데이트 메서드 (이미지 추가 및 삭제 처리)
+    @Transactional
+    public void updateProductImages(Product product, ProductImagesRequestDto imagesRequestDto, List<Long> imagesToDelete) {
+        // 1. 삭제할 이미지 처리
+        if (imagesToDelete != null && !imagesToDelete.isEmpty()) {
+            for (Long imageId : imagesToDelete) {
+                Images image = imagesRepository.findByIdAndProduct(imageId, product)
+                        .orElseThrow(() -> new IllegalArgumentException("해당 이미지가 존재하지 않습니다."));
+                deleteFile(image.getImagesUrl()); // S3에서 파일 삭제
+                imagesRepository.delete(image); // DB에서 삭제
+            }
+        }
+
+        // 2. 새로운 이미지 추가
+        if (imagesRequestDto != null && imagesRequestDto.getImagesUrl() != null) {
+            for (String imageUrl : imagesRequestDto.getImagesUrl()) {
+                Images images = new Images(imageUrl, ImageType.PRODUCT, product);
+                product.getImagesList().add(images);
+                imagesRepository.save(images);
+            }
+        }
+    }
+
     //    // 여러 파일 업로드 메소드
 //    public List<String> saveFiles(List<MultipartFile> multipartFiles) throws IOException {
 //        List<String> fileUrls = new ArrayList<>();

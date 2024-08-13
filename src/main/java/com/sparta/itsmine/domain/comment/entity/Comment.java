@@ -2,6 +2,7 @@ package com.sparta.itsmine.domain.comment.entity;
 
 import com.sparta.itsmine.domain.comment.dto.CommentRequestDto;
 import com.sparta.itsmine.domain.qna.entity.Qna;
+import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.TimeStamp;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,6 +19,9 @@ public class Comment extends TimeStamp {
     private Long id;
 
     @Column(nullable = false)
+    private String author;
+
+    @Column(nullable = false)
     private String content;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -25,6 +29,7 @@ public class Comment extends TimeStamp {
     private Qna qna;
 
     public Comment(CommentRequestDto commentRequestDto, Qna qna) {
+        this.author = commentRequestDto.getAuthor();
         this.content = commentRequestDto.getContent();
         this.qna = qna;
     }
