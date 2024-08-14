@@ -4,6 +4,10 @@ import com.sparta.itsmine.domain.user.entity.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+
+import io.micrometer.common.lang.NonNull;
+import jakarta.persistence.LockModeType;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -16,4 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByBlockedAtIsNotNull();
 
     Optional<User> findByKakaoId(Long kakaoId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<User> findById(Long userId);
 }

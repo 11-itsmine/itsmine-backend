@@ -54,4 +54,5 @@ public class UserAdapter {
     public List<User> blockUserList() {
         return userRepository.findAllByBlockedAtIsNotNull();
     }
+
 }

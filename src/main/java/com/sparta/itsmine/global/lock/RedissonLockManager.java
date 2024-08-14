@@ -27,9 +27,6 @@ public class RedissonLockManager implements LockManager {
 		boolean isLocked = false;
 		try {
 			isLocked = lock.tryLock(WAIT_TIME, LEASE_TIME, TIME_UNIT);
-			if (!isLocked) {
-				throw new IllegalArgumentException("키를 얻을 수 없습니다.");
-			}
 			return operation.get();
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt(); // 인터럽트 상태 복구
