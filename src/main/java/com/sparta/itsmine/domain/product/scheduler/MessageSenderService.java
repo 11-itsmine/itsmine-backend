@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.product.scheduler;
 
 import static com.sparta.itsmine.global.common.config.RabbitConfig.DLX_EXCHANGE_NAME;
+import static com.sparta.itsmine.global.common.config.RabbitConfig.MAIN_EXCHANGE_NAME;
 import static com.sparta.itsmine.global.common.config.RabbitConfig.PRODUCT_ROUTING_KEY;
 
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,9 @@ public class MessageSenderService {
      */
     public void sendMessage(Long productId, long delayMillis) {
         MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setHeader("x-delay", delayMillis);
+        messageProperties.setExpiration(String.valueOf(delayMillis)); // TTL 설정
 
         Message message = new Message(productId.toString().getBytes(), messageProperties);
-        amqpTemplate.send(DLX_EXCHANGE_NAME,
-                PRODUCT_ROUTING_KEY, message);
+        amqpTemplate.send(MAIN_EXCHANGE_NAME, "product.routing.key", message);
     }
 }
