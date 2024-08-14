@@ -153,13 +153,7 @@ const Profile = () => {
                 },
             });
 
-            setUploadSuccess(true);
-            setProfile((prevProfile) => ({
-                ...prevProfile,
-                imagesUrl: response.data.imageUrl,
-            }));
-            setUploadError(null);
-            setShowUploadButton(false);
+            alert('프로필 사진이 성공적으로 업로드되었습니다.');
 
         } catch (err) {
             if (err.response && err.response.status === 409) {
