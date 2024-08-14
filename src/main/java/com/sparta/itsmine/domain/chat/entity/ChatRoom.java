@@ -76,5 +76,4 @@ public class ChatRoom {
             this.toUserStatus = ChatStatus.BLOCK;
         }
     }
-
 }

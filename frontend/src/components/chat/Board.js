@@ -16,6 +16,7 @@ const Board = ({currentUserId}) => {
       try {
         const response = await axiosInstance.get('/v1/chatrooms');
         setChatRooms(response.data.data || []);
+        console.log(response);
       } catch (error) {
         console.error('Failed to fetch chat rooms:', error);
       }

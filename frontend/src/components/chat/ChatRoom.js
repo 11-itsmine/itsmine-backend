@@ -7,7 +7,7 @@ const ChatRoom = ({room, onOpenChat}) => {
       : room.fromUserNickname;
   const otherUserStatus = isFromUser ? room.toUserStatus : room.fromUserStatus;
 
-  // fromUserStatus가 'END'일 경우 렌더링하지 않음
+  // fromUserStatus가 'END'일 경우만 렌더링하지 않음
   if (room.fromUserStatus === 'END') {
     return null;
   }
@@ -16,7 +16,7 @@ const ChatRoom = ({room, onOpenChat}) => {
       <ChatRoomItem onClick={onOpenChat}>
         <ChatDetails>
           <RoomName>
-            {otherUserNickname} ({otherUserStatus})
+            {otherUserNickname} ({otherUserStatus}) {/* 상태를 항상 표시 */}
           </RoomName>
           <LastMessage>{room.productName}</LastMessage>
         </ChatDetails>
@@ -29,7 +29,7 @@ export default ChatRoom;
 const ChatRoomItem = styled.li`
   background-color: #f5f5f5;
   padding: 15px;
-  margin-bottom: 8px; /* 아이템 간격 조정 */
+  margin-bottom: 8px;
   border-radius: 5px;
   display: flex;
   justify-content: space-between;
@@ -38,7 +38,7 @@ const ChatRoomItem = styled.li`
   transition: background-color 0.3s ease;
 
   &:last-child {
-    margin-bottom: 0; /* 마지막 아이템의 하단 여백 제거 */
+    margin-bottom: 0;
   }
 
   &:hover {
@@ -55,13 +55,13 @@ const ChatDetails = styled.div`
 
 const RoomName = styled.h4`
   margin: 0;
-  font-size: 0.85em; /* 폰트 크기를 줄여서 텍스트가 더 잘 맞도록 설정 */
+  font-size: 0.85em;
   color: #333;
   font-weight: bold;
 `;
 
 const LastMessage = styled.p`
   margin: 0;
-  font-size: 0.75em; /* 폰트 크기를 줄여서 공간을 절약 */
+  font-size: 0.75em;
   color: #777;
 `;
