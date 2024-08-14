@@ -57,7 +57,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KakaoPayService {
 
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final RedisService redisService;
     @Value("${kakaopay.api.secret.key}")
     private String kakaopaySecretKey;
@@ -144,20 +144,29 @@ public class KakaoPayService {
         Product product = productAdapter.getProduct(productId);
         User user = userAdapter.findById(userId);
 
-        String tid = (String)redisTemplate.opsForValue().get(user.getUsername()+":tid");
+        String tid = redisTemplate.opsForValue().get(user.getUsername()+":tid");
         // Request param
         KakaoPayApproveRequestDto kakaoPayApproveRequestDto = KakaoPayApproveRequestDto.builder()
                 .cid(cid)//가맹점 코드, 10자
                 .tid(tid)//결제 고유번호, 결제 준비 API 응답에 포함
                 .partnerOrderId(product.getId())//가맹점 주문번호, 결제 준비 API 요청과 일치해야 함
                 .partnerUserId(user.getUsername())//가맹점 회원 id, 결제 준비 API 요청과 일치해야 함
-                .pgToken(
-                        pgToken)//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
+                .pgToken(pgToken)//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
                 .build();
 
         KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, tid,
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
+
+        // Send Request
+        HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
+                kakaoPayApproveRequestDto, headers);
+
+        KakaoPayApproveResponseDto response = new RestTemplate().postForObject(
+                "https://open-api.kakaopay.com/online/v1/payment/approve",
+                entityMap,
+                KakaoPayApproveResponseDto.class
+        );
 
         if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
             auction.updateStatus(SUCCESS_BID);
@@ -170,16 +179,6 @@ public class KakaoPayService {
             auctionService.currentPriceUpdate(auction.getBidPrice(), product);
             auctionService.scheduleMessage(product.getId(), product.getDueDate());
         }
-
-        // Send Request
-        HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
-                kakaoPayApproveRequestDto, headers);
-
-        KakaoPayApproveResponseDto response = new RestTemplate().postForObject(
-                "https://open-api.kakaopay.com/online/v1/payment/approve",
-                entityMap,
-                KakaoPayApproveResponseDto.class
-        );
 
         return response;
     }
