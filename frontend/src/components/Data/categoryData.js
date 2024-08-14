@@ -6,9 +6,10 @@ export const CATEGORY_FILTER = {
     {id: 3, name: '뷰티', query: '3'},
     {id: 4, name: '전자기기', query: '4'},
     {id: 5, name: '가전제품', query: '5'},
-    {id: 5, name: '유아용품', query: '6'},
-    {id: 5, name: '의류', query: '7'},
-    {id: 5, name: '신발', query: '8'},
+    {id: 6, name: '유아용품', query: '6'},
+    {id: 7, name: '의류', query: '7'},
+    {id: 8, name: '신발', query: '8'},
+    {id: 9, name: '기타', query: '9'},
   ],
 };
 

@@ -6,34 +6,31 @@ const Category = ({ categorydata, selectCategory, filterSelect }) => {
 
   const { categoryList, categoryName } = categorydata;
 
-  const handelCategory = () => {
-    setIsFilterTab(!isFilterTab);
+  const handleCategoryClick = (category) => {
+    selectCategory(category); // category의 id를 그대로 전달
   };
+
   return (
       <CategoryWrapper>
         <Title>
           <CategoryTag>{categoryName}</CategoryTag>
-          <SeeMore onClick={handelCategory}>{isFilterTab ? '+' : '-'}</SeeMore>
+          <SeeMore onClick={() => setIsFilterTab(!isFilterTab)}>
+            {isFilterTab ? '+' : '-'}
+          </SeeMore>
         </Title>
         <List>
-          {categoryList.map(category => {
-            return (
-                <Hide key={category.id} isFilterTab={isFilterTab}>
-                  <SelectCategory
-                      onClick={() => {
-                        selectCategory(category);
-                      }}
-                  >
-                    <CheckBox
-                        type="checkBox"
-                        checked={filterSelect.name === category.name}
-                        readOnly
-                    />
-                    {category.name}
-                  </SelectCategory>
-                </Hide>
-            );
-          })}
+          {categoryList.map(category => (
+              <Hide key={category.id} isFilterTab={isFilterTab}>
+                <SelectCategory onClick={() => handleCategoryClick(category)}>
+                  <CheckBox
+                      type="checkBox"
+                      checked={filterSelect.id === category.id}
+                      readOnly
+                  />
+                  {category.name}
+                </SelectCategory>
+              </Hide>
+          ))}
         </List>
       </CategoryWrapper>
   );
@@ -65,7 +62,6 @@ const SeeMore = styled.button`
 const List = styled.div`
   display: flex;
   flex-direction: column;
-
   color: ${props => props.theme.colors.black};
 `;
 
