@@ -131,6 +131,7 @@ public class KakaoPayService {
         return kakaoPayReadyResponseDto;
     }
 
+    @DistributedLock(prefix = KAKAOPAY_PREFIX, key = "auctionId")
     public KakaoPayApproveResponseDto approve(String pgToken, Long productId,
             Long userId, Long auctionId) {
         // ready할 때 저장해놓은 TID로 승인 요청
@@ -157,10 +158,18 @@ public class KakaoPayService {
         KakaoPayTid KakaoPayTid = new KakaoPayTid(cid, tid,
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
-        redisTemplate.opsForValue().set(user.getUsername() + ":auctionTemp", String.valueOf(auctionId), 10, TimeUnit.SECONDS);
-        redisTemplate.opsForValue().set(user.getUsername() + ":productTemp", String.valueOf(productId), 10, TimeUnit.SECONDS);
-        // 동시성 제어 시작 부분. 현재 가격 확인 로직도 들어가야함.
-        updateAuction(user.getUsername());
+
+        if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
+            auction.updateStatus(SUCCESS_BID);
+            auctionRepository.save(auction);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
+            deleteWithOutSuccessfulAuction(product.getId());
+        } else {
+            auction.updateStatus(BID);
+            auctionRepository.save(auction);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
+            auctionService.scheduleMessage(product.getId(), product.getDueDate());
+        }
 
         // Send Request
         HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
@@ -317,22 +326,4 @@ public class KakaoPayService {
         }
 
     }
-
-    @DistributedLock(prefix = KAKAOPAY_PREFIX, key = "auctionId")
-    public void updateAuction(String username) {
-        Auction auction = auctionRepository.findById(Long.valueOf(redisService.getValue(username, ":auctionTemp"))).orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
-        Product product = productRepository.findById(Long.valueOf(redisService.getValue(username, ":productTemp"))).orElseThrow(() -> new IllegalArgumentException("물품을 찾을 수 없습니다."));
-        if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
-            auction.updateStatus(SUCCESS_BID);
-            auctionRepository.save(auction);
-            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
-            deleteWithOutSuccessfulAuction(product.getId());
-        } else {
-            auction.updateStatus(BID);
-            auctionRepository.save(auction);
-            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
-            auctionService.scheduleMessage(product.getId(), product.getDueDate());
-        }
-    }
-
 }
