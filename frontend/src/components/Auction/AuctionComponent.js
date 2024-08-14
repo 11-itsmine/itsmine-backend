@@ -122,9 +122,12 @@ const AuctionComponent = ({userId}) => {
       setChatRoomInfo(response.data.data);
       setIsChatOpen(true);
     } catch (err) {
-      setError("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
+      if (err.response && err.response.data && err.response.data.message) {
+        alert(err.response.data.message); // 오류 메시지를 팝업으로 표시
+      } else {
+        alert("채팅 방 생성에 실패했습니다. 다시 시도하세요."); // 기본 오류 메시지
+      }
       console.error("Error creating chat room:", err);
-      showError("채팅 방 생성에 실패했습니다. 다시 시도하세요.");
     }
   };
 
@@ -144,7 +147,7 @@ const AuctionComponent = ({userId}) => {
     try {
       const response = await axiosInstance.post(
           `/v1/kakaopay/ready/${productId}`,
-          { bidPrice },
+          {bidPrice},
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -152,7 +155,7 @@ const AuctionComponent = ({userId}) => {
           }
       );
 
-      const { next_redirect_pc_url } = response.data.data;
+      const {next_redirect_pc_url} = response.data.data;
       window.location.href = next_redirect_pc_url; // 리다이렉트로 변경
 
       setMessage("입찰이 성공적으로 완료되었습니다.");

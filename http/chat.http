@@ -101,12 +101,13 @@ Content-Type: application/json
 
 
 ### 방 생성
-POST http://localhost:8080/chatrooms
+POST http://localhost:8080/v1/chatrooms
 Content-Type: application/json
 Authorization: {{Authorization}}
 
 {
-  "userId": 4
+  "userId": 4,
+  "productId": 10
 }
 
 ### 내가 채팅중인 방 목록
