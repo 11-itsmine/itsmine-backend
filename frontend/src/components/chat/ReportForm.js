@@ -83,25 +83,18 @@ const FormContainer = styled.div`
   background-color: #fff;
   color: #000;
   border-radius: 8px;
-  width: 90%; /* 너비를 90%로 조정 */
-  max-width: 400px; /* 최대 너비를 400px로 제한 */
+  width: 80%;
+  max-width: 350px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  position: fixed;
+  top: 76%;
+  left: 46%;
   transform: translate(-50%, -50%);
-  z-index: 1000; /* 다른 요소들 위에 표시되도록 설정 */
-
-  @media (max-width: 600px) {
-    width: 100%; /* 작은 화면에서는 폼이 화면에 꽉 차게 */
-    height: 100%;
-    border-radius: 0; /* 작은 화면에서는 모서리 둥글기를 제거 */
-    padding: 10px; /* 패딩을 줄여 화면 공간 절약 */
-    top: 0;
-    left: 0;
-    transform: none; /* 작은 화면에서는 중앙 정렬을 하지 않음 */
-  }
+  min-height: 52vh;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 1000;
 `;
 
 const FormHeader = styled.div`
@@ -112,10 +105,18 @@ const FormHeader = styled.div`
 `;
 
 const CloseButton = styled.button`
-  background: transparent;
+  background-color: #c7d3f6; /* 제출 버튼과 동일한 배경색 */
+  color: #fff;
   border: none;
-  font-size: 1.5rem;
+  border-radius: 4px;
+  padding: 10px 20px;
   cursor: pointer;
+  font-size: 0.875rem; /* 제출 버튼과 크기 통일 */
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #5b6eae;
+  }
 `;
 
 const FormBody = styled.form`
@@ -143,26 +144,29 @@ const Select = styled.select`
 `;
 
 const Textarea = styled.textarea`
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   padding: 10px;
   border-radius: 4px;
   border: 1px solid #ddd;
-  min-height: 100px;
+  min-height: 175px;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 `;
 
 const SubmitButton = styled.button`
-  background-color: #7289da;
+  background-color: #bfcdf8;
   color: #fff;
   border: none;
   border-radius: 4px;
   padding: 10px 20px;
   cursor: pointer;
+  font-size: 0.875rem;
   transition: background-color 0.2s;
+  margin-top: 20px;
 
   &:hover {
     background-color: #5b6eae;
