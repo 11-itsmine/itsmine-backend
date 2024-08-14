@@ -15,7 +15,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, CustomP
 
     Product findByProductName(String productName);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
+//    @Lock(LockModeType.PESSIMISTIC_WRITE)
+//    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
     List<Product> findAllByUserId(Long userId);
 }

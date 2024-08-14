@@ -72,24 +72,34 @@ public class KakaoPayController {
 
     //결제 도중 취소하면 결제 중단
     @GetMapping("/cancel/{agent}/{openType}")//결제 취소
-    public String cancel(@PathVariable("agent") String agent,
+    public ResponseEntity<Void> cancel(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType) {
         // 주문건이 진짜 취소되었는지 확인 후 취소 처리
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
         // the “show payment status” API is called and then check if the status is QUIT_PAYMENT before suspending the payment
-        return "결제를 중단하셨습니다.";
+        String redirectUrl = "http://localhost:3000/itsmine?status=cancel";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+
+        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
     }
 
     //결제 실패(도중에 알 수 없는 이유로 연결이 끊겨서 안된다거나)
     @GetMapping("/fail/{agent}/{openType}")//결제 실패
-    public String fail(@PathVariable("agent") String agent,
+    public ResponseEntity<Void> fail(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType) {
         // 주문건이 진짜 실패되었는지 확인 후 실패 처리
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
         // the “show payment status” API is called and then check if the status is FAIL_PAYMENT before suspending the payment
-        return "결제 실패\n결제가 완료되지 않았습니다 다시 결제해주세요";
+        String redirectUrl = "http://localhost:3000/itsmine?status=fail";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+
+        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
     }
 
     //결제 취소 및 환불

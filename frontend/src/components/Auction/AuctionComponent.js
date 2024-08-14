@@ -1,17 +1,17 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import styled from "styled-components";
-import {useNavigate, useParams} from "react-router-dom";
-import {MdEdit} from "react-icons/md";
-import {FaDeleteLeft} from "react-icons/fa6";
+import { useNavigate, useParams } from "react-router-dom";
+import { MdEdit } from "react-icons/md";
+import { FaDeleteLeft } from "react-icons/fa6";
 import ChatWindow from "../chat/ChatWindow";
 import Modal from "../chat/Modal";
 import ReportForm from "../backOffice/ReportForm";
 import QnAList from "../qna/QnAList";
 
-const AuctionComponent = ({userId}) => {
+const AuctionComponent = ({ userId }) => {
   const [product, setProduct] = useState(null);
-  const [userRole, setUserRole] = useState(""); // Add userRole state
+  const [userRole, setUserRole] = useState("");
   const [bidPrice, setBidPrice] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -20,11 +20,11 @@ const AuctionComponent = ({userId}) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatRoomInfo, setChatRoomInfo] = useState(null);
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [popoverMessage, setPopoverMessage] = useState("");
 
   const navigate = useNavigate();
-  const {productId} = useParams();
+  const { productId } = useParams();
 
-  // Fetch user role
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
@@ -35,7 +35,7 @@ const AuctionComponent = ({userId}) => {
               Authorization: `Bearer ${token.trim()}`,
             },
           });
-          console.log("Fetched userRole:", response.data.userRole); // Log userRole
+          console.log("Fetched userRole:", response.data.userRole);
           setUserRole(response.data.userRole);
         } else {
           console.log("No token found");
@@ -67,7 +67,7 @@ const AuctionComponent = ({userId}) => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            }
+            },
           }
       );
 
@@ -92,7 +92,7 @@ const AuctionComponent = ({userId}) => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            }
+            },
           }
       );
       setIsLiked((prevIsLiked) => !prevIsLiked);
@@ -110,12 +110,12 @@ const AuctionComponent = ({userId}) => {
           `/v1/chatrooms`,
           {
             userId: product.userId,
-            productId: productId
+            productId: productId,
           },
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            }
+            },
           }
       );
 
@@ -140,22 +140,36 @@ const AuctionComponent = ({userId}) => {
 
   const handleBid = async () => {
     if (!bidPrice) {
-      showError("입찰 가격을 입력하세요.");
+      alert("입찰 가격을 입력하세요.");
       return;
     }
+
+    const currentPrice = product.currentPrice;
+    const auctionNowPrice = product.auctionNowPrice;
+
+    if (bidPrice <= currentPrice) {
+      alert("입찰 가격은 현재 가격보다 높아야 합니다.");
+      return;
+    }
+
+    if (bidPrice > auctionNowPrice) {
+      alert("입찰 가격은 즉시 구매 가격을 초과할 수 없습니다.");
+      return;
+    }
+
     const token = localStorage.getItem("Authorization");
     try {
       const response = await axiosInstance.post(
           `/v1/kakaopay/ready/${productId}`,
-          {bidPrice},
+          { bidPrice },
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            }
+            },
           }
       );
 
-      const {next_redirect_pc_url} = response.data.data;
+      const { next_redirect_pc_url } = response.data.data;
       window.location.href = next_redirect_pc_url; // 리다이렉트로 변경
 
       setMessage("입찰이 성공적으로 완료되었습니다.");
@@ -203,7 +217,7 @@ const AuctionComponent = ({userId}) => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-            }
+            },
           }
       );
       setIsReportOpen(false);
@@ -215,7 +229,6 @@ const AuctionComponent = ({userId}) => {
   };
 
   const handleEdit = () => {
-    // 이동 또는 상품 수정 폼 열기
     navigate(`/edit-product/${productId}`);
   };
 
@@ -228,7 +241,7 @@ const AuctionComponent = ({userId}) => {
         },
       });
       alert("상품이 삭제되었습니다.");
-      navigate("/products"); // 삭제 후 상품 목록으로 이동
+      navigate("/products");
     } catch (err) {
       console.error("Error deleting product:", err);
       showError("상품 삭제에 실패했습니다. 다시 시도하세요.");
@@ -248,11 +261,19 @@ const AuctionComponent = ({userId}) => {
         <LeftColumn>
           <ImageSlider>
             <Arrow left onClick={prevImage}>
-              &lt;
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" className="bi bi-arrow-left-square-fill" viewBox="0 0 16 16">
+                <path d="M16 14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2zm-4.5-6.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H11.5a.5.5 0 0 0 0-1"/>
+              </svg>
             </Arrow>
-            <MainImage src={product.imagesUrl[currentImageIndex]}
-                       alt="Product"/>
-            <Arrow onClick={nextImage}>&gt;</Arrow>
+            <MainImage src={product.imagesUrl[currentImageIndex]} alt="Product" />
+            <Arrow onClick={nextImage}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                   fill="gray" className="bi bi-arrow-right-square-fill"
+                   viewBox="0 0 16 16">
+                <path
+                    d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1"/>
+              </svg>
+            </Arrow>
           </ImageSlider>
         </LeftColumn>
         <RightColumn>
@@ -261,8 +282,8 @@ const AuctionComponent = ({userId}) => {
             {(userRole === "MANAGER" || (userRole === "USER" && product.userId
                 === userId)) && (
                 <IconContainer>
-                  <MdEdit onClick={handleEdit}/>
-                  <FaDeleteLeft onClick={handleDelete}/>
+                  <MdEdit onClick={handleEdit} />
+                  <FaDeleteLeft onClick={handleDelete} />
                 </IconContainer>
             )}
             <LikeButton onClick={toggleLike} isLiked={isLiked}>
@@ -290,23 +311,44 @@ const AuctionComponent = ({userId}) => {
                   placeholder="입찰 가격"
                   min={product.currentPrice + 1}
               />
-              <BidButton onClick={handleBid}>입찰</BidButton>
+              <BidButton
+                  onClick={handleBid}
+                  data-bs-toggle="popover"
+                  title={popoverMessage ? "입찰 금액 오류" : ""}
+                  data-bs-content={popoverMessage}
+              >
+                입찰
+              </BidButton>
             </BidContainer>
+
+            <IncrementButtons>
+              <IncrementButton onClick={() => setBidPrice((prev) => (parseInt(prev) || 0) + 100)}>
+                +100원
+              </IncrementButton>
+              <IncrementButton onClick={() => setBidPrice((prev) => (parseInt(prev) || 0) + 1000)}>
+                +1000원
+              </IncrementButton>
+              <IncrementButton onClick={() => setBidPrice((prev) => (parseInt(prev) || 0) + 10000)}>
+                +10000원
+              </IncrementButton>
+              <IncrementButton onClick={() => setBidPrice((prev) => (parseInt(prev) || 0) + 100000)}>
+                +100000원
+              </IncrementButton>
+            </IncrementButtons>
+
             {message && <SuccessText>{message}</SuccessText>}
           </BidSection>
           <ChatAndReportContainer>
             <ChatButton onClick={handleStartChat}>채팅으로 문의하기</ChatButton>
-            <ReportButton
-                onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
+            <ReportButton onClick={() => setIsReportOpen(true)}>신고하기</ReportButton>
           </ChatAndReportContainer>
-          <QnAList productId={productId} userId={userId} userRole={userRole}/>
+          <QnAList productId={productId} userId={userId} userRole={userRole} />
         </RightColumn>
         <Modal isOpen={isChatOpen} onClose={toggleChatWindow}>
-          {chatRoomInfo && <ChatWindow room={chatRoomInfo}
-                                       onClose={toggleChatWindow}/>}
+          {chatRoomInfo && <ChatWindow room={chatRoomInfo} onClose={toggleChatWindow} />}
         </Modal>
         <Modal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)}>
-          <ReportForm onSubmit={handleReportSubmit}/>
+          <ReportForm onSubmit={handleReportSubmit} />
         </Modal>
       </StyledContainer>
   );
@@ -351,8 +393,11 @@ const ImageSlider = styled.div`
 
 const MainImage = styled.img`
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
 `;
 
 const Arrow = styled.div`
@@ -375,7 +420,7 @@ const Arrow = styled.div`
     background-color: rgba(255, 255, 255, 0.2);
   }
 
-  ${({left}) => (left ? `left: 10px;` : `right: 10px;`)}
+  ${({ left }) => (left ? `left: 10px;` : `right: 10px;`)}
 `;
 
 const ProductTitle = styled.h1`
@@ -418,17 +463,17 @@ const PriceInfo = styled.div`
 
 const PriceButton = styled.button`
   flex: 1;
-  background-color: ${({primary}) => (primary ? "#e74c3c" : "#27ae60")};
+  background-color: ${({ primary }) => (primary ? "#e74c3c" : "#27ae60")};
   padding: 15px;
   color: white;
   border-radius: 10px;
   text-align: left;
-  margin-right: ${({primary}) => (primary ? "10px" : "0")};
+  margin-right: ${({ primary }) => (primary ? "10px" : "0")};
   border: none;
   cursor: pointer;
 
   &:hover {
-    background-color: ${({primary}) => (primary ? "#c0392b" : "#2ecc71")};
+    background-color: ${({ primary }) => (primary ? "#c0392b" : "#2ecc71")};
   }
 `;
 
@@ -456,6 +501,25 @@ const BidInput = styled.input`
   border: 1px solid #ddd;
   border-radius: 5px;
   margin-right: 15px;
+`;
+
+const IncrementButtons = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+`;
+
+const IncrementButton = styled.button`
+  background-color: #f2f2f2;
+  border: 1px solid #ddd;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
 `;
 
 const BidButton = styled.button`
@@ -514,10 +578,10 @@ const LikeButton = styled.button`
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: ${({isLiked}) => (isLiked ? "#e74c3c" : "#ccc")};
+  color: ${({ isLiked }) => (isLiked ? "#e74c3c" : "#ccc")};
 
   &:hover {
-    color: ${({isLiked}) => (isLiked ? "#c0392b" : "#888")};
+    color: ${({ isLiked }) => (isLiked ? "#c0392b" : "#888")};
   }
 `;
 
