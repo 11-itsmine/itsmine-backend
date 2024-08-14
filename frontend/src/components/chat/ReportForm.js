@@ -83,13 +83,25 @@ const FormContainer = styled.div`
   background-color: #fff;
   color: #000;
   border-radius: 8px;
-  width: 400px;
+  width: 90%; /* 너비를 90%로 조정 */
+  max-width: 400px; /* 최대 너비를 400px로 제한 */
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 1000; /* 다른 요소들 위에 표시되도록 설정 */
+
+  @media (max-width: 600px) {
+    width: 100%; /* 작은 화면에서는 폼이 화면에 꽉 차게 */
+    height: 100%;
+    border-radius: 0; /* 작은 화면에서는 모서리 둥글기를 제거 */
+    padding: 10px; /* 패딩을 줄여 화면 공간 절약 */
+    top: 0;
+    left: 0;
+    transform: none; /* 작은 화면에서는 중앙 정렬을 하지 않음 */
+  }
 `;
 
 const FormHeader = styled.div`

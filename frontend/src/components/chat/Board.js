@@ -9,7 +9,7 @@ const Board = ({currentUserId}) => {
   const [chatRooms, setChatRooms] = useState([]);
   const [isChatWindowVisible, setIsChatWindowVisible] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [isMinimized, setIsMinimized] = useState(false); // 최소화 상태를 관리하는 상태 추가
+  const [isMinimized, setIsMinimized] = useState(true); // 처음에 최소화된 상태로 설정
 
   useEffect(() => {
     const fetchRooms = async () => {
