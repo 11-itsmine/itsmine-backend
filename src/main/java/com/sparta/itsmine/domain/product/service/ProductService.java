@@ -1,6 +1,5 @@
 package com.sparta.itsmine.domain.product.service;
 
-import com.sparta.itsmine.domain.auction.service.AuctionService;
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.domain.images.service.ImagesService;
@@ -18,7 +17,6 @@ import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -65,7 +63,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponseDto> getAllProductsWithPage(int page, int size, String category,
+    public Page<ProductResponseDto> getAllProductsWithPage(int page, int size, Long category,
             String price, String search, String sort) {
 
         if (sort == null) {
@@ -96,10 +94,12 @@ public class ProductService {
         Product product = adapter.getProduct(productId);
 
         // 기존 상품 정보 업데이트
-        product.updateProduct(product, updateDto.getProductCreateDto(), updateDto.getProductCreateDto().getDueDate());
+        product.updateProduct(product, updateDto.getProductCreateDto(),
+                updateDto.getProductCreateDto().getDueDate());
 
         // 이미지 업데이트 (추가 및 삭제)
-        imagesService.updateProductImages(product, updateDto.getProductImagesRequestDto(), updateDto.getImagesToDelete());
+        imagesService.updateProductImages(product, updateDto.getProductImagesRequestDto(),
+                updateDto.getImagesToDelete());
 
         adapter.saveProduct(product);
     }
