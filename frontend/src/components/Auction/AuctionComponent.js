@@ -348,7 +348,7 @@ const AuctionComponent = ({ userId }) => {
           {chatRoomInfo && <ChatWindow room={chatRoomInfo} onClose={toggleChatWindow} />}
         </Modal>
         <Modal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)}>
-          <ReportForm onSubmit={handleReportSubmit} />
+          <ReportForm productId={productId} onClose={() => setIsReportOpen(false)} />
         </Modal>
       </StyledContainer>
   );
