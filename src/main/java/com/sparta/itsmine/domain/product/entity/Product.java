@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.product.entity;
 
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
 
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.category.entity.Category;
@@ -173,8 +174,10 @@ public class Product extends TimeStamp {
         this.likeCount = this.likeCount + count;
     }
 
-    public void blockProduct() {
-        this.status = ProductStatus.FAIL_BID;
-        this.deletedAt = LocalDateTime.now();
+    public void blockProductWithOutSuccessBid(Product product) {
+        if(!product.getStatus().equals(SUCCESS_BID)){
+            this.status = ProductStatus.FAIL_BID;
+            this.deletedAt = LocalDateTime.now();
+        }
     }
 }
