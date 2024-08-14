@@ -74,7 +74,7 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
     @Cacheable("productsMain")
     @Override
-    public Page<Product> findProducts(Pageable pageable, String category, String price, String search, String sort) {
+    public Page<Product> findProducts(Pageable pageable, Long category, String price, String search, String sort) {
         if (sort == null) {
             sort = "createdAt"; // 기본 정렬 필드 설정
         }
@@ -105,8 +105,9 @@ public class ProductRepositoryImpl implements CustomProductRepository {
         return new PageImpl<>(products, pageable, total);
     }
 
-    private BooleanExpression categoryEq(String category) {
-        return category != null ? product.category.categoryName.eq(category) : null;
+    // 카테고리 필터 메서드
+    private BooleanExpression categoryEq(Long category) {
+        return category != null ? product.category.id.eq(category) : null;
     }
 
     private BooleanExpression priceEq(String price) {

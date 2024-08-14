@@ -59,7 +59,7 @@ public class ProductController {
     public ResponseEntity<HttpResponseDto> getAllProductsWithPage(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "category", required = false) Long category,
             @RequestParam(value = "price", required = false) String price,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "sort", required = false) String sort

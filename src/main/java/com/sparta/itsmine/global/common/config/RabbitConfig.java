@@ -12,7 +12,6 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -33,10 +32,6 @@ public class RabbitConfig {
     public static final String PRODUCT_ROUTING_KEY = "product.routing.key";
     public static final String PRODUCT_QUEUE_NAME = "product.queue";
     public static final String DELAYED_QUEUE_NAME = "delayed.queue";
-
-    private static final String CHAT_QUEUE_NAME = "chat.queue";
-    private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
-    private static final String CHAT_ROUTING_KEY = "*.room.*";
 
     @Value("${spring.rabbitmq.host}")
     private String rabbitHost;
@@ -66,7 +61,9 @@ public class RabbitConfig {
     @Bean
     @Qualifier("productQueue")
     public Queue productQueue() {
-        return QueueBuilder.durable(PRODUCT_QUEUE_NAME).build();
+        return QueueBuilder.durable(PRODUCT_QUEUE_NAME)
+                .withArgument("x-dead-letter-exchange", DLX_EXCHANGE_NAME)
+                .build();
     }
 
     @Bean
@@ -76,17 +73,6 @@ public class RabbitConfig {
                 .withArgument("x-dead-letter-exchange", MAIN_EXCHANGE_NAME)
                 .withArgument("x-dead-letter-routing-key", PRODUCT_ROUTING_KEY)
                 .build();
-    }
-
-    @Bean
-    @Qualifier("chatQueue")
-    public Queue chatQueue() {
-        return QueueBuilder.durable(CHAT_QUEUE_NAME).build();
-    }
-
-    @Bean
-    public TopicExchange chatExchange() {
-        return new TopicExchange(CHAT_EXCHANGE_NAME, true, false);
     }
 
     @Bean
@@ -101,11 +87,6 @@ public class RabbitConfig {
         return BindingBuilder.bind(delayedQueue).to(dlxExchange).with(PRODUCT_ROUTING_KEY);
     }
 
-    @Bean
-    public Binding chatBinding(@Qualifier("chatQueue") Queue chatQueue,
-            TopicExchange chatExchange) {
-        return BindingBuilder.bind(chatQueue).to(chatExchange).with(CHAT_ROUTING_KEY);
-    }
 
     @Bean
     SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(

@@ -16,9 +16,9 @@ const ItemList = () => {
   const [selectCategory, setSelectCategory] = useState({});
   const [selectPrice, setSelectPrice] = useState({});
   const [userInput, setUserInput] = useState('');
-  const [optionValue, setOptionValue] = useState('createdAt'); // Default sort by createdAt
-  const [limit] = useState(8); // Number of items per page
-  const [page, setPage] = useState(0); // Current page number
+  const [optionValue, setOptionValue] = useState('createdAt');
+  const [limit] = useState(8);
+  const [page, setPage] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const ItemList = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const categoryString = selectCategory.query ? `&category=${selectCategory.query}` : '';
+      const categoryString = selectCategory.id ? `&category=${selectCategory.id}` : '';
       const priceString = selectPrice.query ? `&price=${selectPrice.query}` : '';
 
       try {
@@ -62,10 +62,7 @@ const ItemList = () => {
           throw new Error('Failed to fetch');
         }
 
-        let data = response.data.data.content;
-
-        // Sort products by currentPrice in descending order
-        data = data.sort((a, b) => b.currentPrice - a.currentPrice);
+        const data = response.data.data.content;
 
         console.log('Fetched data:', data);
         setProductsList((prevProducts) =>
@@ -81,7 +78,7 @@ const ItemList = () => {
 
   const handleCategory = (category) => {
     setSelectCategory((prevCategory) =>
-        prevCategory.name === category.name ? {} : category
+        prevCategory.id === category.id ? {} : category
     );
     setPage(0); // Reset page on filter change
   };
@@ -117,7 +114,13 @@ const ItemList = () => {
         <BannerWrapper>
           <BannerList>
             {BANNER_LIST.map((banner) => (
-                <Banner key={banner.id} src={banner.src} text={banner.text} />
+                <Banner
+                    key={banner.id}
+                    src={banner.src}
+                    text={banner.text}
+                    category={banner.category}
+                    selectCategory={handleCategory}
+                />
             ))}
           </BannerList>
         </BannerWrapper>
