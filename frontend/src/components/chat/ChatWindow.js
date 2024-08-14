@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {Stomp} from '@stomp/stompjs';
 import axiosInstance from '../../api/axiosInstance';
 import {v4 as uuidv4} from 'uuid';
-import ReportForm from './ReportForm'; // 신고 폼 컴포넌트 임포트 // 신고 폼 컴포넌트 임포트
+import ReportForm from './ReportForm';
 
 const ChatWindow = ({room, onClose, onLeave}) => {
   const [messages, setMessages] = useState([]);
@@ -170,6 +170,8 @@ const ChatWindow = ({room, onClose, onLeave}) => {
 };
 
 export default ChatWindow;
+
+// 스타일 컴포넌트 정의는 이전과 동일
 
 // 스타일 컴포넌트 정의
 const ChatWindowContainer = styled.div`
