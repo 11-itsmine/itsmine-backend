@@ -109,17 +109,17 @@ public class ReportService {
         if (user.getId().equals(requestDto.getUserId())) {
             throw new DataDuplicatedException(ResponseExceptionEnum.SELF_NOT_BLOCK);
         }
-        LocalDateTime blockDate = LocalDateTime.now().plusDays(requestDto.getBlockPlusDate());
-        log.info("BLOCK userID : {} ", requestDto.getUserId());
         User blockUser = userAdapter.findById(requestDto.getUserId());
+        LocalDateTime blockDate = LocalDateTime.now().plusDays(requestDto.getBlockPlusDate());
         List<Product> blockProducts = productRepository.findAllByUserId(blockUser.getId());
+        log.info("BLOCK userID : {} ", requestDto.getUserId());
         List<ChatRoom> chatRooms = chatRoomRepository
                 .findAllByFromUserIdOrToUserId(blockUser.getId());
 
         blockUser.block(blockDate, requestDto.getBenReason());
         for (Product product : blockProducts) {
             kakaoPayService.deleteProductWithAuction(product.getId());
-            product.blockProduct();
+            product.blockProductWithOutSuccessBid(product);
         }
         chatRooms.forEach(chatRoom -> chatRoom.blockChatRoom(blockUser));
 

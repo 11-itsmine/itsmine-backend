@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {Stomp} from '@stomp/stompjs';
 import axiosInstance from '../../api/axiosInstance';
 import {v4 as uuidv4} from 'uuid';
-import ReportForm from './ReportForm'; // 신고 폼 컴포넌트 임포트 // 신고 폼 컴포넌트 임포트
+import ReportForm from './ReportForm';
 
 const ChatWindow = ({room, onClose, onLeave}) => {
   const [messages, setMessages] = useState([]);
@@ -11,6 +11,10 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   const [isReportFormVisible, setIsReportFormVisible] = useState(false);
   const stompClient = useRef(null);
   const messageListRef = useRef(null);
+
+  // Determine if the current user or the other user is blocked or the chat is ended
+  const isChatDisabled = room.toUserStatus === 'BLOCK' || room.toUserStatus
+      === 'END' || room.fromUserStatus === 'BLOCK';
 
   useEffect(() => {
     if (!room?.roomId) {
@@ -61,7 +65,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === '' || !room?.roomId) {
+    if (newMessage.trim() === '' || !room?.roomId || isChatDisabled) {
       return;
     }
     const messageObject = {
@@ -95,6 +99,8 @@ const ChatWindow = ({room, onClose, onLeave}) => {
       onLeave(); // 성공 시 onLeave 콜백 호출
     } catch (error) {
       console.error('Failed to leave the chat room:', error);
+    } finally {
+      window.location.reload(); // 페이지 리로드 추가
     }
   };
 
@@ -117,10 +123,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   };
 
   const otherUserNickname = room.fromUserId === room.userDetailId
-      ? room.toUserNickname
-      : room.fromUserNickname;
-  const toUserId = room.fromUserId === room.userDetailId ? room.toUserId
-      : room.fromUserId;
+      ? room.toUserNickname : room.fromUserNickname;
 
   return (
       <ChatWindowContainer>
@@ -149,22 +152,26 @@ const ChatWindow = ({room, onClose, onLeave}) => {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="메시지를 입력하세요..."
+              placeholder={isChatDisabled ? "채팅이 차단되었거나 종료되었습니다."
+                  : "메시지를 입력하세요..."}
               onKeyPress={handleKeyPress}
+              disabled={isChatDisabled} // Disable input if chat is disabled
           />
-          <SendButton onClick={handleSendMessage}>보내기</SendButton>
+          <SendButton onClick={handleSendMessage} disabled={isChatDisabled}>
+            보내기
+          </SendButton>
         </MessageInputContainer>
         {isReportFormVisible && (
-            <ReportForm
-                onClose={handleCloseReportForm}
-                toUserId={toUserId} // 신고 대상 사용자의 ID 전달
-            />
+            <ReportForm onClose={handleCloseReportForm}
+                        toUserId={room.toUserId}/>
         )}
       </ChatWindowContainer>
   );
 };
 
 export default ChatWindow;
+
+// 스타일 컴포넌트 정의는 이전과 동일
 
 // 스타일 컴포넌트 정의
 const ChatWindowContainer = styled.div`

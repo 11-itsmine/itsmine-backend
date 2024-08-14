@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.chat.service;
 
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_BLACKLIST_USER;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_NOT_CHAT;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CHAT_ROOM_SELF_CREATE;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
@@ -86,6 +87,10 @@ public class ChatService {
         Optional<ChatRoom> existingChatRoom = chatRoomRepository.findByFromUserIdAndToUserIdAndProductId(
                 fromUser.getId(), toUser.getId(), requestDto.getProductId());
         if (existingChatRoom.isPresent()) {
+            if (!existingChatRoom.get().getFromUserStatus().equals(ChatStatus.TALK) ||
+                    !existingChatRoom.get().getToUserStatus().equals(ChatStatus.TALK)) {
+                throw new DataDuplicatedException(CHAT_ROOM_NOT_CHAT);
+            }
             return new RoomInfoResponseDto(existingChatRoom.get(), fromUser.getId());
         }
         Product product = productRepository.findById(requestDto.getProductId()).orElseThrow(
