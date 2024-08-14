@@ -3,13 +3,13 @@ server:
 
 spring:
   rabbitmq:
-    host: ${RABBITMQ_BROKER}
-    port: ${RABBITMQ_PORT} # RabbitMQ SSL port
+    host: itsmine-rabbitmq-1
+    port: 5672 # RabbitMQ SSL port
     username: ${RABBITMQ_USERNAME}
     password: ${RABBITMQ_PASSWORD}
     virtual-host: ${RABBITMQ_VIRTUAL_HOST}
     ssl:
-      enabled: true
+      enabled: false
 
   data:
     redis:
