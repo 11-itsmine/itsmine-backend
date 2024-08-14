@@ -45,8 +45,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // 주소 : ws://localhost:8080/ws
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(chatMessageInterceptor);
-    }
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(chatMessageInterceptor);
+//    }
 }

@@ -41,7 +41,7 @@ const SignIn = ({ onLogin }) => {
       if (error.response && error.response.data) {
         setErrorMessage(error.response.data.message);
       } else {
-        setErrorMessage('로그인에 실패했습니다. 다시 시도해주세요.');
+        setErrorMessage('Failed to Sign-in. Try this again later.');
       }
     }
   };

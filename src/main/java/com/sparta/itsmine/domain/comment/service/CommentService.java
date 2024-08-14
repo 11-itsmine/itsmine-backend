@@ -30,7 +30,7 @@ public class CommentService {
         Qna qna = getQna(qnaId);
 
         // 판매자 또는 MANAGER만 댓글 작성 가능
-        if (!qna.getUser().getId().equals(user.getId()) && !user.getUserRole().equals(UserRole.MANAGER)) {
+        if (!qna.getProduct().getUser().getId().equals(user.getId()) && !user.getUserRole().equals(UserRole.MANAGER)) {
             throw new DataNotFoundException(NO_AUTHORIZATION_COMMNET);
         }
 

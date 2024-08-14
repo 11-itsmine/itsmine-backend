@@ -549,8 +549,8 @@ const Profile = () => {
                                     </Typography>
                                 )}
                                 {auctions.map((auction) => (
-                                    <Grid item xs={12} sm={6} md={4} key={auction.productName}>
-                                        <Link to={`/products/${auction.productName}`} style={{ textDecoration: 'none' }}>
+                                    <Grid item xs={12} sm={6} md={4} key={auction.productId}>
+                                        <Link to={`/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
                                             <Paper sx={{ p: 2 }}>
                                                 {auction.imagesUrl && auction.imagesUrl.length > 0 && (
                                                     <img

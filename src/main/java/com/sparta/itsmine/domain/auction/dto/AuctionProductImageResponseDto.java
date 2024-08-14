@@ -11,7 +11,7 @@ public class AuctionProductImageResponseDto extends AuctionProductResponseDto {
     private final List<String> imagesUrl;
 
     public AuctionProductImageResponseDto(AuctionProductResponseDto auctionProductResponseDto,Product product) {
-        super(auctionProductResponseDto.getUsername(), auctionProductResponseDto.getProductName(),
+        super(auctionProductResponseDto.getProductId(),auctionProductResponseDto.getUsername(), auctionProductResponseDto.getProductName(),
                 auctionProductResponseDto.getBidPrice(), auctionProductResponseDto.getStatus());
         this.imagesUrl = product.getImageUrls();
     }

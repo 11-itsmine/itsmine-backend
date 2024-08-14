@@ -23,7 +23,7 @@ function Main() {
 
   return (
       <MainWrapper>
-        <Carousel/>
+        {/*<Carousel/>*/}
         <ItemList items={items}/>
         <Board currentUserId={12345}/> {/* Board 컴포넌트 추가 */}
       </MainWrapper>
