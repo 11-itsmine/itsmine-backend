@@ -60,6 +60,7 @@ public enum ResponseExceptionEnum {
     CHAT_NOT_ONE_TO_ONE(HttpStatus.NOT_FOUND, "나간 유저가 존재하여 채팅이 불가능 합니다."),
     CHAT_BLACKLIST_USER(HttpStatus.NOT_FOUND, "블랙 리스트에 등록된 유저 입니다."),
     CHAT_ROOM_SELF_CREATE(HttpStatus.NOT_FOUND, "혼자서 채팅방을 생성할수 없습니다."),
+    CHAT_ROOM_NOT_CHAT(HttpStatus.BAD_REQUEST, "이미 채팅방을 나가셨습니다. 양쪽이 나가야 다시 채팅이 가능합니다."),
 
     // 상품 이미지
     INVALID_URL_EXCEPTION(HttpStatus.OK, "유효하지 않은 URL 경로입니다. 올바른 URL 을 입력해주세요."),

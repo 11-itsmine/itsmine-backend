@@ -9,41 +9,17 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isReportFormVisible, setIsReportFormVisible] = useState(false);
-  const [isBlocked, setIsBlocked] = useState(false); // 상대방이 차단했는지 여부
-  const [isUserBlocked, setIsUserBlocked] = useState(false); // 본인이 차단당했는지 여부
   const stompClient = useRef(null);
   const messageListRef = useRef(null);
 
+  // Determine if the current user or the other user is blocked or the chat is ended
+  const isChatDisabled = room.toUserStatus === 'BLOCK' || room.toUserStatus
+      === 'END' || room.fromUserStatus === 'BLOCK';
+
   useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        // 상대방 상태 확인
-        const toUserResponse = await axiosInstance.get(
-            `/v1/users/${room.toUserId}/status`);
-        if (toUserResponse.data.status === 'BLOCKED') {
-          alert('차단당한 유저입니다.');
-          onClose(); // 팝업을 띄운 후 채팅방을 닫음
-          return;
-        }
-
-        // 본인 상태 확인
-        const fromUserResponse = await axiosInstance.get(
-            `/v1/users/${room.userDetailId}/status`);
-        if (fromUserResponse.data.status === 'BLOCKED') {
-          setIsUserBlocked(true); // 본인이 차단당했으면 입력 필드를 비활성화
-        }
-
-      } catch (error) {
-        console.error('Failed to check user status:', error);
-      }
-    };
-
-    checkUserStatus();
-
     if (!room?.roomId) {
       return;
     }
-
     const fetchMessages = async () => {
       try {
         const response = await axiosInstance.get(
@@ -89,7 +65,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === '' || !room?.roomId || isUserBlocked) {
+    if (newMessage.trim() === '' || !room?.roomId || isChatDisabled) {
       return;
     }
     const messageObject = {
@@ -124,8 +100,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
     } catch (error) {
       console.error('Failed to leave the chat room:', error);
     } finally {
-      // 페이지 리프레시
-      window.location.reload();
+      window.location.reload(); // 페이지 리로드 추가
     }
   };
 
@@ -148,10 +123,7 @@ const ChatWindow = ({room, onClose, onLeave}) => {
   };
 
   const otherUserNickname = room.fromUserId === room.userDetailId
-      ? room.toUserNickname
-      : room.fromUserNickname;
-  const toUserId = room.fromUserId === room.userDetailId ? room.toUserId
-      : room.fromUserId;
+      ? room.toUserNickname : room.fromUserNickname;
 
   return (
       <ChatWindowContainer>
@@ -180,20 +152,18 @@ const ChatWindow = ({room, onClose, onLeave}) => {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={isUserBlocked ? '차단되어 메시지를 보낼 수 없습니다'
-                  : '메시지를 입력하세요...'}
+              placeholder={isChatDisabled ? "채팅이 차단되었거나 종료되었습니다."
+                  : "메시지를 입력하세요..."}
               onKeyPress={handleKeyPress}
-              disabled={isUserBlocked} // 본인이 차단당했을 경우 입력 비활성화
+              disabled={isChatDisabled} // Disable input if chat is disabled
           />
-          <SendButton onClick={handleSendMessage} disabled={isUserBlocked}>
+          <SendButton onClick={handleSendMessage} disabled={isChatDisabled}>
             보내기
           </SendButton>
         </MessageInputContainer>
         {isReportFormVisible && (
-            <ReportForm
-                onClose={handleCloseReportForm}
-                toUserId={toUserId} // 신고 대상 사용자의 ID 전달
-            />
+            <ReportForm onClose={handleCloseReportForm}
+                        toUserId={room.toUserId}/>
         )}
       </ChatWindowContainer>
   );

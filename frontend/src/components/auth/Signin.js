@@ -39,9 +39,9 @@ const SignIn = ({ onLogin }) => {
       // 로그인 실패 시 처리 로직
       console.error('Login failed:', error);
       if (error.response && error.response.data) {
-        setErrorMessage(error.response.data.message);
+        alert('비밀번호를 다시 확인해주세요.'); // alert 창으로 변경
       } else {
-        setErrorMessage('로그인에 실패했습니다. 다시 시도해주세요.');
+        alert('Failed to Sign-in. Try this again later.'); // 예외 처리
       }
     }
   };
@@ -60,11 +60,11 @@ const SignIn = ({ onLogin }) => {
         <Logo>ItsMine</Logo>
         <Form onSubmit={handleSubmit}>
           <LoginForm>
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">아이디</Label>
             <Input
                 id="username"
                 name="username"
-                placeholder="Enter your username"
+                placeholder="아이디를 입력해주세요"
                 value={loginRequest.username}
                 onChange={handleChange}
                 autoComplete="username"
@@ -72,12 +72,12 @@ const SignIn = ({ onLogin }) => {
             />
           </LoginForm>
           <LoginForm>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">비밀번호</Label>
             <Input
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="비밀번호를 입력해주세요"
                 value={loginRequest.password}
                 onChange={handleChange}
                 autoComplete="current-password"
@@ -89,21 +89,20 @@ const SignIn = ({ onLogin }) => {
                 value="remember"
                 color="primary"
             />
-            Remember me
+            로그인 상태 유지
           </FormControlLabel>
-          {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
 
-          <LoginBtn type="submit">Log In</LoginBtn>
+          <LoginBtn type="submit">로그인</LoginBtn>
           <KakaoBtn onClick={handleKakaoButtonClick}>
             <KakaoLoginImage src={kakaoLoginImage} alt="Login with Kakao" />
           </KakaoBtn>
 
           <GridContainer>
             <GridItem>
-              <Link href="#">Forgot password?</Link>
+              <Link href="#">비밀번호 찾기</Link>
             </GridItem>
             <GridItem>
-              <Link href="/signup">Don't have an account? Sign Up</Link>
+              <Link href="/signup">회원가입 하기</Link>
             </GridItem>
           </GridContainer>
         </Form>
@@ -173,13 +172,8 @@ const Checkbox = styled.input`
   margin-right: ${props => props.theme.margins.base};
 `;
 
-const ErrorText = styled.p`
-  color: ${props => props.theme.palette.error.main};
-  font-size: ${props => props.theme.fontSizes.small};
-`;
-
 const LoginBtn = styled.button`
-  background: #ebebeb;
+  background: #333333; /* 더 진한 색상으로 설정 */
   width: 100%;
   margin-top: 0.8rem;
   margin-bottom: 0.5rem;
@@ -189,6 +183,16 @@ const LoginBtn = styled.button`
   font-size: ${props => props.theme.fontSizes.base};
   color: ${props => props.theme.colors.white};
   cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s; /* 클릭 시 변화를 위해 트랜지션 추가 */
+
+  &:hover {
+    background-color: #555555; /* 호버 시 약간 더 밝은 색으로 변경 */
+  }
+
+  &:active {
+    background-color: #111111; /* 클릭 시 더 진한 색상으로 변경 */
+    transform: scale(0.98); /* 클릭 시 약간 눌리는 효과 */
+  }
 `;
 
 const KakaoBtn = styled.button`
@@ -199,10 +203,20 @@ const KakaoBtn = styled.button`
   height: 3.375rem; // Login button height
   margin-bottom: 1rem;
   border: ${props => props.theme.borders.lightGray};
-  background: #ffe501;
+  background: #ffe501; /* 기본 카카오 버튼 색상 */
   text-decoration: none;
   cursor: pointer;
   border-radius: 10px;
+  transition: background-color 0.3s, transform 0.2s; /* 클릭 시 변화를 위해 트랜지션 추가 */
+
+  &:hover {
+    background-color: #ffd400; /* 호버 시 색상 변경 (조금 더 진하게) */
+  }
+
+  &:active {
+    background-color: #e5b800; /* 클릭 시 더 진한 색상으로 변경 */
+    transform: scale(0.98); /* 클릭 시 약간 눌리는 효과 */
+  }
 `;
 
 const KakaoLoginImage = styled.img`

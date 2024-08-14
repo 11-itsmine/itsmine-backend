@@ -153,13 +153,7 @@ const Profile = () => {
                 },
             });
 
-            setUploadSuccess(true);
-            setProfile((prevProfile) => ({
-                ...prevProfile,
-                imagesUrl: response.data.imageUrl,
-            }));
-            setUploadError(null);
-            setShowUploadButton(false);
+            alert('프로필 사진이 성공적으로 업로드되었습니다.');
 
         } catch (err) {
             if (err.response && err.response.status === 409) {
@@ -549,8 +543,8 @@ const Profile = () => {
                                     </Typography>
                                 )}
                                 {auctions.map((auction) => (
-                                    <Grid item xs={12} sm={6} md={4} key={auction.productName}>
-                                        <Link to={`/products/${auction.productName}`} style={{ textDecoration: 'none' }}>
+                                    <Grid item xs={12} sm={6} md={4} key={auction.productId}>
+                                        <Link to={`/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
                                             <Paper sx={{ p: 2 }}>
                                                 {auction.imagesUrl && auction.imagesUrl.length > 0 && (
                                                     <img

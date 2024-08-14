@@ -33,19 +33,18 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     private final JPAQueryFactory jpaQueryFactory;
     private final ProductRepository productRepository;
 
-
     /*
-    select u.username,p.product_name,max(a.bid_price),a.status
+    select p.id,u.username,p.product_name,max(a.bid_price),a.status
     from auctions a,user u,product p
     where u.id=2 and u.id=a.user_id and p.id=a.product_id and a.status = p.status and a.status != 'NEED_PAY'
     group by p.id;
-    */
+     */
     //자신이 고른 상품 전체 조회
     @Cacheable("AuctionAllByUser")
     public Page<AuctionProductImageResponseDto> findAuctionAllByUserid(Long userId,
             Pageable pageable) {
         List<AuctionProductResponseDto> auctionProductResponseDtoList = jpaQueryFactory
-                .select(new QAuctionProductResponseDto(user.username, product.productName,
+                .select(new QAuctionProductResponseDto(product.id, user.username, product.productName,
                         auction.bidPrice.max(), auction.status))
                 .from(auction)
                 .innerJoin(auction.product, product)

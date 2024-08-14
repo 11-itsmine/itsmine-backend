@@ -119,7 +119,7 @@ public class ReportService {
         blockUser.block(blockDate, requestDto.getBenReason());
         for (Product product : blockProducts) {
             kakaoPayService.deleteProductWithAuction(product.getId());
-            product.blockProduct();
+            product.blockProductWithOutSuccessBid(product);
         }
         chatRooms.forEach(chatRoom -> chatRoom.blockChatRoom(blockUser));
 
