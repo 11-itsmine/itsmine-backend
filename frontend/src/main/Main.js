@@ -1,12 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import styled from 'styled-components';
 import Carousel from "../components/carousel/Carousel";
 import ItemList from "../components/item/ItemList";
-import Board from '../components/chat/Board'; // Board 컴포넌트 임포트
+import Board from '../components/chat/Board';
+import { useLocation } from 'react-router-dom'; // useLocation hook 추가
 
 function Main() {
   const [items, setItems] = useState([]);
+  const location = useLocation(); // 현재 위치 정보 가져오기
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -21,11 +23,22 @@ function Main() {
     fetchItems();
   }, []);
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const status = queryParams.get('status');
+
+    if (status === 'cancel') {
+      alert('결제가 취소되었습니다. 메인화면으로 돌아갑니다.');
+    } else if (status === 'fail') {
+      alert('결제가 실패하였습니다. 메인화면으로 돌아갑니다.');
+    }
+  }, [location]);
+
   return (
       <MainWrapper>
         {/*<Carousel/>*/}
-        <ItemList items={items}/>
-        <Board currentUserId={12345}/> {/* Board 컴포넌트 추가 */}
+        <ItemList items={items} />
+        <Board currentUserId={12345} />
       </MainWrapper>
   );
 }
@@ -37,5 +50,5 @@ const MainWrapper = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  padding-bottom: 20px; /* Footer와 겹치지 않도록 여백 추가 */
+  padding-bottom: 20px;
 `;
