@@ -81,6 +81,10 @@ public class KakaoPayService {
 
 
     public KakaoPayReadyResponseDto ready(Long productId, User user, AuctionRequestDto requestDto) {
+
+        //ban 상태의 유저는 입찰 못하게 차단
+        user.checkBlock();
+
         // Request header
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
@@ -284,6 +288,7 @@ public class KakaoPayService {
 
     public void deleteWithOutSuccessfulAuction(Long productId) {
         List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
+        //왜냐하면 맥스값이 곧 낙찰가니까
 
         for (Auction auction : auctions) {
             if (auction.getStatus().equals(BID)) {
@@ -306,7 +311,7 @@ public class KakaoPayService {
                 KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
                 kakaoCancel(kakaoPayTid.getTid());
                 auctionRepository.delete(auction);
-            } else {
+            } else if(auction.getStatus().equals(NEED_PAY)) {
                 auctionRepository.delete(auction);
             }
         }
