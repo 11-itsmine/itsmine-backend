@@ -33,7 +33,8 @@
 
 ### 🧑‍🤝‍🧑 개발자 소개
 
-![2024-08-15 (2)](https://github.com/user-attachments/assets/5c15bfd7-3c67-445c-9d6b-8a8a09acdf5d)
+![2024-08-15 (3)](https://github.com/user-attachments/assets/e11832f0-c7fb-41b4-8d9f-98822229baae)
+
 
 ---
 ### 💻 개발 환경
