@@ -32,6 +32,10 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +50,7 @@ public class UserService {
     private final RefreshTokenAdapter refreshTokenAdapter;
     private final UserAdapter userAdapter;
     private final RedisTemplate<String, String> redisTemplate;
+    private final AuthenticationManager authenticationManager;
 
     // @Value("${admin.token}")
     // private String adminToken;
@@ -152,6 +157,13 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(temporaryPassword));
         userRepository.save(user);
 
+        // 인증 객체 갱신
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getUsername(), temporaryPassword)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         return temporaryPassword;
     }
 
@@ -171,6 +183,14 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
         userRepository.save(user);
+
+        // 인증 객체 갱신
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getUsername(), passwordChangeRequest.getNewPassword())
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
     }
 
     // 10자리 랜덤한 패스워드를 생성하는 메서드
