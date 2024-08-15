@@ -1,8 +1,10 @@
 package com.sparta.itsmine.domain.user.controller;
 
 
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_CHANGE_PASSWORD;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_LOGIN;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_LOGOUT;
+import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TEMPORARY_PASSWORD;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_DELETE_SUCCESS;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_RESIGN_SUCCESS;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
@@ -14,6 +16,8 @@ import static com.sparta.itsmine.global.common.response.ResponseUtils.of;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.itsmine.domain.social.kakao.service.KakaoService;
 import com.sparta.itsmine.domain.user.dto.BlockResponseDto;
+import com.sparta.itsmine.domain.user.dto.PasswordChangeRequest;
+import com.sparta.itsmine.domain.user.dto.PasswordFindRequest;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserIdRequestDto;
@@ -22,6 +26,7 @@ import com.sparta.itsmine.domain.user.dto.UserRoleDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.service.UserService;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
+import com.sparta.itsmine.global.common.response.ResponseCodeEnum;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import com.sparta.itsmine.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,6 +73,23 @@ public class UserController {
     ) {
         userService.logout(userDetails.getUsername());
         return of(SUCCESS_LOGOUT);
+    }
+
+    @PostMapping ("/find-password")
+    public ResponseEntity<HttpResponseDto> findPassword(
+            @RequestBody PasswordFindRequest passwordFindRequest
+    ){
+        String randomPassword = userService.findPassword(passwordFindRequest);
+        return of(SUCCESS_TEMPORARY_PASSWORD, randomPassword);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<HttpResponseDto> changePassword(
+            @RequestBody PasswordChangeRequest passwordChangeRequest) {
+
+        userService.changePassword(passwordChangeRequest);
+
+        return of(SUCCESS_CHANGE_PASSWORD);
     }
 
     @GetMapping("/profile")

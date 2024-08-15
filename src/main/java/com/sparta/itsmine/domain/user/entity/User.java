@@ -31,7 +31,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "user", indexes = {@Index(name="idx_username",columnList = "username")})
+@Table(
+        name = "user",
+        indexes = {
+                @Index(name = "idx_username", columnList = "username"),
+                @Index(name = "idx_name", columnList = "name"),
+                @Index(name = "idx_email", columnList = "email"),
+                @Index(name = "idx_username_name_email", columnList = "username, name, email")
+        }
+)
 public class User extends TimeStamp {
 
     /**
