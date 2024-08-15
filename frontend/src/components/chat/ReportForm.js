@@ -52,7 +52,6 @@ const ReportForm = ({onClose, toUserId}) => {
           >
             <option value="CHAT">채팅 메시지</option>
             <option value="USER">사용자</option>
-            <option value="PRODUCT">상품</option>
             <option value="ETC">기타</option>
           </Select>
 
