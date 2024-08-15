@@ -47,7 +47,7 @@ public class ReportService {
                     () -> new DataNotFoundException(ResponseExceptionEnum.PRODUCT_NOT_FOUND)
             );
             badPerson = product.getUser();
-        } else if (requestDto.getReportType().equals(ReportType.CHAT)) {
+        } else {
             badPerson = userAdapter.findById(requestDto.getTypeId());
         }
         reportRepository.save(new Report(user, badPerson, requestDto));
