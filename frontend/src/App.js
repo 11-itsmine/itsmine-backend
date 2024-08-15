@@ -80,7 +80,7 @@ function App() {
               <Route path="/" element={<Navigate to="/itsmine" />} />
               <Route path="/itsmine" element={<Main />} />
               <Route path="/itsmine/login" element={<SignIn isLoggedIn={isLoggedIn} onLogin={handleLogin} />} />
-              <Route path ="/itsmine/findpassword" element={<FindPassword/>}/>
+              <Route path ="/itsmine/find-password" element={<FindPassword/>}/>
               <Route path ="/itsmine/change-password" element={<ChangePassword/>}/>
               <Route path="/signup" element={<SignUp />} />
               <Route path="/oauth/callback/kakao" element={<KakaoCallback isLoggedIn={isLoggedIn} onLogin={handleLogin} />} />
