@@ -74,20 +74,32 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
     @Cacheable("productsMain")
     @Override
-    public Page<Product> findProducts(Pageable pageable, Long category, String price, String search, String sort) {
+    public Page<Product> findProducts(Pageable pageable, Long category, String priceRange, String search, String sort) {
         if (sort == null) {
             sort = "createdAt"; // 기본 정렬 필드 설정
         }
 
+        // Parse the price range
+        Long minPrice = null;
+        Long maxPrice = null;
+        if (priceRange != null && !priceRange.isEmpty()) {
+            String[] priceParts = priceRange.split("-");
+            if (priceParts.length == 2) {
+                minPrice = Long.parseLong(priceParts[0]);
+                maxPrice = Long.parseLong(priceParts[1]);
+            }
+        }
+
+        // Construct the query with filters
         List<Product> products = queryFactory
                 .selectFrom(product)
                 .where(
-                        product.status.eq(BID), // Ensure only products with status BID are fetched
+                        product.status.eq(BID),
                         categoryEq(category),
-                        priceEq(price),
+                        priceBetween(minPrice, maxPrice),
                         productNameContains(search)
                 )
-                .orderBy(sort.equals("createdAt") ? product.createdAt.desc() : product.createdAt.asc()) // Sorting logic
+                .orderBy(sort.equals("createdAt") ? product.createdAt.desc() : product.createdAt.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -95,9 +107,9 @@ public class ProductRepositoryImpl implements CustomProductRepository {
         long total = queryFactory
                 .selectFrom(product)
                 .where(
-                        product.status.eq(BID), // Ensure only products with status BID are counted
+                        product.status.eq(BID),
                         categoryEq(category),
-                        priceEq(price),
+                        priceBetween(minPrice, maxPrice),
                         productNameContains(search)
                 )
                 .fetch().size();
@@ -105,13 +117,17 @@ public class ProductRepositoryImpl implements CustomProductRepository {
         return new PageImpl<>(products, pageable, total);
     }
 
+
     // 카테고리 필터 메서드
     private BooleanExpression categoryEq(Long category) {
         return category != null ? product.category.id.eq(category) : null;
     }
 
-    private BooleanExpression priceEq(String price) {
-        return price != null ? product.startPrice.eq(Integer.parseInt(price)) : null;
+    private BooleanExpression priceBetween(Long minPrice, Long maxPrice) {
+        if (minPrice != null && maxPrice != null) {
+            return product.currentPrice.between(minPrice, maxPrice);
+        }
+        return null;
     }
 
     private BooleanExpression productNameContains(String search) {

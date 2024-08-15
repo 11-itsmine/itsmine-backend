@@ -78,7 +78,7 @@ public class KakaoPayController {
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
         // the “show payment status” API is called and then check if the status is QUIT_PAYMENT before suspending the payment
-        String redirectUrl = "http://localhost:3000/itsmine?status=cancel";
+        String redirectUrl = "https://itsyours.store/itsmine?status=cancel";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUrl));
@@ -94,7 +94,7 @@ public class KakaoPayController {
         // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
         // To prevent the unwanted request cancellation caused by attack,
         // the “show payment status” API is called and then check if the status is FAIL_PAYMENT before suspending the payment
-        String redirectUrl = "http://localhost:3000/itsmine?status=fail";
+        String redirectUrl = "https://itsyours.store/itsmine?status=fail";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUrl));
