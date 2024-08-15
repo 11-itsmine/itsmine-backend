@@ -32,18 +32,16 @@
 ---
 
 ### 🧑‍🤝‍🧑 개발자 소개
-- 김성찬(리더)
-- 주장현(부 리더)
-- 이정빈(팀원)
-- 이순모(팀원)
-- 김동우(팀원)
 
+![2024-08-15 (2)](https://github.com/user-attachments/assets/5c15bfd7-3c67-445c-9d6b-8a8a09acdf5d)
+
+---
 ### 💻 개발 환경
 - Version : Java 17
 - IDE : IntelliJ
 - Framework : SpringBoot 3.3.0
 - ORM : JPA
-
+---
 ### ⚙️ 기술 스택
 - Computing : AWS EC2, Docker
 - Container & Image Management : ECR
@@ -54,15 +52,12 @@
 - Storage : AWS S3
 - Messaging Services : AmazonMQ (RabbitMQ, ActiveMQ)
 - 아이디어 회의 : Slack, Zoom, Notion, figma, ERD Cloud
-
 ---
-
 ### 🔌 아키텍처
 
 ![image (2)](https://github.com/user-attachments/assets/d9f0c049-c737-4d5f-80fc-3f4b1503d704)
 
 ---
-
 ### ✒️ API 정보
 - Onepage Notion : https://peach-carpenter-5d0.notion.site/0ead0e5ec875420ea06dd3c4262322ea
 - Team Notion : https://www.notion.so/teamsparta/faf10b31eec04c97a18819caad6e1a54
