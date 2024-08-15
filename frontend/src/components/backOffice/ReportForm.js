@@ -58,10 +58,7 @@ const ReportForm = ({productId, onClose}) => {
               value={reportType}
               onChange={(e) => setReportType(e.target.value)}
           >
-            <option value="USER">사용자</option>
             <option value="PRODUCT">상품</option>
-            <option value="CHAT">채팅</option>
-            <option value="ETC">기타</option>
           </Select>
           <SubmitButton type="submit">신고하기</SubmitButton>
           {error && <ErrorText>{error}</ErrorText>}
