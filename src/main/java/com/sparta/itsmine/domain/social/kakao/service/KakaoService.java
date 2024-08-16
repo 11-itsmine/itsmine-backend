@@ -6,7 +6,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.itsmine.domain.redis.RedisService;
+import com.sparta.itsmine.domain.refreshtoken.service.RefreshTokenService;
 import com.sparta.itsmine.domain.user.dto.KakaoUserInfoDto;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
@@ -39,8 +39,8 @@ public class KakaoService {
     // restTemplate를 수동으로 등록해야합니다.
     private final RestTemplate restTemplate;
     private final JwtProvider jwtProvider;
-	@Autowired
-	private RedisService redisService;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     public String kakaoLogin(String code, HttpServletResponse res) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -61,7 +61,7 @@ public class KakaoService {
                 kakaoUser.getUserRole());
 
         res.setHeader(AUTHORIZATION_HEADER, accessToken);
-        redisService.saveRefreshToken(kakaoUser.getUsername(), refreshToken);
+        refreshTokenService.save(kakaoUser.getUsername(), refreshToken);
 
         res.setStatus(SC_OK);
         res.setCharacterEncoding("UTF-8");
