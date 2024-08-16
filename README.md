@@ -59,6 +59,12 @@
 ![image (2)](https://github.com/user-attachments/assets/d9f0c049-c737-4d5f-80fc-3f4b1503d704)
 
 ---
+### 📼 시연 영상
+
+[![이츠마인 페이지 시연영상](http://img.youtube.com/vi/ZirbEetGmtY/0.jpg)]((https://www.youtube.com/watch?v=ZirbEetGmtY))
+
+
+---
 ### ✒️ API 정보
 - Onepage Notion : https://peach-carpenter-5d0.notion.site/0ead0e5ec875420ea06dd3c4262322ea
 - Team Notion : https://www.notion.so/teamsparta/faf10b31eec04c97a18819caad6e1a54
