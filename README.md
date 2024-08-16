@@ -66,7 +66,7 @@
 ---
 ### 📼 시연 영상
 
-[![이츠마인 페이지 시연영상](http://img.youtube.com/vi/ZirbEetGmtY/0.jpg)]((https://www.youtube.com/watch?v=ZirbEetGmtY))
+[![이츠마인 페이지 시연영상](http://img.youtube.com/vi/ZirbEetGmtY/0.jpg)](https://www.youtube.com/watch?v=ZirbEetGmtY)
 
 
 ---
