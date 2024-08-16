@@ -1,7 +1,13 @@
 package com.sparta.itsmine.domain.user.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenAdapter;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.sparta.itsmine.domain.user.dto.BlockResponseDto;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
@@ -15,15 +21,10 @@ import com.sparta.itsmine.global.exception.DataDuplicatedException;
 import com.sparta.itsmine.global.exception.user.UserAlreadyExistsException;
 import com.sparta.itsmine.global.exception.user.UserDeletedException;
 import com.sparta.itsmine.global.exception.user.UserNotDeletedException;
+
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -33,7 +34,6 @@ public class UserService {
     private final UserAdapter adapter;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final RefreshTokenAdapter refreshTokenAdapter;
     private final UserAdapter userAdapter;
     private final RedisTemplate<String, String> redisTemplate;
 
