@@ -17,7 +17,9 @@ import AdminPage from "./components/backOffice/AdminPage";
 import axiosInstance from './api/axiosInstance';
 import LoadingScreen from './components/LoadingScreen';
 import ProductEditPage from "./components/createproduct/ProductEditPage"; // 로딩 페이지 추가
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'; // Navigate 임포트 추가
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import FindPassword from "./components/auth/FindPassword"; // Navigate 임포트 추가
+import ChangePassword from "./components/auth/ChangePassword";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -78,6 +80,8 @@ function App() {
               <Route path="/" element={<Navigate to="/itsmine" />} />
               <Route path="/itsmine" element={<Main />} />
               <Route path="/itsmine/login" element={<SignIn isLoggedIn={isLoggedIn} onLogin={handleLogin} />} />
+              <Route path ="/itsmine/find-password" element={<FindPassword/>}/>
+              <Route path ="/itsmine/change-password" element={<ChangePassword/>}/>
               <Route path="/signup" element={<SignUp />} />
               <Route path="/oauth/callback/kakao" element={<KakaoCallback isLoggedIn={isLoggedIn} onLogin={handleLogin} />} />
               <Route path="/products" element={<CreateProduct />} />
