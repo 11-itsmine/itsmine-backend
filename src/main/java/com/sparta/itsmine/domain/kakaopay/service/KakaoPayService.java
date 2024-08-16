@@ -148,6 +148,9 @@ public class KakaoPayService {
         Product product = productAdapter.getProduct(productId);
         User user = userAdapter.findById(userId);
 
+        if (auction.getBidPrice() <= product.getCurrentPrice()) {
+            throw new IllegalArgumentException("이미 더 높은 가격에 입찰되었습니다.");
+        }
         String tid = redisTemplate.opsForValue().get(user.getUsername()+":tid");
         // Request param
         KakaoPayApproveRequestDto kakaoPayApproveRequestDto = KakaoPayApproveRequestDto.builder()

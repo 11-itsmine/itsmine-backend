@@ -13,6 +13,7 @@ import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
+import com.sparta.itsmine.domain.redis.RedisService;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.lock.DistributedLock;
 
@@ -27,6 +28,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,10 +43,15 @@ public class AuctionService {
 	private final RedissonClient redissonClient;
 
 	private final String LOCK_KEY_PREFIX = "auctionLock";
+	private final RedisTemplate<String, Integer> redisTemplate;
 
 	@DistributedLock(prefix = LOCK_KEY_PREFIX, key = "productId")
 	public AuctionResponseDto createAuction(User user, Long productId,
 		AuctionRequestDto requestDto, Integer totalAmount) {
+		Integer redisPrice = redisTemplate.opsForValue().get("bidprice" + productId);  // 입찰 가격 동시성 제어
+		if (redisPrice != null && requestDto.getBidPrice() <= redisPrice) {
+			throw new IllegalArgumentException("이미 더 높은 가격에 입찰중입니다.");
+		}
 		Product product = productAdapter.getProduct(productId);
 		Integer bidPrice = requestDto.getBidPrice();
 		ProductStatus status = ProductStatus.NEED_PAY;
@@ -52,6 +59,7 @@ public class AuctionService {
 		Auction auction = createAuctionEntity(user, product, bidPrice, status, totalAmount);
 
 		checkAuctionValidity(auction, product, bidPrice, user);
+		redisTemplate.opsForValue().set("bidprice:" + productId, requestDto.getBidPrice()); // 입찰 가격 동시성 제어
 		auctionRepository.save(auction);
 		return new AuctionResponseDto(auction);
 	}
