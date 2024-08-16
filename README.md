@@ -33,6 +33,11 @@
 
 ### 🧑‍🤝‍🧑 개발자 소개
 
+| 리더 : 김성찬 | 부 리더 : 주장현 | 팀원 : 이순모 | 팀원 : 이정빈 | 팀원 : 김동우 |
+|--------------------------------------------|--------------------------------------------|---------------------------------------------|--------------------------------------------|---------------------------------------------|
+| <img src="https://github.com/user-attachments/assets/693e5a20-1e18-4058-b4ee-4907affec4e6" width="128" height="128"> | <img src="https://github.com/user-attachments/assets/9eed1e23-f2f1-4ff4-9a09-48f548706c20" width="128" height="128"> | <img src="https://github.com/user-attachments/assets/10141f48-ab22-4384-bc23-4ae7683fbd8e" width="128" height="128"> | <img src="https://github.com/user-attachments/assets/20599ef6-145d-4a69-ab2b-708aaf6957a8" width="128" height="128"> | <img src="https://github.com/user-attachments/assets/5d549bcb-3292-4241-9eac-468d3bab42db" width="128" height="128"> |
+
+
 ![2024-08-15 (3)](https://github.com/user-attachments/assets/e11832f0-c7fb-41b4-8d9f-98822229baae)
 
 
