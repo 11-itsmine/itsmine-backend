@@ -62,3 +62,4 @@
 ### ✒️ API 정보
 - Onepage Notion : https://peach-carpenter-5d0.notion.site/0ead0e5ec875420ea06dd3c4262322ea
 - Team Notion : https://www.notion.so/teamsparta/faf10b31eec04c97a18819caad6e1a54
+- Our Site : https://itsyours.store/itsmine
