@@ -8,13 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class MessageSenderService {
 
-    private final AmqpTemplate amqpTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     /**
      * 지정된 시간만큼 지연 후 메시지를 전송합니다.
@@ -27,6 +28,6 @@ public class MessageSenderService {
         messageProperties.setExpiration(String.valueOf(delayMillis)); // TTL 설정
 
         Message message = new Message(productId.toString().getBytes(), messageProperties);
-        amqpTemplate.send(MAIN_EXCHANGE_NAME, "product.routing.key", message);
+        rabbitTemplate.send(MAIN_EXCHANGE_NAME, "product.routing.key", message);
     }
 }

@@ -299,7 +299,6 @@ public class KakaoPayService {
                 auctionRepository.delete(auction);
             }
         }
-
         messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
     }
 
