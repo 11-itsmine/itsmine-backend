@@ -3,6 +3,14 @@ package com.sparta.itsmine.global.security.filters;
 import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.itsmine.domain.redis.RedisService;
 import com.sparta.itsmine.domain.user.dto.LoginRequestDto;
@@ -11,20 +19,9 @@ import com.sparta.itsmine.domain.user.utils.UserRole;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
 import com.sparta.itsmine.global.exception.user.UserDeletedException;
-import com.sparta.itsmine.global.security.UserDetailsImpl;
-import com.sparta.itsmine.global.security.UserDetailsServiceImpl;
 import com.sparta.itsmine.global.security.JwtProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
+import com.sparta.itsmine.global.security.UserDetailsImpl;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
