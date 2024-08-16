@@ -13,6 +13,9 @@ const SignUp = () => {
     nickname: '',
   });
 
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
   const [refundPolicyAccepted, setRefundPolicyAccepted] = useState(false); // 환불 정책 동의 상태
   const [privacyPolicyAccepted, setPrivacyPolicyAccepted] = useState(false); // 개인정보 수집 및 이용 동의 상태
 
@@ -20,39 +23,43 @@ const SignUp = () => {
 
   const validateSignupRequest = () => {
     const { name, username, password, nickname } = signupRequest;
+    let newErrors = {};
 
     // 필수 필드 체크
-    if (!name || !username || !password || !nickname) {
-      return "모든 필수 항목을 입력해주세요.";
+    if (!name) {
+      newErrors.name = "이름을 입력해주세요.";
+    } else if (!/^[가-힣]{1,4}$/.test(name)) {
+      newErrors.name = "이름은 한글로만 최대 4글자까지 입력할 수 있습니다.";
     }
 
-    // 유효성 검사
-    if (name === nickname) {
-      return "닉네임과 이름은 같을 수 없습니다.";
+    if (!username) {
+      newErrors.username = "아이디를 입력해주세요.";
+    } else if (!/^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{10,20}$/.test(username)) {
+      newErrors.username = "아이디는 영문 소문자와 숫자를 포함하여 최소 10자 이상, 최대 20자 이하여야 합니다.";
     }
 
-    if (!/^[가-힣]{1,4}$/.test(name)) {
-      return "이름은 한글로만 최대 4글자까지 입력할 수 있습니다.";
+    if (!password) {
+      newErrors.password = "비밀번호를 입력해주세요.";
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()]).{10,}$/.test(password)) {
+      newErrors.password = "비밀번호는 대소문자 포함 영문, 숫자, 특수문자를 최소 1글자씩 포함하여 최소 10자 이상이어야 합니다.";
     }
 
-    if (!/^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{10,20}$/.test(username)) {
-      return "아이디는 영문 소문자와 숫자를 포함하여 최소 10자 이상, 최대 20자 이하여야 합니다.";
+    if (!nickname) {
+      newErrors.nickname = "닉네임을 입력해주세요.";
+    } else if (name && name === nickname) {
+      newErrors.nickname = "닉네임과 이름은 같을 수 없습니다.";
     }
 
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()]).{10,}$/.test(password)) {
-      return "비밀번호는 대소문자 포함 영문, 숫자, 특수문자를 최소 1글자씩 포함하여 최소 10자 이상이어야 합니다.";
-    }
-
-    return null;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0 ? null : newErrors;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const validationError = validateSignupRequest();
-    if (validationError) {
-      alert(validationError);
-      return;
+    const validationErrors = validateSignupRequest();
+    if (validationErrors) {
+      return; // 오류가 있는 경우 제출 중단
     }
 
     if (!refundPolicyAccepted || !privacyPolicyAccepted) {
@@ -70,7 +77,6 @@ const SignUp = () => {
       navigate('/itsmine/login');
     } catch (error) {
       if (error.response && error.response.status === 409) {
-        // 409 Conflict 상태 코드를 받으면 아이디 중복으로 처리
         alert('존재하는 아이디입니다.');
       } else {
         console.error('Signup failed:', error);
@@ -82,6 +88,13 @@ const SignUp = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSignupRequest({ ...signupRequest, [name]: value });
+    setErrors({ ...errors, [name]: null }); // 입력 시 해당 필드의 오류 메시지 초기화
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched({ ...touched, [name]: true });
+    validateSignupRequest();
   };
 
   const handleRefundPolicyChange = (e) => {
@@ -90,6 +103,16 @@ const SignUp = () => {
 
   const handlePrivacyPolicyChange = (e) => {
     setPrivacyPolicyAccepted(e.target.checked);
+  };
+
+  const getInputBorderStyle = (fieldName) => {
+    if (touched[fieldName] && errors[fieldName]) {
+      return 'red';
+    } else if (touched[fieldName] && !errors[fieldName]) {
+      return 'green';
+    } else {
+      return '#ebebeb';
+    }
   };
 
   return (
@@ -104,9 +127,11 @@ const SignUp = () => {
                 placeholder="이름을 입력하세요"
                 value={signupRequest.name}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 autoComplete="name"
-                autoFocus
+                borderColor={getInputBorderStyle('name')}
             />
+            {errors.name && <Error>{errors.name}</Error>}
           </SignUpForm>
           <SignUpForm>
             <Label htmlFor="username">아이디 (필수)</Label>
@@ -116,8 +141,11 @@ const SignUp = () => {
                 placeholder="아이디를 입력하세요"
                 value={signupRequest.username}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 autoComplete="username"
+                borderColor={getInputBorderStyle('username')}
             />
+            {errors.username && <Error>{errors.username}</Error>}
           </SignUpForm>
           <SignUpForm>
             <Label htmlFor="email">이메일 주소</Label>
@@ -139,8 +167,11 @@ const SignUp = () => {
                 placeholder="비밀번호를 입력하세요"
                 value={signupRequest.password}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 autoComplete="new-password"
+                borderColor={getInputBorderStyle('password')}
             />
+            {errors.password && <Error>{errors.password}</Error>}
           </SignUpForm>
           <SignUpForm>
             <Label htmlFor="address">주소</Label>
@@ -161,8 +192,11 @@ const SignUp = () => {
                 placeholder="닉네임을 입력하세요"
                 value={signupRequest.nickname}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 autoComplete="nickname"
+                borderColor={getInputBorderStyle('nickname')}
             />
+            {errors.nickname && <Error>{errors.nickname}</Error>}
           </SignUpForm>
 
           <TermsContainer>
@@ -238,9 +272,8 @@ const Form = styled.form`
 const SignUpForm = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: ${props => props.theme.margins.xxl};
+  margin-bottom: ${props => props.theme.margins.xl}; /* 입력 칸 사이 간격 확대 */
   width: 100%;
-  height: 4.375rem;
 `;
 
 const Label = styled.label`
@@ -250,13 +283,13 @@ const Label = styled.label`
 
 const Input = styled.input`
   border: none;
-  border-bottom: 1px solid #ebebeb;
+  border-bottom: 2px solid ${props => props.borderColor || '#ebebeb'};
   padding: ${props => props.theme.paddings.base} 0;
   font-size: ${props => props.theme.fontSizes.small};
 
   &:focus {
     outline: none;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid ${props => props.borderColor || 'black'};
 
     ::placeholder {
       opacity: 0;
@@ -267,6 +300,12 @@ const Input = styled.input`
     color: #bbb;
     opacity: 1;
   }
+`;
+
+const Error = styled.div`
+  color: red;
+  font-size: ${props => props.theme.fontSizes.xs};
+  margin-top: 0.5rem;
 `;
 
 const TermsContainer = styled.div`
@@ -294,7 +333,7 @@ const CheckboxContainer = styled.div`
 `;
 
 const SignUpBtn = styled.button`
-  background: #333333; /* 더 진한 색상으로 설정 */
+  background: #333333;
   width: 100%;
   margin-top: 0.8rem;
   margin-bottom: 0.5rem;
@@ -304,15 +343,15 @@ const SignUpBtn = styled.button`
   font-size: ${props => props.theme.fontSizes.base};
   color: ${props => props.theme.colors.white};
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s; /* 클릭 시 변화를 위해 트랜지션 추가 */
+  transition: background-color 0.3s, transform 0.2s;
 
   &:hover {
-    background-color: #555555; /* 호버 시 색상 변경 */
+    background-color: #555555;
   }
 
   &:active {
-    background-color: #111111; /* 클릭 시 더 진한 색상 */
-    transform: scale(0.98); /* 클릭 시 눌리는 효과 */
+    background-color: #111111;
+    transform: scale(0.98);
   }
 `;
 

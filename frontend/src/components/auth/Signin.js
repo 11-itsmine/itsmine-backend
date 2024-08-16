@@ -99,7 +99,7 @@ const SignIn = ({ onLogin }) => {
 
           <GridContainer>
             <GridItem>
-              <Link href="#">비밀번호 찾기</Link>
+              <Link href="/itsmine/find-password">비밀번호 찾기</Link>
             </GridItem>
             <GridItem>
               <Link href="/signup">회원가입 하기</Link>
