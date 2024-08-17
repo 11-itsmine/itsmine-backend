@@ -208,15 +208,6 @@ const KakaoBtn = styled.button`
   cursor: pointer;
   border-radius: 10px;
   transition: background-color 0.3s, transform 0.2s; /* 클릭 시 변화를 위해 트랜지션 추가 */
-
-  &:hover {
-    background-color: #ffd400; /* 호버 시 색상 변경 (조금 더 진하게) */
-  }
-
-  &:active {
-    background-color: #e5b800; /* 클릭 시 더 진한 색상으로 변경 */
-    transform: scale(0.98); /* 클릭 시 약간 눌리는 효과 */
-  }
 `;
 
 const KakaoLoginImage = styled.img`

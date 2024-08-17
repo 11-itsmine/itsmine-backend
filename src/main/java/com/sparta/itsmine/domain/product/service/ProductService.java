@@ -1,5 +1,7 @@
 package com.sparta.itsmine.domain.product.service;
 
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.FAIL_BID;
+
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.images.dto.ProductImagesRequestDto;
 import com.sparta.itsmine.domain.images.service.ImagesService;
@@ -13,7 +15,6 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
 import com.sparta.itsmine.domain.product.scheduler.MessageSenderService;
-import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class ProductService {
 
     public ProductResponseDto createProduct(ProductCreateDto createDto,
             ProductImagesRequestDto imagesRequestDto, Long userId) {
+
         User user = adapter.findByIdAndDeletedAtIsNull(userId);
         user.checkBlock();
         Category category = adapter.findCategoryByCategoryName(createDto.getCategoryName());
@@ -48,11 +50,12 @@ public class ProductService {
 
         Product product = createDto.toEntity(category);
         product.assignUser(user);
-        product.extendDueDateByHours(createDto.getDueDate());
-        product.setCategory(category);
+//        unnecessary lines
+//        product.extendDueDateByHours(createDto.getDueDate());
+//        product.setCategory(category);
 
-        Product newProduct = adapter.saveProduct(product);
         imagesService.createProductImages(imagesRequestDto, product);
+        Product newProduct = adapter.saveProduct(product);
         scheduleProductUpdate(newProduct);
         return new ProductResponseDto(newProduct, imagesRequestDto);
     }
@@ -110,28 +113,28 @@ public class ProductService {
         Product product = adapter.getProduct(productId);
         kakaoPayService.deleteProductWithAuction(product.getId());
         product.markAsDeleted();
-        product.updateStatus(ProductStatus.FAIL_BID);
+        product.updateStatus(FAIL_BID);
         adapter.saveProduct(product);
-//        auctionService.avoidedAuction(productId);
     }
 
 
     private void scheduleProductUpdate(Product product) {
         // 현재 시간
         LocalDateTime now = LocalDateTime.now();
-
-        // 시작 시간과 종료 시간
-        LocalDateTime startDate = product.getCreatedAt();
         LocalDateTime dueDate = product.getDueDate();
 
-        // 현재 시간과 시작 시간 사이의 차이를 계산
-        long delayMillis = Duration.between(now, dueDate).toMillis();
-
-        // delayMillis가 0 이하일 경우 바로 처리
-        if (delayMillis <= 0) {
-            delayMillis = 1000; // 최소 1초 후에 상태를 처리하도록 설정
+        // 종료 시간이 이미 지났는지 확인
+        if (now.isAfter(dueDate)) {
+            // 종료 시간이 지났다면 최소 1초 안에 상태를 처리하도록 설정
+            messageSenderService.sendMessage(product.getId(), 100);
+            return;
         }
 
-        messageSenderService.sendMessage(product.getId(), delayMillis);
+        // 현재 시간과 종료 시간 사이의 차이를 계산
+        long delayMillis = Duration.between(now, dueDate).toMillis();
+
+        // 최소 0.5초 후에 상태를 처리하도록 설정
+        messageSenderService.sendMessage(product.getId(), Math.max(delayMillis, 500));
     }
+
 }

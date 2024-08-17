@@ -1,5 +1,6 @@
 package com.sparta.itsmine.global.security.filters;
 
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.*;
 import static com.sparta.itsmine.global.security.JwtProvider.AUTHORIZATION_HEADER;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
@@ -68,9 +69,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getUserRole();
 
-        if (userAdapter.isDeleted(username)) {
-            throw new UserDeletedException(ResponseExceptionEnum.USER_DELETED);
-        }
+        userAdapter.isDeleted(username);
 
         String accessToken = jwtProvider.createAccessToken(username, role);
         String refreshToken = jwtProvider.createRefreshToken(username, role);

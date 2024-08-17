@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -43,6 +45,9 @@ public class RabbitConfig {
 
     @Value("${spring.rabbitmq.password}")
     private String rabbitPwd;
+
+    @Value("${spring.rabbitmq.virtual-host}")
+    private String vHost;
 
     @Bean
     public DirectExchange mainExchange() {
@@ -100,12 +105,15 @@ public class RabbitConfig {
     }
 
     @Bean
-    public ConnectionFactory connectionFactory() {
+    public ConnectionFactory connectionFactory()
+            throws NoSuchAlgorithmException, KeyManagementException {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         factory.setHost(rabbitHost);
         factory.setPort(rabbitPort);
         factory.setUsername(rabbitUser);
         factory.setPassword(rabbitPwd);
+        factory.setVirtualHost(vHost);
+        factory.getRabbitConnectionFactory().useSslProtocol();
         return factory;
     }
 
