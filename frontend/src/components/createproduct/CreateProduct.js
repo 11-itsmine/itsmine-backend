@@ -26,6 +26,11 @@ const ProductCreatePage = () => {
   const [categoryName, setCategoryName] = useState('');
   const [categories, setCategories] = useState([]);
   const [imageUrls, setImageUrls] = useState([]);
+  const [isProductNameValid, setIsProductNameValid] = useState(false);
+  const [isDescriptionValid, setIsDescriptionValid] = useState(false);
+  const [isAuctionNowPriceValid, setIsAuctionNowPriceValid] = useState(false);
+  const [isStartPriceValid, setIsStartPriceValid] = useState(false);
+  const [isDueDateValid, setIsDueDateValid] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,8 +78,61 @@ const ProductCreatePage = () => {
     setImageUrls(newImageUrls);
   };
 
+  const handleAuctionNowPriceChange = (e) => {
+    const value = e.target.value;
+    if (value >= 0) { // Ensure value is at least 1
+      setAuctionNowPrice(value);
+      setIsAuctionNowPriceValid(true);
+    } else {
+      setIsAuctionNowPriceValid(false);
+    }
+  };
+
+  const handleStartPriceChange = (e) => {
+    const value = e.target.value;
+    if (value >= 0) { // Ensure value is at least 1
+      setStartPrice(value);
+      setIsStartPriceValid(true);
+    } else {
+      setIsStartPriceValid(false);
+    }
+  };
+
+  const handleDueDateChange = (e) => {
+    const value = e.target.value;
+    if (value >= 1) { // Ensure value is at least 1
+      setDueDate(value);
+      setIsDueDateValid(true);
+    } else {
+      setIsDueDateValid(false);
+    }
+  };
+
+  const handleProductNameChange = (e) => {
+    const value = e.target.value;
+    setProductName(value);
+    setIsProductNameValid(!!value);
+  };
+
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    setDescription(value);
+    setIsDescriptionValid(!!value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (
+        !isProductNameValid ||
+        !isDescriptionValid ||
+        !isAuctionNowPriceValid ||
+        !isStartPriceValid ||
+        !isDueDateValid
+    ) {
+      alert('모든 필드를 올바르게 입력하세요.');
+      return;
+    }
+
     try {
       const productData = {
         productCreateDto: {
@@ -104,7 +162,7 @@ const ProductCreatePage = () => {
       <Container
           maxWidth="lg"
           sx={{
-            mt: 1,  // 이전 mt: 8에서 줄임
+            mt: 1,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -142,11 +200,19 @@ const ProductCreatePage = () => {
                         fullWidth
                         label="상품명"
                         value={productName}
-                        onChange={(e) => setProductName(e.target.value)}
+                        onChange={handleProductNameChange}
                         required
                         sx={{
                           '& .MuiInputBase-input': { fontSize: '16px' },
                           '& .MuiInputLabel-root': { color: '#757575', fontSize: '16px' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: isProductNameValid ? '#28a745' : '#ff1744',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: isProductNameValid ? '#28a745' : '#ff1744',
+                            },
+                          },
                         }}
                     />
                   </Grid>
@@ -155,13 +221,21 @@ const ProductCreatePage = () => {
                         fullWidth
                         label="설명"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={handleDescriptionChange}
                         multiline
                         rows={4}
                         required
                         sx={{
                           '& .MuiInputBase-input': { fontSize: '16px' },
                           '& .MuiInputLabel-root': { color: '#757575', fontSize: '16px' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: isDescriptionValid ? '#28a745' : '#ff1744',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: isDescriptionValid ? '#28a745' : '#ff1744',
+                            },
+                          },
                         }}
                     />
                   </Grid>
@@ -171,11 +245,22 @@ const ProductCreatePage = () => {
                         label="즉시 구매가"
                         type="number"
                         value={auctionNowPrice}
-                        onChange={(e) => setAuctionNowPrice(e.target.value)}
+                        onChange={handleAuctionNowPriceChange}
                         required
                         sx={{
-                          '& .MuiInputBase-input': { fontSize: '16px' },
+                          '& .MuiInputBase-input': {
+                            fontSize: '16px',
+                            backgroundColor: isAuctionNowPriceValid ? '#d4edda' : '#ffebee',
+                          },
                           '& .MuiInputLabel-root': { color: '#757575', fontSize: '16px' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: isAuctionNowPriceValid ? '#28a745' : '#ff1744',
+                            },
+                          },
+                        }}
+                        InputProps={{
+                          inputProps: { min: 1 }, // Minimum value is 1
                         }}
                     />
                   </Grid>
@@ -185,11 +270,22 @@ const ProductCreatePage = () => {
                         label="시작 가격"
                         type="number"
                         value={startPrice}
-                        onChange={(e) => setStartPrice(e.target.value)}
+                        onChange={handleStartPriceChange}
                         required
                         sx={{
-                          '& .MuiInputBase-input': { fontSize: '16px' },
+                          '& .MuiInputBase-input': {
+                            fontSize: '16px',
+                            backgroundColor: isStartPriceValid ? '#d4edda' : '#ffebee',
+                          },
                           '& .MuiInputLabel-root': { color: '#757575', fontSize: '16px' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: isStartPriceValid ? '#28a745' : '#ff1744',
+                            },
+                          },
+                        }}
+                        InputProps={{
+                          inputProps: { min: 1 }, // Minimum value is 1
                         }}
                     />
                   </Grid>
@@ -199,11 +295,22 @@ const ProductCreatePage = () => {
                         label="경매 진행 시간 (시간 단위)"
                         type="number"
                         value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
+                        onChange={handleDueDateChange}
                         required
                         sx={{
-                          '& .MuiInputBase-input': { fontSize: '16px' },
+                          '& .MuiInputBase-input': {
+                            fontSize: '16px',
+                            backgroundColor: isDueDateValid ? '#d4edda' : '#ffebee',
+                          },
                           '& .MuiInputLabel-root': { color: '#757575', fontSize: '16px' },
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: isDueDateValid ? '#28a745' : '#ff1744',
+                            },
+                          },
+                        }}
+                        InputProps={{
+                          inputProps: { min: 1 }, // Minimum value is 1
                         }}
                     />
                   </Grid>
@@ -220,6 +327,14 @@ const ProductCreatePage = () => {
                           sx={{
                             '& .MuiInputBase-input': { fontSize: '16px' },
                             '& .MuiInputLabel-root': { color: '#757575', fontSize: '16px' },
+                            '& .MuiOutlinedInput-root': {
+                              '& fieldset': {
+                                borderColor: categoryName ? '#28a745' : '#ff1744',
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: categoryName ? '#28a745' : '#ff1744',
+                              },
+                            },
                           }}
                       >
                         {categories.map((category, index) => (
@@ -237,7 +352,7 @@ const ProductCreatePage = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, width: '100%', justifyContent: 'center' }}>
                     {imageUrls.map((url, index) => (
-                        <Box key={index} sx={{ position: 'relative', width: '48%', height: '200px' }}> {/* 이미지 크기 키움 */}
+                        <Box key={index} sx={{ position: 'relative', width: '48%', height: '200px' }}>
                           <img
                               src={url}
                               alt={`이미지 ${index + 1}`}
