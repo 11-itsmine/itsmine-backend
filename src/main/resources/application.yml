@@ -3,17 +3,17 @@ server:
 
 spring:
   rabbitmq:
-    host: ${RABBITMQ_BROKER}
-    port: ${RABBITMQ_PORT} # RabbitMQ SSL port
-    username: ${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}
-    virtual-host: ${RABBITMQ_VIRTUAL_HOST}
-    ssl:
-      enabled: true
+    host: ${RABBITMQ_BROKER}  #localhost #${RABBITMQ_BROKER}
+    port: ${RABBITMQ_PORT}   #5672 #${RABBITMQ_PORT} # RabbitMQ SSL port
+    username: ${RABBITMQ_USERNAME}   #guest #${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}   #guest #${RABBITMQ_PASSWORD}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST}   #로컬 테스트 시 주석
+    ssl:   #로컬 테스트 시 주석
+      enabled: true    #로컬 테스트 시 주석
 
   data:
     redis:
-      host: ${REDIS_HOST} # 로컬에서 할 때는  localhost, 배포할 때는 ${REDIS_HOST}
+      host: localhost # 로컬에서 할 때는  localhost, 배포할 때는 ${REDIS_HOST}
       port: ${REDIS_PORT}
       repositories:
         enabled: false
