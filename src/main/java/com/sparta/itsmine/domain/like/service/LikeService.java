@@ -5,7 +5,6 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS
 
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.itsmine.domain.like.dto.LikeResponseDto;
 import com.sparta.itsmine.domain.like.entity.Like;
