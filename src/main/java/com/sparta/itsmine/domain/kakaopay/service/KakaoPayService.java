@@ -5,6 +5,7 @@ import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
 import static com.sparta.itsmine.domain.user.entity.QUser.user;
 
+import com.esotericsoftware.kryo.util.Null;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -152,6 +153,28 @@ public class KakaoPayService {
             throw new IllegalArgumentException("이미 더 높은 가격에 입찰되었습니다.");
         }
         String tid = redisTemplate.opsForValue().get(user.getUsername()+":tid");
+
+        if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
+            product.updateStatus(SUCCESS_BID);//(사실 DueDate 마감으로 낙찰이 되면 추가 결제로 마저 결제하게끔 만들어야 하는데 그건 너무 큰 작업이라 일단 미루겠습니다)
+            productRepository.save(product);
+
+            auction.updateStatus(SUCCESS_BID);
+            auctionRepository.save(auction);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
+            deleteWithOutSuccessfulAuction(product.getId());
+        } else {
+            Auction maxBidAuction=auctionRepository.findByProductIdAndMaxBid(productId);
+            if(maxBidAuction != null){
+                if(auction.getBidPrice() <= maxBidAuction.getBidPrice()){
+                    throw new IllegalArgumentException();
+                }
+            }
+            auction.updateStatus(BID);
+            auctionRepository.save(auction);
+            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
+            auctionService.scheduleMessage(product.getId(), product.getDueDate());
+        }
+
         // Request param
         KakaoPayApproveRequestDto kakaoPayApproveRequestDto = KakaoPayApproveRequestDto.builder()
                 .cid(cid)//가맹점 코드, 10자
@@ -165,6 +188,7 @@ public class KakaoPayService {
                 product.getId(), user.getUsername(), pgToken, auction);
         kakaoPayRepository.save(KakaoPayTid);
 
+
         // Send Request
         HttpEntity<KakaoPayApproveRequestDto> entityMap = new HttpEntity<>(
                 kakaoPayApproveRequestDto, headers);
@@ -174,18 +198,6 @@ public class KakaoPayService {
                 entityMap,
                 KakaoPayApproveResponseDto.class
         );
-
-        if (auction.getBidPrice().equals(product.getAuctionNowPrice())) {
-            auction.updateStatus(SUCCESS_BID);
-            auctionRepository.save(auction);
-            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
-            deleteWithOutSuccessfulAuction(product.getId());
-        } else {
-            auction.updateStatus(BID);
-            auctionRepository.save(auction);
-            auctionService.currentPriceUpdate(auction.getBidPrice(), product);
-            auctionService.scheduleMessage(product.getId(), product.getDueDate());
-        }
 
         return response;
     }
@@ -290,19 +302,17 @@ public class KakaoPayService {
     }
 
     public void deleteWithOutSuccessfulAuction(Long productId) {
-        List<Auction> auctions = auctionRepository.findAllByProductIdWithOutMaxPrice(productId);
-        //왜냐하면 맥스값이 곧 낙찰가니까
+        List<Auction> auctions = auctionRepository.findAllByProductId(productId);
 
         for (Auction auction : auctions) {
             if (auction.getStatus().equals(BID)) {
                 KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
                 kakaoCancelForSuccessBid(kakaoPayTid.getTid());
                 auctionRepository.delete(auction);
-            } else {
+            } else if(auction.getStatus().equals(NEED_PAY)) {
                 auctionRepository.delete(auction);
             }
         }
-
         messageSenderService.sendMessage(productId, 0); // 즉시 메시지 전송
     }
 

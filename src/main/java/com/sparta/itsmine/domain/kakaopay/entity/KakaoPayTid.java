@@ -44,7 +44,7 @@ public class KakaoPayTid {
     @Column(nullable = false)
     private String pgToken;//결제승인 요청을 인증하는 토큰 사용자 결제 수단 선택 완료 시, approval_url로 redirection 해줄 때 pg_token을 query string으로 전달
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "auction_id")
     private Auction auction;
 
