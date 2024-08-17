@@ -24,8 +24,8 @@ public class CategoryService {
         }
     }
 
-    public List<CategoryResponseDto> getCategory(){
-        List<Category> category=categoryRepository.findAll();
+    public List<CategoryResponseDto> getCategory() {
+        List<Category> category = categoryRepository.findAll();
         return category.stream().map(CategoryResponseDto::new).toList();
     }
 }
