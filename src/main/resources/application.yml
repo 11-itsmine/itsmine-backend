@@ -3,13 +3,13 @@ server:
 
 spring:
   rabbitmq:
-    host: ${RABBITMQ_BROKER}  #localhost #${RABBITMQ_BROKER}
-    port: ${RABBITMQ_PORT}   #5672 #${RABBITMQ_PORT} # RabbitMQ SSL port
-    username: ${RABBITMQ_USERNAME}   #guest #${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}   #guest #${RABBITMQ_PASSWORD}
-    virtual-host: ${RABBITMQ_VIRTUAL_HOST}   #로컬 테스트 시 주석
-    ssl:   #로컬 테스트 시 주석
-      enabled: true    #로컬 테스트 시 주석
+    host: localhost  #localhost #${RABBITMQ_BROKER}
+    port: 5672   #5672 #${RABBITMQ_PORT} # RabbitMQ SSL port
+    username: guest   #guest #${RABBITMQ_USERNAME}
+    password: guest   #guest #${RABBITMQ_PASSWORD}
+#    virtual-host: ${RABBITMQ_VIRTUAL_HOST}   #로컬 테스트 시 주석
+#    ssl:   #로컬 테스트 시 주석
+#      enabled: true    #로컬 테스트 시 주석
 
   data:
     redis:
@@ -26,18 +26,18 @@ spring:
     packages:
       trust-all: true
 
-  datasource:
-    url: jdbc:mariadb://${DB_URL}/itsmine
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
+#  datasource:
+#    url: jdbc:mariadb://${DB_URL}/itsmine
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+#    driver-class-name: org.mariadb.jdbc.Driver
 
   # 로컬용
-#  datasource:
-#      url: jdbc:mysql://${DB_URL}/itsmine
-#      username: ${DB_USER}
-#      password: ${DB_PASSWORD}
-#      driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+      url: jdbc:mysql://${DB_URL}/itsmine
+      username: ${DB_USER}
+      password: ${DB_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
     init:
