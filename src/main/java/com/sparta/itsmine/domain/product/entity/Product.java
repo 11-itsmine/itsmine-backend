@@ -150,7 +150,7 @@ public class Product extends TimeStamp {
     }
 
     public void extendDueDateByHours(Integer hours) {
-        this.dueDate = this.getDueDate().plusSeconds(hours);
+        this.dueDate = this.getDueDate().plusHours(hours);
     }
 
     public void setCategory(Category category) {
