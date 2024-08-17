@@ -19,6 +19,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,7 @@ public class MessageListener{
     private final AuctionRepository auctionRepository;
     private final AuctionService auctionService;
     private final KakaoPayService kakaoPayService;
+    private final RabbitAdmin rabbitAdmin;
 
     @RabbitListener(queues = DELAYED_QUEUE_NAME)
     public void receiveMessage(Long productId, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) {
@@ -74,7 +76,11 @@ public class MessageListener{
             channel.basicAck(tag, false);
         } catch (Exception e) {
             log.error("Error processing message with productId {}: {}", productId, e.getMessage());
+
             try {
+                // 큐 purge 처리 추가
+                rabbitAdmin.purgeQueue(DELAYED_QUEUE_NAME, false); // 오류 발생 시 큐 비우기
+                log.info("Purged messages from queue: {}", DELAYED_QUEUE_NAME);
                 // 메시지 재처리 없이 삭제
                 channel.basicNack(tag, false, false);
             } catch (IOException ioException) {
