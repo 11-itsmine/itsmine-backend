@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -16,6 +14,7 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,9 +44,6 @@ public class RabbitConfig {
     @Value("${spring.rabbitmq.password}")
     private String rabbitPwd;
 
-    @Value("${spring.rabbitmq.virtual-host}")
-    private String rabbitVh;
-
     @Bean
     public DirectExchange mainExchange() {
         return new DirectExchange(MAIN_EXCHANGE_NAME, true, false);
@@ -70,8 +66,6 @@ public class RabbitConfig {
     @Qualifier("delayedQueue")
     public Queue delayedQueue() {
         return QueueBuilder.durable(DELAYED_QUEUE_NAME)
-                .withArgument("x-dead-letter-exchange", MAIN_EXCHANGE_NAME)
-                .withArgument("x-dead-letter-routing-key", PRODUCT_ROUTING_KEY)
                 .build();
     }
 
@@ -94,7 +88,7 @@ public class RabbitConfig {
         final SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(jsonMessageConverter());
-        factory.setAcknowledgeMode(AcknowledgeMode.AUTO); // 자동 처리 메세지 삭제 설정
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL); // 수동 처리 메세지 삭제 설정
         return factory;
     }
 
@@ -106,15 +100,12 @@ public class RabbitConfig {
     }
 
     @Bean
-    public ConnectionFactory connectionFactory()
-            throws NoSuchAlgorithmException, KeyManagementException {
+    public ConnectionFactory connectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         factory.setHost(rabbitHost);
         factory.setPort(rabbitPort);
         factory.setUsername(rabbitUser);
         factory.setPassword(rabbitPwd);
-        factory.setVirtualHost(rabbitVh);
-        factory.getRabbitConnectionFactory().useSslProtocol();
         return factory;
     }
 
@@ -130,5 +121,10 @@ public class RabbitConfig {
     @Bean
     public Module dateTimeModule() {
         return new JavaTimeModule();
+    }
+
+    @Bean
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
     }
 }

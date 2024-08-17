@@ -22,7 +22,7 @@ public class ProductCreateDto {
                 .description(description)
                 .auctionNowPrice(auctionNowPrice)
                 .startPrice(startPrice)
-                .dueDate(LocalDateTime.now().plusHours(dueDate))
+                .dueDate(LocalDateTime.now().plusMinutes(dueDate))
                 .category(category).build();
     }
 }

@@ -73,26 +73,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 
         return new PageImpl<>(auctionProductImageResponseDtoList, pageable, count);
     }
-
-    //자신이 고른 상품 조회(신텍스오류)
-/*    @Cacheable("ByUserAndProduct")
-    public Optional<AuctionProductResponseDto> findByUserIdAndProductId(Long userId,
-            Long productId) {
-        return Optional.ofNullable(jpaQueryFactory
-                .select(new QAuctionProductResponseDto(user.username, product.productName,
-                        auction.bidPrice.max(), auction.status))
-                .from(auction)
-                .innerJoin(auction.product, product)
-                .innerJoin(auction.user, user)
-                .where(user.id.eq(userId).and(product.id.eq(productId)))
-                .fetchOne());
-    }*/
-
-    /*
-    select *
-    from auctions
-    where product_id=2 and bid_price != (select max(bid_price) from auctions where product_id=2);
-    */
+/*
     //해당 상품에 대한 모든 입찰가를 찾기(최댓값 빼고)
     @Cacheable("WithOutSuccessfulAuction")
     public List<Auction> findAllByProductIdWithOutMaxPrice(Long productId) {
@@ -111,6 +92,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                         .and(auction.bidPrice.ne(maxBidPriceSubQuery)))
                 .fetch();
     }
+*/
 
     /*
     select *
