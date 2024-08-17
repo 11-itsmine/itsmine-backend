@@ -8,6 +8,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.sparta.itsmine.domain.user.dto.BlockResponseDto;
+import com.sparta.itsmine.domain.user.dto.PasswordChangeRequest;
+import com.sparta.itsmine.domain.user.dto.PasswordFindRequest;
 import com.sparta.itsmine.domain.user.dto.ProfileUpdateRequestDto;
 import com.sparta.itsmine.domain.user.dto.SignupRequestDto;
 import com.sparta.itsmine.domain.user.dto.UserResponseDto;
