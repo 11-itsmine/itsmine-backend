@@ -4,7 +4,9 @@ package com.sparta.itsmine.domain.user.service;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.INVALID_PASSWORD;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
 
-import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenAdapter;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import com.sparta.itsmine.domain.user.dto.BlockResponseDto;
 import com.sparta.itsmine.domain.user.dto.PasswordChangeRequest;
 import com.sparta.itsmine.domain.user.dto.PasswordFindRequest;
@@ -47,7 +49,6 @@ public class UserService {
     private final UserAdapter adapter;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final RefreshTokenAdapter refreshTokenAdapter;
     private final UserAdapter userAdapter;
     private final RedisTemplate<String, String> redisTemplate;
     private final AuthenticationManager authenticationManager;
