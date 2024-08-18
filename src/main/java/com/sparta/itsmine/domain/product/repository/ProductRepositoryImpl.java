@@ -1,12 +1,12 @@
 package com.sparta.itsmine.domain.product.repository;
 
 import static com.sparta.itsmine.domain.product.entity.QProduct.product;
-import static com.sparta.itsmine.domain.product.utils.ProductStatus.*;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.itsmine.domain.product.entity.Product;
-import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
@@ -64,17 +64,17 @@ public class ProductRepositoryImpl implements CustomProductRepository {
                 .where(
                         product.user.id.eq(userId)
                                 .and(product.deletedAt.isNull())
-                                .and(product.status.eq(BID)) // Add condition for BID status
+                                .and(product.status.eq(BID))
                 )
                 .fetch().size();
 
         return new PageImpl<>(products, pageable, total);
     }
 
-
     @Cacheable("productsMain")
     @Override
-    public Page<Product> findProducts(Pageable pageable, Long category, String priceRange, String search, String sort) {
+    public Page<Product> findProducts(Pageable pageable, Long category, String priceRange,
+            String search, String sort) {
         if (sort == null) {
             sort = "createdAt"; // 기본 정렬 필드 설정
         }
@@ -90,6 +90,9 @@ public class ProductRepositoryImpl implements CustomProductRepository {
             }
         }
 
+        // 정렬 기준 설정
+        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(sort);
+
         // Construct the query with filters
         List<Product> products = queryFactory
                 .selectFrom(product)
@@ -99,7 +102,7 @@ public class ProductRepositoryImpl implements CustomProductRepository {
                         priceBetween(minPrice, maxPrice),
                         productNameContains(search)
                 )
-                .orderBy(sort.equals("createdAt") ? product.createdAt.desc() : product.createdAt.asc())
+                .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -117,6 +120,20 @@ public class ProductRepositoryImpl implements CustomProductRepository {
         return new PageImpl<>(products, pageable, total);
     }
 
+    // 정렬 기준을 동적으로 설정하는 메서드
+    private OrderSpecifier<?> getOrderSpecifier(String sort) {
+        switch (sort) {
+            case "auctionNowPrice":
+                return product.auctionNowPrice.asc();
+            case "currentPrice":
+                return product.currentPrice.desc();
+            case "likeCount":
+                return product.likeCount.desc();
+            case "createdAt":
+            default:
+                return product.createdAt.desc();
+        }
+    }
 
     // 카테고리 필터 메서드
     private BooleanExpression categoryEq(Long category) {

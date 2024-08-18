@@ -1,8 +1,16 @@
 package com.sparta.itsmine.global.security;
 
-import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenAdapter;
-import com.sparta.itsmine.domain.refreshtoken.repository.RefreshTokenRepository;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
 import com.sparta.itsmine.domain.user.utils.UserRole;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,15 +22,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.security.Key;
-import java.util.Base64;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
@@ -37,8 +38,7 @@ public class JwtProvider {
     public static final Long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
     public static final Long ACCESS_TOKEN_TIME = 1000L; // 1초
 
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final RefreshTokenAdapter refreshTokenAdapter;
+
     private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${jwt-secret-key}")

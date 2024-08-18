@@ -28,16 +28,9 @@ public class CommentService {
     @Transactional
     public AddCommentResponseDto addComment(Long qnaId, User user, CommentRequestDto commentRequestDto) {
         Qna qna = getQna(qnaId);
-
-        // 판매자 또는 MANAGER만 댓글 작성 가능
-        if (!qna.getProduct().getUser().getId().equals(user.getId()) && !user.getUserRole().equals(UserRole.MANAGER)) {
-            throw new DataNotFoundException(NO_AUTHORIZATION_COMMNET);
-        }
-
-        checkDuplicateComment(qnaId);
+        validationComment(qna, user);
         Comment comment = new Comment(commentRequestDto, qna);
         commentAdapter.save(comment);
-
         return new AddCommentResponseDto(comment, user);
     }
 
@@ -52,11 +45,7 @@ public class CommentService {
     public void updateComment(Long qnaId, CommentRequestDto requestDto, User user) {
         Qna qna = getQna(qnaId);
 
-        // 판매자 또는 MANAGER만 댓글 수정 가능
-        if (!qna.getUser().getId().equals(user.getId()) && !user.getUserRole().equals(UserRole.MANAGER)) {
-            throw new DataNotFoundException(NO_AUTHORIZATION_MODIFICATION);
-        }
-
+        commentAdapter.checkUserAndManager(qna, user);
         Comment comment = getCommentByQnaId(qnaId);
         comment.commentUpdate(requestDto);
     }
@@ -66,11 +55,7 @@ public class CommentService {
     public void deleteComment(Long qnaId, User user) {
         Qna qna = getQna(qnaId);
 
-        // 판매자 또는 MANAGER만 댓글 삭제 가능
-        if (!qna.getUser().getId().equals(user.getId()) && !user.getUserRole().equals(UserRole.MANAGER)) {
-            throw new DataNotFoundException(NO_AUTHORIZATION_DELETE);
-        }
-
+        commentAdapter.checkUserAndManager(qna, user);
         Comment comment = getCommentByQnaId(qnaId);
         commentRepository.delete(comment);
     }
@@ -86,7 +71,8 @@ public class CommentService {
     }
 
     // 문의사항에 이미 댓글이 있는지 확인
-    public void checkDuplicateComment(Long qnaId) {
-        commentAdapter.checkDuplicateComment(qnaId);
+    public void validationComment(Qna qna, User user) {
+        commentAdapter.checkUserAndManager(qna, user);
+        commentAdapter.checkDuplicateComment(qna.getId());
     }
 }

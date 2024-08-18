@@ -6,12 +6,10 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS
 
 import com.sparta.itsmine.domain.category.dto.CategoryDto;
 import com.sparta.itsmine.domain.category.dto.CategoryResponseDto;
-import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.category.service.CategoryService;
 import com.sparta.itsmine.global.common.response.HttpResponseDto;
 import com.sparta.itsmine.global.common.response.ResponseUtils;
 import java.util.List;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
