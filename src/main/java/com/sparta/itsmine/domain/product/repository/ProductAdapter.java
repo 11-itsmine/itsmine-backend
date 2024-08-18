@@ -3,16 +3,21 @@ package com.sparta.itsmine.domain.product.repository;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_IN_DATE;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_PRICE_EXEPTION;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
 
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.category.repository.CategoryRepository;
+import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
+import com.sparta.itsmine.global.common.response.ResponseExceptionEnum;
+import com.sparta.itsmine.global.exception.DataFormatException;
 import com.sparta.itsmine.global.exception.DataNotFoundException;
 import com.sparta.itsmine.global.exception.product.ProductInDateException;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,5 +75,11 @@ public class ProductAdapter {
 
     public Product saveProduct(Product product) {
         return productRepository.save(product);
+    }
+
+    public void verifyInputPrices(ProductCreateDto createDto) {
+        if(createDto.getStartPrice() >= createDto.getAuctionNowPrice()){
+            throw new DataFormatException(PRODUCT_PRICE_EXEPTION);
+        }
     }
 }

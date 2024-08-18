@@ -44,6 +44,7 @@ public class ProductService {
             ProductImagesRequestDto imagesRequestDto, Long userId) {
 
         User user = adapter.findByIdAndDeletedAtIsNull(userId);
+        adapter.verifyInputPrices(createDto);
         user.checkBlock();
         Category category = adapter.findCategoryByCategoryName(createDto.getCategoryName());
         adapter.existActiveProductByUserAndName(userId, createDto.getCategoryName());
@@ -54,8 +55,8 @@ public class ProductService {
 //        product.extendDueDateByHours(createDto.getDueDate());
 //        product.setCategory(category);
 
-        imagesService.createProductImages(imagesRequestDto, product);
         Product newProduct = adapter.saveProduct(product);
+        imagesService.createProductImages(imagesRequestDto, product);
         scheduleProductUpdate(newProduct);
         return new ProductResponseDto(newProduct, imagesRequestDto);
     }
