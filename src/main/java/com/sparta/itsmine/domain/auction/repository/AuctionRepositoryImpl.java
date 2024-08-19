@@ -5,6 +5,7 @@ import static com.sparta.itsmine.domain.product.entity.QProduct.product;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
 import static com.sparta.itsmine.domain.user.entity.QUser.user;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -16,6 +17,7 @@ import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.entity.QProduct;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
+import com.sparta.itsmine.global.exception.DataNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,7 +46,8 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     public Page<AuctionProductImageResponseDto> findAuctionAllByUserid(Long userId,
             Pageable pageable) {
         List<AuctionProductResponseDto> auctionProductResponseDtoList = jpaQueryFactory
-                .select(new QAuctionProductResponseDto(product.id, user.username, product.productName,
+                .select(new QAuctionProductResponseDto(product.id, user.username,
+                        product.productName,
                         auction.bidPrice.max(), auction.status))
                 .from(auction)
                 .innerJoin(auction.product, product)
@@ -58,7 +61,8 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 
         List<AuctionProductImageResponseDto> auctionProductImageResponseDtoList = auctionProductResponseDtoList.stream()
                 .map(dto -> {
-                    Product product = productRepository.findByProductName(dto.getProductName());
+                    Product product = productRepository.findById(dto.getProductId())
+                            .orElseThrow(() -> new DataNotFoundException(PRODUCT_NOT_FOUND));
                     return new AuctionProductImageResponseDto(dto, product);
                 })
                 .toList();

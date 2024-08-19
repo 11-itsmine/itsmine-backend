@@ -71,7 +71,7 @@ public class KakaoPayController {
     }
 
     //결제 도중 취소하면 결제 중단
-    @GetMapping("/cancel/{agent}/{openType}")//결제 취소
+    @GetMapping("/cancel/{agent}/{openType}")//agent는 매체를 명시, openType은 리다이렉트 방법을 명시
     public ResponseEntity<Void> cancel(@PathVariable("agent") String agent,
             @PathVariable("openType") String openType) {
         // 주문건이 진짜 취소되었는지 확인 후 취소 처리
@@ -103,7 +103,7 @@ public class KakaoPayController {
     }
 
     //결제 취소 및 환불
-    @PostMapping("/refund")
+    @PostMapping("/refund")//tid를 RequestParam으로 받는다, refund는 걍 지은 이름
     public ResponseEntity<HttpResponseDto> refund(@RequestParam("tid") String tid) {
 
         KakaoPayCancelResponseDto kakaoPayCancelResponseDto = kakaoPayService.kakaoCancel(tid);
