@@ -51,9 +51,6 @@ public class ProductService {
 
         Product product = createDto.toEntity(category);
         product.assignUser(user);
-//        unnecessary lines
-//        product.extendDueDateByHours(createDto.getDueDate());
-//        product.setCategory(category);
 
         Product newProduct = adapter.saveProduct(product);
         imagesService.createProductImages(imagesRequestDto, product);
@@ -78,7 +75,7 @@ public class ProductService {
         Page<Product> products = productRepository.findProducts(pageRequest, category, price,
                 search, sort);
         return products.map(ProductResponseDto::new);
-    }
+    } 
 
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> getUserProductsWithPage(int page, int size, Long userId) {
