@@ -3,21 +3,22 @@ package com.sparta.itsmine.domain.product.repository;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.CATEGORY_NOT_FOUND;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_IN_DATE;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
+import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_PRICE_EXEPTION;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.USER_NOT_FOUND;
 
 import com.sparta.itsmine.domain.category.entity.Category;
 import com.sparta.itsmine.domain.category.repository.CategoryRepository;
+import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.domain.user.repository.UserRepository;
+import com.sparta.itsmine.global.exception.DataFormatException;
 import com.sparta.itsmine.global.exception.DataNotFoundException;
 import com.sparta.itsmine.global.exception.product.ProductInDateException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -62,10 +63,16 @@ public class ProductAdapter {
         return productRepository.findAllByUserIdAndDeletedAtIsNull(userId, pageable)
                 .map(ProductResponseDto::new);
     }
-    
+
     public Product getProduct(Long productId) {
         return productRepository.findActiveProductById(productId)
                 .orElseThrow(() -> new DataNotFoundException(PRODUCT_NOT_FOUND));
+    }
+
+    public void verifyInputPrices(ProductCreateDto createDto) {
+        if (createDto.getStartPrice() >= createDto.getAuctionNowPrice()) {
+            throw new DataFormatException(PRODUCT_PRICE_EXEPTION);
+        }
     }
 
     public Product saveProduct(Product product) {
