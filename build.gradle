@@ -129,7 +129,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation platform('org.springframework.boot:spring-boot-dependencies:2.7.15')
 
-    // MAc DNS Resolution fix
+    // MAC DNS Resolution fix
     runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
 
     //카카오페이 관련

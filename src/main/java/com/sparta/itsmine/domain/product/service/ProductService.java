@@ -44,18 +44,16 @@ public class ProductService {
             ProductImagesRequestDto imagesRequestDto, Long userId) {
 
         User user = adapter.findByIdAndDeletedAtIsNull(userId);
+        adapter.verifyInputPrices(createDto);
         user.checkBlock();
         Category category = adapter.findCategoryByCategoryName(createDto.getCategoryName());
         adapter.existActiveProductByUserAndName(userId, createDto.getCategoryName());
 
         Product product = createDto.toEntity(category);
         product.assignUser(user);
-//        unnecessary lines
-//        product.extendDueDateByHours(createDto.getDueDate());
-//        product.setCategory(category);
 
-        imagesService.createProductImages(imagesRequestDto, product);
         Product newProduct = adapter.saveProduct(product);
+        imagesService.createProductImages(imagesRequestDto, product);
         scheduleProductUpdate(newProduct);
         return new ProductResponseDto(newProduct, imagesRequestDto);
     }
@@ -77,7 +75,7 @@ public class ProductService {
         Page<Product> products = productRepository.findProducts(pageRequest, category, price,
                 search, sort);
         return products.map(ProductResponseDto::new);
-    }
+    } 
 
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> getUserProductsWithPage(int page, int size, Long userId) {

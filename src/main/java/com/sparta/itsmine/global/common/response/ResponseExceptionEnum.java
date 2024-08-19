@@ -26,6 +26,7 @@ public enum ResponseExceptionEnum {
     PRODUCT_IN_DATE(HttpStatus.BAD_REQUEST, "해당 상품이 입찰 경매 진행 중입니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
     USER_MISMATCH(HttpStatus.BAD_REQUEST, "유저가 일치하지 않습니다"),
+    PRODUCT_PRICE_EXEPTION(HttpStatus.BAD_REQUEST, "상품의 즉시 구매가는 무조건 현재 입찰가보다 커야 합니다."),
 
     //QNA
     QNA_ERROR(HttpStatus.BAD_REQUEST, "문의 오류 발생"),
@@ -69,7 +70,7 @@ public enum ResponseExceptionEnum {
     REPORT_COMPLETE_STATUS(HttpStatus.BAD_REQUEST, "이미 처리한 신고 입니다."),
     REPORT_MANAGER_STATUS(HttpStatus.BAD_REQUEST, "매니저가 아닙니다."),
     REPORT_NOT_ROLE(HttpStatus.BAD_REQUEST, "권한이 없습니다"),
-    SELF_NOT_BLOCK(HttpStatus.BAD_REQUEST, "본인을 차단 할수 없습니다.");
+    SELF_NOT_BLOCK(HttpStatus.BAD_REQUEST, "본인을 차단 할수 없습니다."),;
 
     private final HttpStatus httpStatus;
     private final String message;

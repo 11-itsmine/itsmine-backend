@@ -75,6 +75,7 @@ public class ProductRepositoryImpl implements CustomProductRepository {
     @Override
     public Page<Product> findProducts(Pageable pageable, Long category, String priceRange,
             String search, String sort) {
+
         if (sort == null) {
             sort = "createdAt"; // 기본 정렬 필드 설정
         }
@@ -122,17 +123,12 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
     // 정렬 기준을 동적으로 설정하는 메서드
     private OrderSpecifier<?> getOrderSpecifier(String sort) {
-        switch (sort) {
-            case "auctionNowPrice":
-                return product.auctionNowPrice.asc();
-            case "currentPrice":
-                return product.currentPrice.desc();
-            case "likeCount":
-                return product.likeCount.desc();
-            case "createdAt":
-            default:
-                return product.createdAt.desc();
-        }
+        return switch (sort) {
+            case "auctionNowPrice" -> product.auctionNowPrice.asc();
+            case "currentPrice" -> product.currentPrice.desc();
+            case "likeCount" -> product.likeCount.desc();
+            default -> product.createdAt.desc();
+        };
     }
 
     // 카테고리 필터 메서드
