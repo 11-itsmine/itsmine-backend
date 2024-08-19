@@ -87,6 +87,7 @@ public class KakaoPayService {
         user.checkBlock();
 
         // Request header
+        //카카오 어플리케이션 Secret key dev버전을 header에 추가한다
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -119,13 +120,14 @@ public class KakaoPayService {
                 .build();
 
         // Send reqeust
+        //요청을 카카오페이 API에 요청을 보낼 때 HttpEntity 객체로 헤더와 요청 바디를 묶어서 전달
         HttpEntity<KakaoPayReadyRequestDtd> entityMap = new HttpEntity<>(kakaoPayReadyRequestDtd,
                 headers);
-
+        //응답을 HTTP 응답을 담는 객체로 만들고 RestTemplate으로 카카오페이 API 서버에 POST 요청을 보내고 응답을 받는다
         ResponseEntity<KakaoPayReadyResponseDto> response = new RestTemplate().postForEntity(
-                "https://open-api.kakaopay.com/online/v1/payment/ready",
+                "https://open-api.kakaopay.com/online/v1/payment/ready",//카카오페이 API의 결제 준비를 위한 엔드포인트 URL
                 entityMap,
-                KakaoPayReadyResponseDto.class
+                KakaoPayReadyResponseDto.class//응답을 받을 때 KakaoPayReadyResponseDto 형태로 변환
         );
         KakaoPayReadyResponseDto kakaoPayReadyResponseDto = response.getBody();
 
