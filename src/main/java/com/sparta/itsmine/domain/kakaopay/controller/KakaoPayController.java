@@ -60,7 +60,7 @@ public class KakaoPayController {
             @PathVariable("productId") Long productId, @PathVariable("userId") Long userId,
             @PathVariable("auctionId") Long auctionId) {
         kakaoPayService.approve(pgToken, productId, userId, auctionId);
-        String redirectUrl = "http://localhost:3000/itsmine?status=success";
+        String redirectUrl = "https://itsyours.store/itsmine?status=success";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUrl));
