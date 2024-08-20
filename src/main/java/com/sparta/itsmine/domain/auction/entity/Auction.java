@@ -9,7 +9,9 @@ import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.utils.ProductStatus;
 import com.sparta.itsmine.domain.user.entity.User;
 import com.sparta.itsmine.global.common.TimeStamp;
+import com.sparta.itsmine.global.exception.CommonException;
 import com.sparta.itsmine.global.exception.DataDuplicatedException;
+import com.sparta.itsmine.global.exception.DataFormatException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -70,7 +72,7 @@ public class Auction extends TimeStamp {
 
     public void checkUser(User user, Product product) {
         if (user.getId().equals(product.getUser().getId())) {
-            throw new DataDuplicatedException(AUCTION_DENIED_BID);
+            throw new DataFormatException(AUCTION_DENIED_BID);
         }
     }
 
@@ -78,19 +80,19 @@ public class Auction extends TimeStamp {
         //현재 입찰가(고른 상품에서 가장 높은 입찰가 or 상품 처음 입찰가) 이하이거나 즉시구매가를 넘어서 입찰하려하면 예외처리
         if (bidPrice <= product.getCurrentPrice()
                 || bidPrice > product.getAuctionNowPrice()) {
-            throw new DataDuplicatedException(AUCTION_IMPOSSIBLE_BID);
+            throw new DataFormatException(AUCTION_IMPOSSIBLE_BID);
         }
     }
 
     public void checkStatus(ProductStatus status) {
         if (!status.equals(ProductStatus.BID)) {
-            throw new DataDuplicatedException(AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS);
+            throw new DataFormatException(AUCTION_IMPOSSIBLE_BID_CAUSE_STATUS);
         }
     }
 
     public void checkCurrentPrice(Integer bidPrice, Integer currentPrice) {
         if (bidPrice <= currentPrice) {
-            throw new DataDuplicatedException(AUCTION_IMPOSSIBLE_BID);
+            throw new DataFormatException(AUCTION_IMPOSSIBLE_BID);
         }
     }
 }

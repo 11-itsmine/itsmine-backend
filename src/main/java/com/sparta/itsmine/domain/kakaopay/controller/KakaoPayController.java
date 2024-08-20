@@ -60,7 +60,7 @@ public class KakaoPayController {
             @PathVariable("productId") Long productId, @PathVariable("userId") Long userId,
             @PathVariable("auctionId") Long auctionId) {
         kakaoPayService.approve(pgToken, productId, userId, auctionId);
-        String redirectUrl = "https://itsyours.store/itsmine";
+        String redirectUrl = "https://itsyours.store/itsmine?status=success";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUrl));
@@ -128,5 +128,15 @@ public class KakaoPayController {
         KakaoPayGetTidResponseDto kakaoPayGetTidResponseDto = kakaoPayService.getTid(
                 kakaoPayGetTidRequestDto, userDetails.getUser());
         return ResponseUtils.of(KAKAOPAY_TID_SUCCESS_GET, kakaoPayGetTidResponseDto);
+    }
+
+    @PostMapping("/additional/{productId}")//추가 결제 요청
+    public ResponseEntity<HttpResponseDto> additionalReady(
+            @PathVariable("productId") Long productId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        kakaoPayService.kakaoCancel(kakaoPayService.FindTidByProductId(productId));
+        KakaoPayReadyResponseDto kakaoPayReadyResponseDto = kakaoPayService.additionalReady(
+                productId, userDetails.getUser());
+        return ResponseUtils.of(KAKAOPAY_READY, kakaoPayReadyResponseDto);
     }
 }

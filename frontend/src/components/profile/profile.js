@@ -123,7 +123,7 @@ const Profile = () => {
                 return '낙찰';
             case 'FAIL_BID':
                 return '유찰';
-            case 'NEED_PAY':
+            case 'NEED_PAYMENT':
                 return '결재 필요';
             default:
                 return '알 수 없음'; // 예상하지 못한 값에 대한 기본 처리

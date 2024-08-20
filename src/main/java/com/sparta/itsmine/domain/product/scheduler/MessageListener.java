@@ -2,6 +2,7 @@ package com.sparta.itsmine.domain.product.scheduler;
 
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.FAIL_BID;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAYMENT_FOR_SUCCESS_BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
 import static com.sparta.itsmine.global.common.config.RabbitConfig.DELAYED_QUEUE_NAME;
 
@@ -45,22 +46,21 @@ public class MessageListener {
 
             LocalDateTime now = LocalDateTime.now();
 
-            //DueDate가 다 되고 NEED_PAY 상태의 입찰만 있거나 입찰 기록이 아얘 없으면 유찰
-            //NEED_PAY 상태의 입찰만 있으면 삭제하고 유찰 처리
+            //DueDate가 다 되고 NEED_PAYMENT 상태의 입찰만 있거나 입찰 기록이 아얘 없으면 유찰
+            //NEED_PAYMENT 상태의 입찰만 있으면 삭제하고 유찰 처리
             if (product.getDueDate().isBefore(now) && product.getStatus().equals(BID)) {
-                //뭐가 됐든 DueDate가 다 됐으면 NEED_PAY 상태의 입찰은 다 제거해줘야함
+                //뭐가 됐든 DueDate가 다 됐으면 NEED_PAYMENT 상태의 입찰은 다 제거해줘야함
                 auctionService.deleteAllNeedPay(auctions);
 
                 if (hasNoAuctions) {
                     product.updateStatus(FAIL_BID);
                     productRepository.save(product);
                 } else {
-                    product.updateStatus(
-                            SUCCESS_BID);//(사실 DueDate 마감으로 낙찰이 되면 추가 결제로 마저 결제하게끔 만들어야 하는데 그건 너무 큰 작업이라 일단 미루겠습니다)
+                    product.updateStatus(NEED_PAYMENT_FOR_SUCCESS_BID);
                     productRepository.save(product);
 
                     Auction auction = auctionRepository.findByProductIdAndMaxBid(product.getId());
-                    auction.updateStatus(SUCCESS_BID);
+                    auction.updateStatus(NEED_PAYMENT_FOR_SUCCESS_BID);//마감 시간 다 되서 낙찰된 건 10%로 밖에 결제를 안 했으니 나머지를 결제해야함
                     auctionRepository.save(auction);
                     kakaoPayService.deleteWithOutSuccessfulAuction(product.getId());
                 }

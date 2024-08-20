@@ -46,8 +46,8 @@ public class RabbitConfig {
     @Value("${spring.rabbitmq.password}")
     private String rabbitPwd;
 
-    @Value("${spring.rabbitmq.virtual-host}")
-    private String vHost;
+//    @Value("${spring.rabbitmq.virtual-host}")
+//    private String vHost;
 
     @Bean
     public DirectExchange mainExchange() {
@@ -112,8 +112,8 @@ public class RabbitConfig {
         factory.setPort(rabbitPort);
         factory.setUsername(rabbitUser);
         factory.setPassword(rabbitPwd);
-        factory.setVirtualHost(vHost);
-        factory.getRabbitConnectionFactory().useSslProtocol();
+//        factory.setVirtualHost(vHost);
+//        factory.getRabbitConnectionFactory().useSslProtocol();
         return factory;
     }
 

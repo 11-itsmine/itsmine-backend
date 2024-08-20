@@ -1,15 +1,18 @@
 package com.sparta.itsmine.domain.auction.service;
 
 
-import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAYMENT;
 
 import com.sparta.itsmine.domain.auction.dto.AuctionProductImageResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionProductResponseDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionRequestDto;
+import com.sparta.itsmine.domain.auction.dto.AuctionRequestForSuccessBidDto;
 import com.sparta.itsmine.domain.auction.dto.AuctionResponseDto;
 import com.sparta.itsmine.domain.auction.entity.Auction;
 import com.sparta.itsmine.domain.auction.repository.AuctionAdapter;
 import com.sparta.itsmine.domain.auction.repository.AuctionRepository;
+import com.sparta.itsmine.domain.kakaopay.entity.KakaoPayTid;
+import com.sparta.itsmine.domain.kakaopay.repository.KakaoPayRepository;
 import com.sparta.itsmine.domain.product.entity.Product;
 import com.sparta.itsmine.domain.product.repository.ProductAdapter;
 import com.sparta.itsmine.domain.product.repository.ProductRepository;
@@ -27,11 +30,9 @@ import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,17 +47,37 @@ public class AuctionService {
     private final RedissonClient redissonClient;
 
     private final String LOCK_KEY_PREFIX = "auctionLock";
+    private final KakaoPayRepository kakaoPayRepository;
 
     @DistributedLock(prefix = LOCK_KEY_PREFIX, key = "productId")
     public AuctionResponseDto createAuction(User user, Long productId,
             AuctionRequestDto requestDto, Integer totalAmount) {
         Product product = productAdapter.getProduct(productId);
         Integer bidPrice = requestDto.getBidPrice();
-        ProductStatus status = ProductStatus.NEED_PAY;
+        ProductStatus status = ProductStatus.NEED_PAYMENT;
 
         Auction auction = createAuctionEntity(user, product, bidPrice, status, totalAmount);
 
         checkAuctionValidity(auction, product, bidPrice, user);
+        auctionRepository.save(auction);
+        return new AuctionResponseDto(auction);
+    }
+
+    @DistributedLock(prefix = LOCK_KEY_PREFIX, key = "productId")
+    public AuctionResponseDto createAuctionForSuccessBid(User user, Long productId,
+            Integer totalAmount) {
+        Product product = productAdapter.getProduct(productId);
+
+        AuctionRequestForSuccessBidDto auctionRequestDto = AuctionRequestForSuccessBidDto.builder()
+                .bidPrice(totalAmount)
+                .build();
+
+        ProductStatus status = ProductStatus.NEED_PAYMENT_FOR_SUCCESS_BID;
+
+        Auction auction = createAuctionEntity(user, product, auctionRequestDto.getBidPrice(), status, totalAmount);
+
+        auction.checkUser(user, product);
+
         auctionRepository.save(auction);
         return new AuctionResponseDto(auction);
     }
@@ -84,15 +105,6 @@ public class AuctionService {
                 - System.currentTimeMillis();
     }
 
-    public void allDeleteBid(Long productId) {
-        auctionRepository.deleteAllByProductId(productId);
-    }
-
-    @Transactional
-    public void avoidedAuction(Long productId) {
-        allDeleteBid(productId);
-    }
-
     public void currentPriceUpdate(Integer bidPrice, Product product) {
         product.currentPriceUpdate(bidPrice);
         productRepository.save(product);
@@ -103,11 +115,12 @@ public class AuctionService {
     }
 
     public void deleteAllNeedPay(List<Auction> auctions) {
-        //뭐가 됐든 DueDate가 다 됐으면 NEED_PAY 상태의 입찰은 다 제거해줘야함
+        //뭐가 됐든 DueDate가 다 됐으면 NEED_PAYMENT 상태의 입찰은 다 제거해줘야함
         for (Auction auction : auctions) {//얘부터 옮기고
-            if (auction.getStatus().equals(NEED_PAY)) {
+            if (auction.getStatus().equals(NEED_PAYMENT)) {
                 auctionRepository.delete(auction);
             }
         }
     }
+
 }
