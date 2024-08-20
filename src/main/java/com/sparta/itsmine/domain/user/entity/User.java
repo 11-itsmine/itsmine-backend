@@ -83,8 +83,6 @@ public class User extends TimeStamp {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Images> imagesList = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "user")
-//    private List<JoinChat> joinChatList;
 
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
