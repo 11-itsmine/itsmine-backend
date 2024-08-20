@@ -1,6 +1,7 @@
 package com.sparta.itsmine.domain.kakaopay.service;
 
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.FAIL_BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAYMENT;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAYMENT_FOR_SUCCESS_BID;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.SUCCESS_BID;
@@ -226,10 +227,16 @@ public class KakaoPayService {
 
         auction.updateStatus(NEED_PAYMENT);
         auctionRepository.save(auction);
-
-        if(!product.getStatus().equals(NEED_PAYMENT_FOR_SUCCESS_BID)){
+        //낙찰을 취소 및 환불해주는 경우는 사이트 측 잘못으로 환불이 이루어진다 만약 NEED_PAYMENT_FOR_SUCCESS_BID 상태에서 환불을 원한다면 낙찰 결제 마저 하고 낙찰 상태에서 환불을 받는게 나을 거 같다 굳이 NEED_PAYMENT_FOR_SUCCESS_BID 상태에서의 환불을 만들 필요가 없는 거 같다
+        if(product.getStatus().equals(SUCCESS_BID)){
+            product.updateStatus(FAIL_BID);
+            product.markAsDeleted();
+            productRepository.save(product);
+        }//NEED_PAYMENT_FOR_SUCCESS_BID 상태는 마감 시간이 다 되서 생기는 상태 즉 마감 시간이 다 지났기에 환불해준들 가격 반영이 필요가 없다 어차피 못 팔테니까
+        else if(!product.getStatus().equals(NEED_PAYMENT_FOR_SUCCESS_BID)){
             bidCancelAndSetCurrentPrice(product);
         }
+
 
         kakaoPayRepository.delete(kakaoPayTid);
         return response;
@@ -263,6 +270,7 @@ public class KakaoPayService {
         kakaoPayRepository.delete(kakaoPayTid);
     }
 
+    //자의적인 입찰 취소로 낙찰은 무를 수 없다
     public void bidCancel(String tid) {
 
         KakaoPayTid kakaoPayTid = kakaoPayRepository.findByTid(tid);
@@ -271,8 +279,15 @@ public class KakaoPayService {
 
         auction.updateStatus(NEED_PAYMENT);
         auctionRepository.save(auction);
-
-        bidCancelAndSetCurrentPrice(product);
+        //이 경우는 좀 다르다 위에선 낙찰 결제 전이나 후나 전액 환불을 해주니까 괜찮지만 여기선 보즘금을 환불해주지 않는다 그래서 낙찰 뒤 취소가 아닌 낙찰 전 취소로 추가결제를 하기 전에 취소를 한다 추가결제까지 해놓고 취소해달라 해봐야 늦었다
+        if(product.getStatus().equals(NEED_PAYMENT_FOR_SUCCESS_BID)){
+            product.updateStatus(FAIL_BID);
+            product.markAsDeleted();
+            productRepository.save(product);
+        }//NEED_PAYMENT_FOR_SUCCESS_BID 상태 이외의 다른 상태에선 입찰이 취소 되면 현재가에도 반영 시킨다 왜냐하면 어차피 BID 상태 이외의 상태에선 입찰 못 하기 때문에 이 else는 사실상 BID 상태일때만 가능하다는 말이랑 똑같다
+        else{
+            bidCancelAndSetCurrentPrice(product);
+        }
 
         kakaoPayRepository.delete(kakaoPayTid);
 
@@ -291,9 +306,9 @@ public class KakaoPayService {
         Auction auction = auctionRepository.findByBidPriceAndUserAndProduct(
                 user.orElseThrow().getId(), product.getId(),
                 kakaoPayGetTidRequestDto.getBidPrice());
-        KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
+        Optional<KakaoPayTid> kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
 
-        return new KakaoPayGetTidResponseDto(kakaoPayTid.getTid());
+        return new KakaoPayGetTidResponseDto(kakaoPayTid.orElseThrow().getTid());
 
     }
 
@@ -354,8 +369,8 @@ public class KakaoPayService {
 
         for (Auction auction : auctions) {
             if (auction.getStatus().equals(BID)) {
-                KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
-                kakaoCancelForSuccessBid(kakaoPayTid.getTid());
+                Optional<KakaoPayTid> kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
+                kakaoCancelForSuccessBid(kakaoPayTid.orElseThrow().getTid());
                 auctionRepository.delete(auction);
             } else if (auction.getStatus().equals(NEED_PAYMENT)) {
                 auctionRepository.delete(auction);
@@ -369,8 +384,8 @@ public class KakaoPayService {
 
         for (Auction auction : auctions) {
             if (auction.getStatus().equals(BID)) {
-                KakaoPayTid kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
-                kakaoCancel(kakaoPayTid.getTid());
+                Optional<KakaoPayTid> kakaoPayTid = kakaoPayRepository.findByAuctionId(auction.getId());
+                kakaoCancel(kakaoPayTid.orElseThrow().getTid());
                 auctionRepository.delete(auction);
             } else if (auction.getStatus().equals(NEED_PAYMENT)) {
                 auctionRepository.delete(auction);
@@ -395,9 +410,14 @@ public class KakaoPayService {
     public String FindTidByProductId(Long productId){
         Product product=productAdapter.getProduct(productId);
         Auction auction=auctionRepository.findByProductIdForAdditionalPayment(product.getId());
-        KakaoPayTid KakaoPayTid=kakaoPayRepository.findByAuctionId(auction.getId());
+        Optional<KakaoPayTid> KakaoPayTid=kakaoPayRepository.findByAuctionId(auction.getId());
 
-        return KakaoPayTid.getTid();
+        if(KakaoPayTid.isPresent()){
+           return KakaoPayTid.orElseThrow().getTid();
+        }
+        else{
+            auctionRepository.delete(auction);
+            return null;
+        }
     }
-
 }

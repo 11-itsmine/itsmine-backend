@@ -115,7 +115,23 @@ const Profile = () => {
         fetchAuctions();
     }, [page, size]);
 
-    const getStatusText = (status) => {
+    const handleKakaoPayRequest = async (productId) => {
+        try {
+            const response = await axiosInstance.post(`/v1/kakaopay/additional/${productId}`);
+            const { next_redirect_pc_url } = response.data.data; // 응답에서 URL 가져오기
+            if (next_redirect_pc_url) {
+                window.location.href = next_redirect_pc_url; // 해당 URL로 리다이렉트
+            } else {
+                alert('결제 페이지로 이동할 수 없습니다.');
+            }
+        } catch (error) {
+            console.error('결제 요청 중 오류 발생:', error);
+            alert('결제 요청 중 오류가 발생했습니다.');
+        }
+    };
+
+
+    const getStatusText = (status, productId) => {
         switch (status) {
             case 'BID':
                 return '입찰 중';
@@ -124,11 +140,23 @@ const Profile = () => {
             case 'FAIL_BID':
                 return '유찰';
             case 'NEED_PAYMENT':
-                return '결재 필요';
+                return '결제 필요';
+            case 'NEED_PAYMENT_FOR_SUCCESS_BID':
+                return (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleKakaoPayRequest(productId)} // productId 전달
+                        sx={{ fontSize: '12px', color: '#fff' }}
+                    >
+                        낙찰 결제 필요
+                    </Button>
+                );
             default:
-                return '알 수 없음'; // 예상하지 못한 값에 대한 기본 처리
+                return '알 수 없음';
         }
     };
+
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -544,52 +572,54 @@ const Profile = () => {
                                 )}
                                 {auctions.map((auction) => (
                                     <Grid item xs={12} sm={6} md={4} key={auction.productId}>
-                                        <Link to={`/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
-                                            <Paper sx={{ p: 2 }}>
-                                                {auction.imagesUrl && auction.imagesUrl.length > 0 && (
-                                                    <img
-                                                        src={auction.imagesUrl[0]}
-                                                        alt={auction.productName}
-                                                        style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
-                                                    />
-                                                )}
-                                                <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
-                                                    {auction.productName}
-                                                </Typography>
-                                                <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}>
-                                                    <Grid item xs={6}>
-                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                            입찰자 이름
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={6}>
-                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
-                                                            {auction.username}
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={6}>
-                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                            입찰 가격
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={6}>
-                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
-                                                            {auction.bidPrice}원
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={6}>
-                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
-                                                            입찰 상태
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={6}>
-                                                        <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
-                                                            {getStatusText(auction.status)}
-                                                        </Typography>
-                                                    </Grid>
+                                        <Paper sx={{ p: 2 }}>
+                                            {auction.imagesUrl && auction.imagesUrl.length > 0 && (
+                                                <Link to={`/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
+                                                <img
+                                                    src={auction.imagesUrl[0]}
+                                                    alt={auction.productName}
+                                                    style={{ width: '100%', height: 'auto', objectFit: 'cover', aspectRatio: '1/1' }}
+                                                />
+                                                </Link>
+                                            )}
+                                            <Typography variant="h6" sx={{ fontSize: '16px', fontWeight: 'bold', color: '#262626', mb: 1 }}>
+                                                <Link to={`/products/${auction.productId}`} style={{ textDecoration: 'none' }}>
+                                                {auction.productName}
+                                                </Link>
+                                            </Typography>
+                                            <Grid container spacing={0.1} sx={{ lineHeight: '1.2' }}>
+                                                <Grid item xs={6}>
+                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                        입찰자 이름
+                                                    </Typography>
                                                 </Grid>
-                                            </Paper>
-                                        </Link>
+                                                <Grid item xs={6}>
+                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575' }}>
+                                                        {auction.username}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                        입찰 가격
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
+                                                        {auction.bidPrice}원
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#262626' }}>
+                                                        입찰 상태
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#757575', lineHeight: '1.2' }}>
+                                                        {getStatusText(auction.status, auction.productId)} {/* productId 전달 */}
+                                                    </Typography>
+                                                </Grid>
+                                            </Grid>
+                                        </Paper>
                                     </Grid>
                                 ))}
                             </Grid>
