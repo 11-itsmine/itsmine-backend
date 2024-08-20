@@ -3,7 +3,8 @@ package com.sparta.itsmine.domain.auction.repository;
 import static com.sparta.itsmine.domain.auction.entity.QAuction.auction;
 import static com.sparta.itsmine.domain.product.entity.QProduct.product;
 import static com.sparta.itsmine.domain.product.utils.ProductStatus.BID;
-import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAY;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAYMENT;
+import static com.sparta.itsmine.domain.product.utils.ProductStatus.NEED_PAYMENT_FOR_SUCCESS_BID;
 import static com.sparta.itsmine.domain.user.entity.QUser.user;
 import static com.sparta.itsmine.global.common.response.ResponseExceptionEnum.PRODUCT_NOT_FOUND;
 
@@ -38,7 +39,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
     /*
     select p.id,u.username,p.product_name,max(a.bid_price),a.status
     from auctions a,user u,product p
-    where u.id=2 and u.id=a.user_id and p.id=a.product_id and a.status = p.status and a.status != 'NEED_PAY'
+    where u.id=2 and u.id=a.user_id and p.id=a.product_id and a.status = p.status and a.status != 'NEED_PAYMENT'
     group by p.id;
      */
     //자신이 고른 상품 전체 조회
@@ -53,7 +54,7 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .innerJoin(auction.product, product)
                 .innerJoin(auction.user, user)
                 .where(user.id.eq(userId).and(auction.status.eq(product.status))
-                        .and(auction.status.ne(NEED_PAY)))
+                        .and(auction.status.ne(NEED_PAYMENT)))
                 .groupBy(product.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -77,26 +78,6 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
 
         return new PageImpl<>(auctionProductImageResponseDtoList, pageable, count);
     }
-/*
-    //해당 상품에 대한 모든 입찰가를 찾기(최댓값 빼고)
-    @Cacheable("WithOutSuccessfulAuction")
-    public List<Auction> findAllByProductIdWithOutMaxPrice(Long productId) {
-
-        JPQLQuery<Integer> maxBidPriceSubQuery = JPAExpressions
-                .select(auction.bidPrice.max())
-                .from(auction)
-                .innerJoin(auction.product, product)
-                .where(product.id.eq(productId));
-
-        return jpaQueryFactory
-                .select(auction)
-                .from(auction)
-                .innerJoin(auction.product, product)
-                .where(product.id.eq(productId)
-                        .and(auction.bidPrice.ne(maxBidPriceSubQuery)))
-                .fetch();
-    }
-*/
 
     /*
     select *
@@ -133,7 +114,21 @@ public class AuctionRepositoryImpl implements CustomAuctionRepository {
                 .innerJoin(auction.user, user)
                 .innerJoin(auction.product, product)
                 .where(user.id.eq(userId).and(product.id.eq(productId))
-                        .and(auction.bidPrice.eq(bidPrice)).and(auction.status.ne(NEED_PAY)))
+                        .and(auction.bidPrice.eq(bidPrice)).and(auction.status.ne(NEED_PAYMENT)))
+                .fetchOne();
+    }
+
+    /*
+    select *
+    from auctions
+    where product_id=2 and status='NEED_PAYMENT_FOR_SUCCESS_BID';
+    */
+    public Auction findByProductIdForAdditionalPayment(Long productId) {
+        return jpaQueryFactory.select(auction)
+                .from(auction)
+                .innerJoin(auction.product, product)
+                .where(product.id.eq(productId)
+                        .and(auction.status.eq(NEED_PAYMENT_FOR_SUCCESS_BID)))
                 .fetchOne();
     }
 

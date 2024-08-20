@@ -28,12 +28,6 @@ public class AuctionAdapter {
         return auctionRepository.findAuctionAllByUserid(userId, pageable);
     }
 
-/*    public AuctionProductResponseDto findByUserIdAndProductId(Long userId, Long productId) {
-        return auctionRepository.findByUserIdAndProductId(
-                        userId, productId)
-                .orElseThrow(() -> new DataNotFoundException(AUCTION_NOT_FOUND));
-    }*/
-
     public Auction getAuction(Long id){
         return auctionRepository.findById(id).orElseThrow(()->new DataNotFoundException(AUCTION_NOT_FOUND));
     }

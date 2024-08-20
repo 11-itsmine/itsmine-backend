@@ -18,4 +18,6 @@ public interface CustomAuctionRepository {
     Auction findByProductIdAndMaxBid(Long productId);
 
     Auction findByBidPriceAndUserAndProduct(Long userId,Long productId,Integer bidPrice);
+
+    Auction findByProductIdForAdditionalPayment(Long productId);
 }

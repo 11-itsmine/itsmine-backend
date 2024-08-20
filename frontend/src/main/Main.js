@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axiosInstance from '../api/axiosInstance';
 import styled from 'styled-components';
 import Carousel from "../components/carousel/Carousel";
 import ItemList from "../components/item/ItemList";
 import Board from '../components/chat/Board';
-import { useLocation } from 'react-router-dom'; // useLocation hook 추가
+import {useLocation} from 'react-router-dom'; // useLocation hook 추가
 
 function Main() {
   const [items, setItems] = useState([]);
@@ -27,18 +27,21 @@ function Main() {
     const queryParams = new URLSearchParams(location.search);
     const status = queryParams.get('status');
 
-    if (status === 'cancel') {
-      alert('결제가 취소되었습니다. 메인화면으로 돌아갑니다.');
+    if (status === 'success') {
+      alert('결제 완료되였습니다. 메인화면으로 돌아갑니다.');
+    } else if (status === 'cancel') {
+      alert('결제 취소되었습니다. 메인화면으로 돌아갑니다.');
     } else if (status === 'fail') {
-      alert('결제가 실패하였습니다. 메인화면으로 돌아갑니다.');
+      alert('결제 실패하였습니다. 메인화면으로 돌아갑니다.');
     }
+
   }, [location]);
 
   return (
       <MainWrapper>
         {/*<Carousel/>*/}
-        <ItemList items={items} />
-        <Board currentUserId={12345} />
+        <ItemList items={items}/>
+        <Board currentUserId={12345}/>
       </MainWrapper>
   );
 }

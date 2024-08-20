@@ -1,12 +1,12 @@
 package com.sparta.itsmine.domain.auction.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AuctionRequestDto {
+@Builder
+public class AuctionRequestForSuccessBidDto {
     private Integer bidPrice;
 }

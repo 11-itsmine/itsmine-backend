@@ -291,6 +291,7 @@ const AuctionComponent = ({ userId }) => {
             </LikeButton>
           </ProductTitle>
           <Description>{product.description}</Description>
+          <Duedate>⏰마감 시간: {new Date(product.dueDate).toLocaleString()}</Duedate>
           <PriceInfo>
             <PriceButton onClick={handleBuyNow} primary>
               <PriceTitle>즉시구매가</PriceTitle>
@@ -450,6 +451,12 @@ const IconContainer = styled.div`
 `;
 
 const Description = styled.p`
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 20px;
+`;
+
+const Duedate  = styled.p`
   font-size: 1rem;
   color: #555;
   margin-bottom: 20px;

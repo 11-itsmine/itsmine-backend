@@ -142,16 +142,6 @@ public class ImagesService {
             }
         }
     }
-
-    //    // 여러 파일 업로드 메소드
-//    public List<String> saveFiles(List<MultipartFile> multipartFiles) throws IOException {
-//        List<String> fileUrls = new ArrayList<>();
-//        for (MultipartFile file : multipartFiles) {
-//            String fileUrl = saveFile(file);
-//            fileUrls.add(fileUrl);
-//        }
-//        return fileUrls;
-//    }
 }
 
 
