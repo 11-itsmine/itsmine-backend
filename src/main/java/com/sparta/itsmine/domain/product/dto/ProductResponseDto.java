@@ -40,7 +40,7 @@ public class ProductResponseDto {
         this.productName = product.getProductName();
         this.description = product.getDescription();
         this.auctionNowPrice = product.getAuctionNowPrice();
-        this.startPrice = product.getStartPrice();//수정부분
+        this.startPrice = product.getStartPrice();
         this.currentPrice = product.getCurrentPrice();
         this.dueDate = product.getDueDate();
         this.category = product.getCategory();
