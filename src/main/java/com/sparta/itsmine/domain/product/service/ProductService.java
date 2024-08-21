@@ -20,6 +20,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +65,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "allProductsCache",
+            key = "'productCacheKey'",  // 고정된 키를 사용하여 동일한 캐시를 사용
+            condition = "#category == null && #price == null && #search == null && #sort == null"
+    )
     public Page<ProductResponseDto> getAllProductsWithPage(int page, int size, Long category,
             String price, String search, String sort) {
 
