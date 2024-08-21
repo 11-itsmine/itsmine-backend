@@ -39,7 +39,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "product", indexes = {
         @Index(name = "idx_product_name", columnList = "productName"),
         @Index(name = "idx_user_product_name", columnList = "user_id, productName"),
-        @Index(name = "idx_product_deleted", columnList = "deletedAt")
+        @Index(name = "idx_product_status", columnList = "status"),
+        @Index(name = "idx_product_due_date", columnList = "dueDate"),
+        @Index(name = "idx_product_category", columnList = "category_id")
 })
 @NoArgsConstructor
 public class Product extends TimeStamp {
@@ -131,7 +133,7 @@ public class Product extends TimeStamp {
         this.currentPrice = Optional.ofNullable(createDto.getStartPrice())//시작가 때문에 수정한 부분입니다
                 .orElse(product.getCurrentPrice());
         if (hour != null) {
-            this.dueDate = product.getDueDate().plusHours(hour);
+            this.dueDate = product.getDueDate().plusSeconds(hour);
         } else {
             this.dueDate = product.getDueDate();
         }

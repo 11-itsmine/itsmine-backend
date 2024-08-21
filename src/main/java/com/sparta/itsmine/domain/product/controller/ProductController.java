@@ -6,7 +6,6 @@ import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_SEARCH_PRODUCTS;
 import static com.sparta.itsmine.global.common.response.ResponseCodeEnum.SUCCESS_TO_UPDATE;
 
-import com.sparta.itsmine.domain.product.dto.ProductCreateDto;
 import com.sparta.itsmine.domain.product.dto.ProductCreateRequestDto;
 import com.sparta.itsmine.domain.product.dto.ProductResponseDto;
 import com.sparta.itsmine.domain.product.dto.ProductUpdateRequestDto;
