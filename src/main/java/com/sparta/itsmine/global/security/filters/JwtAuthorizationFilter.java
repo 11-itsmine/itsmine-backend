@@ -47,18 +47,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 		if (StringUtils.hasText(accessToken)) {
 			if (jwtProvider.validateAccessToken(accessToken)) {
-				log.info("액세스 토큰 검증 성공");
 				updateToken(accessToken, username, res);
 			} else if (jwtProvider.hasRefreshToken(username)) {
 				String refreshToken = jwtProvider.substringToken(redisTemplate.opsForValue().get(username));
 					updateToken(refreshToken, username, res);
-					log.info("토큰 Refresh 성공");
 			} else {
 				jwtExceptionHandler(res, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 				return;
 			}
-		} else {
-			log.error("토큰 없음");
 		}
 		filterChain.doFilter(req, res);
 	}
