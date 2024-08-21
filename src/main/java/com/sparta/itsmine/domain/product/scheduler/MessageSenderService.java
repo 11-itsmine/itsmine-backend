@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class MessageSenderService {
 
     private final RabbitTemplate rabbitTemplate;
+    private final Integer latency = 500;
 
     /**
      * 지정된 시간만큼 지연 후 메시지를 전송합니다.
@@ -24,9 +25,9 @@ public class MessageSenderService {
      */
     public void sendMessage(Long productId, long delayMillis) {
         MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setExpiration(String.valueOf(delayMillis)); // TTL 설정
+        messageProperties.setExpiration(String.valueOf(delayMillis + latency)); // TTL 설정
 
-        log.info("Product ID : {}, Delay : {}", productId, delayMillis);
+        log.info("Product ID : {}, Delay : {}", productId, delayMillis+ latency);
 
         Message message = new Message(productId.toString().getBytes(), messageProperties);
         rabbitTemplate.send(MAIN_EXCHANGE_NAME, "product.routing.key", message);
